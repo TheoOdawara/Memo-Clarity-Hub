@@ -16,6 +16,7 @@ interface Badge {
 }
 
 interface UserData {
+  email?: string;
   timezone: string;
   reminderTime: string;
   goal: string;
@@ -24,6 +25,7 @@ interface UserData {
   weeklyFrequencyMinutes: number; // total minutes of audio frequencies this week
   dailyCheckInComplete: boolean;
   onboardingComplete: boolean;
+  isLoggedIn: boolean;
   checkIns: CheckInEntry[];
   currentStreak: number;
   maxStreak: number;
@@ -34,6 +36,7 @@ interface AppContextType {
   userData: UserData;
   updateUserData: (data: Partial<UserData>) => void;
   completeOnboarding: () => void;
+  loginWithEmail: (email: string) => void;
   completeDailyCheckIn: (testimony?: string, isPublic?: boolean) => Badge | null;
   getTodayCheckIn: () => CheckInEntry | null;
   getWeeklyProgress: () => CheckInEntry[];
@@ -44,6 +47,7 @@ interface AppContextType {
 const AppContext = createContext<AppContextType | undefined>(undefined);
 
 const defaultUserData: UserData = {
+  email: '',
   timezone: '',
   reminderTime: '',
   goal: '',
@@ -52,6 +56,7 @@ const defaultUserData: UserData = {
   weeklyFrequencyMinutes: 120, // Initial weekly frequency minutes (2 hours)
   dailyCheckInComplete: false,
   onboardingComplete: false,
+  isLoggedIn: false,
   checkIns: [],
   currentStreak: 0,
   maxStreak: 0,
@@ -82,6 +87,15 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
 
   const completeOnboarding = () => {
     setUserData(prev => ({ ...prev, onboardingComplete: true }));
+  };
+
+  const loginWithEmail = (email: string) => {
+    setUserData(prev => ({ 
+      ...prev, 
+      email,
+      isLoggedIn: true,
+      onboardingComplete: true 
+    }));
   };
 
   const getTodayString = () => {
@@ -241,6 +255,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
       userData,
       updateUserData,
       completeOnboarding,
+      loginWithEmail,
       completeDailyCheckIn,
       getTodayCheckIn,
       getWeeklyProgress,

@@ -4,7 +4,7 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { AppProvider, useAppContext } from './context/AppContext';
-import Onboarding from './components/Onboarding';
+import Login from './components/Login';
 import Header from './components/Header';
 import { AppSidebar } from './components/AppSidebar';
 import Home from './components/Home';
@@ -20,8 +20,8 @@ const AppContent = () => {
   const [activeTab, setActiveTab] = useState('home');
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 
-  if (!userData.onboardingComplete) {
-    return <Onboarding />;
+  if (!userData.isLoggedIn) {
+    return <Login />;
   }
 
   const renderContent = () => {

@@ -77,6 +77,11 @@ export default {
 				neon: {
 					pink: 'hsl(var(--neon-pink))',
 					yellow: 'hsl(var(--neon-yellow))'
+				},
+				login: {
+					background: 'hsl(var(--login-background))',
+					button: 'hsl(var(--login-button))',
+					text: 'hsl(var(--login-text))'
 				}
 			},
 			backgroundImage: {
