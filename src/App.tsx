@@ -12,6 +12,7 @@ import CheckIn from './components/CheckIn';
 import Activities from './components/Activities';
 import Community from './components/Community';
 import Profile from './components/Profile';
+import Frequencies from './components/Frequencies';
 
 const queryClient = new QueryClient();
 
@@ -36,6 +37,8 @@ const AppContent = () => {
         return <Community />;
       case 'profile':
         return <Profile />;
+      case 'frequencies':
+        return <Frequencies />;
       default:
         return <Home />;
     }

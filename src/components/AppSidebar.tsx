@@ -38,7 +38,7 @@ const mainItems = [
 ];
 
 const quickAccessItems = [
-  { id: 'frequency', title: 'Frequência do Dia', image: headphonesRealistic, subtitle: '15 min', color: 'text-electric-blue' },
+  { id: 'frequencies', title: 'Frequência do Dia', image: headphonesRealistic, subtitle: '15 min', color: 'text-electric-blue' },
   { id: 'games', title: 'Jogos Cognitivos', image: gamepadRealistic, subtitle: 'Memória', color: 'text-neon-pink' },
   { id: 'ranking', title: 'Ranking Global', image: trophyRealistic, subtitle: 'Top 100', color: 'text-electric-orange' },
   { id: 'calendar', title: 'Calendário', image: calendarRealistic, subtitle: 'Progresso', color: 'text-electric-green' },
@@ -117,6 +117,7 @@ export function AppSidebar({ activeTab, onTabChange, collapsed, onToggleCollapse
               <Button
                 key={item.id}
                 variant="ghost"
+                onClick={() => onTabChange(item.id)}
                 className="w-full justify-start h-auto p-3 hover:bg-muted/50 group transition-all duration-300 hover:bg-gradient-to-r hover:from-transparent hover:to-muted/30"
               >
                 <div className="w-6 h-6 flex-shrink-0 transition-all duration-300 group-hover:scale-110 mr-3">
