@@ -1,108 +1,180 @@
 import React, { useState } from 'react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { X, Send, AlertCircle } from 'lucide-react';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
-import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
-import { MessageSquare, Globe, Lock } from 'lucide-react';
+import { Switch } from '@/components/ui/switch';
+import { Badge } from '@/components/ui/badge';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { useAppContext } from '@/context/AppContext';
+import { moderateContent } from '@/utils/moderation';
+import { toast } from '@/hooks/use-toast';
 
 interface TestimonyModalProps {
-  isOpen: boolean;
   onClose: () => void;
-  onSubmit: (testimony: string, isPublic: boolean) => void;
+  currentDay: number;
 }
 
-const TestimonyModal: React.FC<TestimonyModalProps> = ({ isOpen, onClose, onSubmit }) => {
-  const [testimony, setTestimony] = useState('');
-  const [isPublic, setIsPublic] = useState(false);
+const TestimonyModal: React.FC<TestimonyModalProps> = ({ onClose, currentDay }) => {
+  const { userData, saveTestimony } = useAppContext();
+  const [content, setContent] = useState('');
+  const [isPublic, setIsPublic] = useState(true);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [moderationError, setModerationError] = useState('');
+  
+  const isMilestone = [7, 30, 60, 90].includes(currentDay);
+  const charLimit = 280;
+  const remainingChars = charLimit - content.length;
 
-  const handleSubmit = () => {
-    if (testimony.trim()) {
-      onSubmit(testimony.trim(), isPublic);
+  const handleSubmit = async () => {
+    if (content.trim().length < 10) {
+      setModerationError('Depoimento muito curto. Mínimo 10 caracteres.');
+      return;
     }
-    handleSkip();
-  };
 
-  const handleSkip = () => {
-    setTestimony('');
-    setIsPublic(false);
-    onClose();
-  };
+    setIsSubmitting(true);
+    setModerationError('');
 
-  const placeholder = "Ex: Me sinto mais focado hoje! A memória está mais nítida...";
+    // Content moderation
+    const moderationResult = moderateContent(content.trim());
+    
+    if (!moderationResult.approved) {
+      setModerationError(moderationResult.reason || 'Conteúdo não aprovado.');
+      setIsSubmitting(false);
+      return;
+    }
+
+    try {
+      // Save testimony
+      const testimony = {
+        id: `testimony_${Date.now()}`,
+        userId: userData.email || 'anonymous',
+        username: userData.username || `Usuario${Math.floor(Math.random() * 999)}`,
+        avatar: userData.avatar || '👤',
+        content: content.trim(),
+        dayNumber: currentDay,
+        milestone: isMilestone ? currentDay : undefined,
+        likes: 0,
+        likedBy: [],
+        date: new Date().toISOString().split('T')[0],
+        timestamp: Date.now(),
+        isPublic
+      };
+
+      if (saveTestimony) {
+        saveTestimony(testimony);
+      }
+
+      toast({
+        title: "Depoimento salvo!",
+        description: isPublic 
+          ? "Seu depoimento foi compartilhado com a comunidade." 
+          : "Seu depoimento foi salvo de forma privada.",
+      });
+
+      onClose();
+    } catch (error) {
+      setModerationError('Erro ao salvar depoimento. Tente novamente.');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-md">
-        <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
-            <MessageSquare className="w-5 h-5 text-primary" />
-            Quer deixar um depoimento?
-          </DialogTitle>
-        </DialogHeader>
+    <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
+      <Card className="w-full max-w-md animate-scale-in">
+        <CardHeader>
+          <div className="flex items-center justify-between">
+            <div>
+              <CardTitle className="flex items-center gap-2">
+                Compartilhe sua experiência
+                {isMilestone && <Badge variant="secondary">🎯 Marco {currentDay} dias</Badge>}
+              </CardTitle>
+              <CardDescription>
+                {isMilestone 
+                  ? `Parabéns pelos ${currentDay} dias! Como tem sido sua jornada?`
+                  : "Como está sendo sua experiência com o Memo Clarity?"
+                }
+              </CardDescription>
+            </div>
+            <Button variant="ghost" size="sm" onClick={onClose}>
+              <X className="w-4 h-4" />
+            </Button>
+          </div>
+        </CardHeader>
         
-        <div className="space-y-4">
+        <CardContent className="space-y-4">
+          {isMilestone && (
+            <Alert>
+              <AlertCircle className="h-4 w-4" />
+              <AlertDescription>
+                Este é um marco especial! Seu depoimento pode inspirar outros usuários.
+              </AlertDescription>
+            </Alert>
+          )}
+
           <div className="space-y-2">
-            <Label htmlFor="testimony">Em uma frase, como você se sente hoje?</Label>
+            <Label htmlFor="testimony">Seu depoimento</Label>
             <Textarea
               id="testimony"
-              value={testimony}
-              onChange={(e) => setTestimony(e.target.value)}
-              placeholder={placeholder}
-              rows={3}
-              maxLength={200}
-              className="resize-none"
+              placeholder="Compartilhe como o Memo Clarity tem ajudado você..."
+              value={content}
+              onChange={(e) => setContent(e.target.value)}
+              className="min-h-[100px]"
+              maxLength={charLimit}
             />
-            <div className="flex justify-between text-xs text-muted-foreground">
-              <span>Opcional</span>
-              <span>{testimony.length}/200</span>
+            <div className="flex justify-between text-sm text-muted-foreground">
+              <span>Dia {currentDay} da sua jornada</span>
+              <span className={remainingChars < 20 ? 'text-destructive' : ''}>
+                {remainingChars} caracteres restantes
+              </span>
             </div>
           </div>
-          
-          {testimony.trim() && (
-            <div className="flex items-center justify-between p-3 border rounded-lg">
-              <div className="flex items-center gap-3">
-                {isPublic ? (
-                  <Globe className="w-4 h-4 text-primary" />
-                ) : (
-                  <Lock className="w-4 h-4 text-muted-foreground" />
-                )}
-                <div>
-                  <Label htmlFor="public-switch" className="font-medium">
-                    {isPublic ? 'Publicar no ranking' : 'Manter privado'}
-                  </Label>
-                  <p className="text-xs text-muted-foreground">
-                    {isPublic ? 'Outros usuários poderão ver' : 'Apenas para você'}
-                  </p>
-                </div>
-              </div>
+
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-2">
               <Switch
-                id="public-switch"
+                id="public"
                 checked={isPublic}
                 onCheckedChange={setIsPublic}
               />
+              <Label htmlFor="public" className="text-sm">
+                Compartilhar publicamente
+              </Label>
             </div>
+            {!isPublic && (
+              <Badge variant="outline" className="text-xs">Privado</Badge>
+            )}
+          </div>
+
+          {moderationError && (
+            <Alert variant="destructive">
+              <AlertCircle className="h-4 w-4" />
+              <AlertDescription>{moderationError}</AlertDescription>
+            </Alert>
           )}
-          
-          <div className="flex gap-3 pt-2">
+
+          <div className="flex gap-2">
+            <Button variant="outline" onClick={onClose} className="flex-1">
+              Cancelar
+            </Button>
             <Button 
-              onClick={handleSkip}
-              variant="outline" 
+              onClick={handleSubmit} 
+              disabled={isSubmitting || content.trim().length < 10}
               className="flex-1"
             >
-              Pular
-            </Button>
-            <Button 
-              onClick={handleSubmit}
-              disabled={!testimony.trim()}
-              className="flex-1 bg-success hover:bg-success/90"
-            >
-              {testimony.trim() ? (isPublic ? 'Publicar' : 'Salvar') : 'Salvar'}
+              <Send className="w-4 h-4 mr-2" />
+              {isSubmitting ? 'Enviando...' : 'Compartilhar'}
             </Button>
           </div>
-        </div>
-      </DialogContent>
-    </Dialog>
+          
+          <p className="text-xs text-muted-foreground text-center">
+            Os depoimentos passam por moderação automática para manter a comunidade segura.
+          </p>
+        </CardContent>
+      </Card>
+    </div>
   );
 };
 

@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react';
 import { GameResult } from '@/types/games';
+import { Testimony } from '@/types/community';
 
 interface CheckInEntry {
   date: string; // YYYY-MM-DD format
@@ -18,6 +19,8 @@ interface Badge {
 
 interface UserData {
   email?: string;
+  username?: string;
+  avatar?: string;
   timezone: string;
   reminderTime: string;
   goal: string;
@@ -33,6 +36,8 @@ interface UserData {
   badges: Badge[];
   gameResults?: GameResult[];
   gameLevels?: { [gameType: string]: number };
+  testimonies?: Testimony[];
+  isPublicProfile?: boolean;
 }
 
 interface AppContextType {
@@ -42,6 +47,7 @@ interface AppContextType {
   loginWithEmail: (email: string) => void;
   completeDailyCheckIn: (testimony?: string, isPublic?: boolean) => Badge | null;
   saveGameResult: (result: GameResult) => void;
+  saveTestimony: (testimony: Testimony) => void;
   getTodayCheckIn: () => CheckInEntry | null;
   getWeeklyProgress: () => CheckInEntry[];
   hasCompletedToday: () => boolean;
@@ -52,6 +58,8 @@ const AppContext = createContext<AppContextType | undefined>(undefined);
 
 const defaultUserData: UserData = {
   email: '',
+  username: '',
+  avatar: '👤',
   timezone: '',
   reminderTime: '',
   goal: '',
@@ -67,6 +75,8 @@ const defaultUserData: UserData = {
   badges: [],
   gameResults: [],
   gameLevels: { sequence: 1, association: 1, reaction: 1 },
+  testimonies: [],
+  isPublicProfile: true,
 };
 
 const milestones = [
@@ -96,11 +106,22 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   };
 
   const loginWithEmail = (email: string) => {
+    // Generate a simple username from email
+    const username = email.split('@')[0] + Math.floor(Math.random() * 99);
+    
     setUserData(prev => ({ 
       ...prev, 
       email,
+      username,
       isLoggedIn: true,
       onboardingComplete: true 
+    }));
+  };
+
+  const saveTestimony = (testimony: Testimony) => {
+    setUserData(prev => ({
+      ...prev,
+      testimonies: [...(prev.testimonies || []), testimony]
     }));
   };
 
@@ -299,6 +320,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
       loginWithEmail,
       completeDailyCheckIn,
       saveGameResult,
+      saveTestimony,
       getTodayCheckIn,
       getWeeklyProgress,
       hasCompletedToday,

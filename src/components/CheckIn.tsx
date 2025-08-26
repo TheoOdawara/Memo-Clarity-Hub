@@ -44,8 +44,10 @@ const CheckIn: React.FC = () => {
     }, 1500);
   };
 
-  const handleTestimonySubmit = (testimony: string, isPublic: boolean) => {
-    const badge = completeDailyCheckIn(testimony, isPublic);
+  const handleTestimonyClose = () => {
+    setShowTestimonyModal(false);
+    // Complete check-in when testimony modal closes (with or without testimony)
+    const badge = completeDailyCheckIn();
     setIsCompleted(true);
     
     if (badge) {
@@ -171,11 +173,12 @@ const CheckIn: React.FC = () => {
       )}
 
       {/* Modals */}
-      <TestimonyModal
-        isOpen={showTestimonyModal}
-        onClose={() => setShowTestimonyModal(false)}
-        onSubmit={handleTestimonySubmit}
-      />
+      {showTestimonyModal && (
+        <TestimonyModal
+          onClose={handleTestimonyClose}
+          currentDay={userData.currentStreak}
+        />
+      )}
       
       <BadgeModal
         badge={newBadge}
