@@ -1,18 +1,20 @@
 import React from 'react';
-import { Bell, Brain, Search, Menu, MessageCircle, User } from 'lucide-react';
+import { Bell, Brain, Search, Menu, MessageCircle, User, Settings, LogOut } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { useAppContext } from '@/context/AppContext';
 import brainLogo from '@/assets/brain-logo.png';
 
 interface HeaderProps {
   onToggleSidebar: () => void;
+  onTabChange: (tab: string) => void;
 }
 
-const Header: React.FC<HeaderProps> = ({ onToggleSidebar }) => {
-  const { userData } = useAppContext();
+const Header: React.FC<HeaderProps> = ({ onToggleSidebar, onTabChange }) => {
+  const { userData, signOut } = useAppContext();
 
   return (
     <header className="bg-card border-b border-border px-4 py-3 sticky top-0 z-50 shadow-sm">
@@ -84,11 +86,32 @@ const Header: React.FC<HeaderProps> = ({ onToggleSidebar }) => {
             </Badge>
           </Button>
 
-          <Avatar className="w-8 h-8 cursor-pointer">
-            <AvatarFallback className="bg-primary text-primary-foreground text-sm">
-              <User className="w-4 h-4" />
-            </AvatarFallback>
-          </Avatar>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Avatar className="w-8 h-8 cursor-pointer">
+                <AvatarFallback className="bg-primary text-primary-foreground text-sm">
+                  <User className="w-4 h-4" />
+                </AvatarFallback>
+              </Avatar>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-56">
+              <DropdownMenuLabel>Minha Conta</DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onClick={() => onTabChange('profile')}>
+                <User className="mr-2 h-4 w-4" />
+                Perfil
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => onTabChange('settings')}>
+                <Settings className="mr-2 h-4 w-4" />
+                Configurações
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onClick={signOut} className="text-red-600">
+                <LogOut className="mr-2 h-4 w-4" />
+                Sair
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       </div>
     </header>

@@ -4,7 +4,7 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { AppProvider, useAppContext } from './context/AppContext';
-import Login from './components/Login';
+import Auth from './pages/Auth';
 import Header from './components/Header';
 import { AppSidebar } from './components/AppSidebar';
 import Home from './components/Home';
@@ -21,12 +21,12 @@ import Settings from './components/Settings';
 const queryClient = new QueryClient();
 
 const AppContent = () => {
-  const { userData } = useAppContext();
+  const { isAuthenticated } = useAppContext();
   const [activeTab, setActiveTab] = useState('home');
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 
-  if (!userData.isLoggedIn) {
-    return <Login />;
+  if (!isAuthenticated) {
+    return <Auth />;
   }
 
   const renderContent = () => {
@@ -66,7 +66,7 @@ const AppContent = () => {
       />
       
       <div className="flex flex-col flex-1 min-w-0">
-        <Header onToggleSidebar={() => setSidebarCollapsed(!sidebarCollapsed)} />
+        <Header onToggleSidebar={() => setSidebarCollapsed(!sidebarCollapsed)} onTabChange={setActiveTab} />
         
         <div className="flex flex-1">
           {/* Main Content */}

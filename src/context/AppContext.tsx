@@ -5,6 +5,8 @@ import { UserTicketData, TicketAction } from '@/types/raffles';
 import { ChatMessage } from '@/types/chat';
 import { UserSettings } from '@/types/settings';
 import { createTicketAction, getCurrentDate, getCurrentMonth } from '@/utils/ticketSystem';
+import { supabase } from '@/integrations/supabase/client';
+import { User, Session } from '@supabase/supabase-js';
 
 interface CheckInEntry {
   date: string; // YYYY-MM-DD format
@@ -40,7 +42,6 @@ interface UserData {
   weeklyFrequencyMinutes: number; // total minutes of audio frequencies this week
   dailyCheckInComplete: boolean;
   onboardingComplete: boolean;
-  isLoggedIn: boolean;
   checkIns: CheckInEntry[];
   currentStreak: number;
   maxStreak: number;
@@ -53,13 +54,16 @@ interface UserData {
 }
 
 interface AppContextType {
+  user: User | null;
+  session: Session | null;
+  isAuthenticated: boolean;
   userData: UserData;
   userTicketData: UserTicketData;
   gameData: { sessions: GameResult[] };
   raffleData: { userTickets: number };
+  signOut: () => Promise<void>;
   updateUserData: (data: Partial<UserData>) => void;
   completeOnboarding: () => void;
-  loginWithEmail: (email: string) => void;
   completeDailyCheckIn: (testimony?: string, isPublic?: boolean) => Badge | null;
   saveGameResult: (result: GameResult) => void;
   saveTestimony: (testimony: Testimony) => void;
@@ -93,7 +97,6 @@ const defaultUserData: UserData = {
   weeklyFrequencyMinutes: 120, // Initial weekly frequency minutes (2 hours)
   dailyCheckInComplete: false,
   onboardingComplete: false,
-  isLoggedIn: false,
   checkIns: [],
   currentStreak: 0,
   maxStreak: 0,
@@ -113,6 +116,8 @@ const milestones = [
 ];
 
 export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
+  const [user, setUser] = useState<User | null>(null);
+  const [session, setSession] = useState<Session | null>(null);
   const [userData, setUserData] = useState<UserData>(() => {
     const stored = localStorage.getItem('memoClarity-userData');
     return stored ? { ...defaultUserData, ...JSON.parse(stored) } : defaultUserData;
@@ -157,6 +162,35 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     };
   });
 
+  const isAuthenticated = !!session?.user;
+
+  // Auth state management
+  useEffect(() => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      setSession(session);
+      setUser(session?.user ?? null);
+      
+      if (event === 'SIGNED_IN' && session?.user) {
+        // Defer data loading to prevent deadlocks
+        setTimeout(() => {
+          loadUserProfile(session.user.id);
+        }, 0);
+      }
+    });
+
+    // Check for existing session
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session);
+      setUser(session?.user ?? null);
+      
+      if (session?.user) {
+        loadUserProfile(session.user.id);
+      }
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
+
   // Save to localStorage whenever userData changes
   useEffect(() => {
     localStorage.setItem('memoClarity-userData', JSON.stringify(userData));
@@ -199,6 +233,56 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
       localStorage.setItem('memoClarity-lastMonth', currentMonth);
     }
   }, []);
+
+  const loadUserProfile = async (userId: string) => {
+    try {
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('user_id', userId)
+        .maybeSingle();
+      
+      if (profile) {
+        setUserData(prev => ({ 
+          ...prev, 
+          username: profile.username || prev.username,
+          onboardingComplete: true 
+        }));
+      }
+    } catch (error) {
+      console.error('Error loading user profile:', error);
+    }
+  };
+
+  const signOut = async () => {
+    try {
+      const { error } = await supabase.auth.signOut();
+      if (error) throw error;
+      
+      // Clear local state
+      setUser(null);
+      setSession(null);
+      setUserData(defaultUserData);
+      setUserTicketData({
+        currentMonthTickets: 0,
+        totalLifetimeTickets: 0,
+        ticketHistory: [],
+        dailyActions: {},
+        monthlyStats: {}
+      });
+      setChatHistory([]);
+      
+      // Clear localStorage
+      localStorage.removeItem('memoClarity-userData');
+      localStorage.removeItem('memoClarity-ticketData');
+      localStorage.removeItem('memoclarity-chat');
+      localStorage.removeItem('memoclarity-settings');
+      
+      window.location.href = '/auth';
+    } catch (error) {
+      console.error('Error signing out:', error);
+    }
+  };
 
   const awardTickets = (action: TicketAction) => {
     const today = getCurrentDate();
@@ -260,19 +344,6 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
 
   const completeOnboarding = () => {
     setUserData(prev => ({ ...prev, onboardingComplete: true }));
-  };
-
-  const loginWithEmail = (email: string) => {
-    // Generate a simple username from email
-    const username = email.split('@')[0] + Math.floor(Math.random() * 99);
-    
-    setUserData(prev => ({ 
-      ...prev, 
-      email,
-      username,
-      isLoggedIn: true,
-      onboardingComplete: true 
-    }));
   };
 
   const saveTestimony = (testimony: Testimony) => {
@@ -503,13 +574,16 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
 
   return (
     <AppContext.Provider value={{
+      user,
+      session,
+      isAuthenticated,
       userData,
       userTicketData,
       gameData: { sessions: userData.gameResults || [] },
       raffleData: { userTickets: userTicketData.currentMonthTickets },
+      signOut,
       updateUserData,
       completeOnboarding,
-      loginWithEmail,
       completeDailyCheckIn,
       saveGameResult,
       saveTestimony,
@@ -518,14 +592,10 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
       getWeeklyProgress,
       hasCompletedToday,
       calculateCognitiveScore,
-      
-      // Chat
       chatHistory,
       addChatMessage,
-      
-      // Settings
       userSettings,
-      updateUserSettings,
+      updateUserSettings
     }}>
       {children}
     </AppContext.Provider>
