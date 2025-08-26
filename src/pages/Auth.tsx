@@ -57,9 +57,15 @@ const Auth = () => {
         window.location.href = '/';
       }
     } catch (error: any) {
+      let errorMessage = error.message || "Erro ao fazer login. Tente novamente.";
+      
+      if (error.message?.includes("Email not confirmed")) {
+        errorMessage = "Por favor, verifique seu email e clique no link de confirmação antes de fazer login.";
+      }
+      
       toast({
         title: "Erro no login",
-        description: error.message || "Erro ao fazer login. Tente novamente.",
+        description: errorMessage,
         variant: "destructive",
       });
     } finally {
