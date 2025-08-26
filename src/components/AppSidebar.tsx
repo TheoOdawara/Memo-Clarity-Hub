@@ -9,7 +9,8 @@ import {
   Trophy,
   Settings,
   ChevronRight,
-  ChevronLeft
+  ChevronLeft,
+  MessageCircle
 } from 'lucide-react';
 import { useAppContext } from '@/context/AppContext';
 import { Badge } from '@/components/ui/badge';
@@ -36,6 +37,7 @@ const mainItems = [
   { id: 'raffles', title: 'Sorteio Mensal', icon: Trophy },
   { id: 'activities', title: 'Atividades', icon: Activity },
   { id: 'community', title: 'Comunidade', icon: Users },
+  { id: 'chat', title: 'Chat Suporte', icon: MessageCircle },
   { id: 'profile', title: 'Perfil', icon: User },
 ];
 
@@ -169,7 +171,11 @@ export function AppSidebar({ activeTab, onTabChange, collapsed, onToggleCollapse
       <div className="border-t p-2">
         <Button 
           variant="ghost" 
-          className="w-full justify-start h-10 hover:bg-muted/50"
+          onClick={() => onTabChange('settings')}
+          className={cn(
+            "w-full justify-start h-10 hover:bg-muted/50",
+            isActive('settings') ? 'bg-primary/10 text-primary font-medium' : ''
+          )}
         >
           <Settings className="w-4 h-4 flex-shrink-0" />
           {!collapsed && <span className="ml-3">Configurações</span>}

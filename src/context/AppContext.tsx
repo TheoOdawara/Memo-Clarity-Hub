@@ -2,6 +2,8 @@ import React, { createContext, useContext, useState, ReactNode, useEffect } from
 import { GameResult } from '@/types/games';
 import { Testimony } from '@/types/community';
 import { UserTicketData, TicketAction } from '@/types/raffles';
+import { ChatMessage } from '@/types/chat';
+import { UserSettings } from '@/types/settings';
 import { createTicketAction, getCurrentDate, getCurrentMonth } from '@/utils/ticketSystem';
 
 interface CheckInEntry {
@@ -19,7 +21,14 @@ interface Badge {
   milestone: number;
 }
 
+interface FrequencyEntry {
+  date: string;
+  duration: number; // in minutes
+  frequency: string;
+}
+
 interface UserData {
+  id: string;
   email?: string;
   username?: string;
   avatar?: string;
@@ -40,11 +49,14 @@ interface UserData {
   gameLevels?: { [gameType: string]: number };
   testimonies?: Testimony[];
   isPublicProfile?: boolean;
+  frequencyData: FrequencyEntry[];
 }
 
 interface AppContextType {
   userData: UserData;
   userTicketData: UserTicketData;
+  gameData: { sessions: GameResult[] };
+  raffleData: { userTickets: number };
   updateUserData: (data: Partial<UserData>) => void;
   completeOnboarding: () => void;
   loginWithEmail: (email: string) => void;
@@ -56,11 +68,20 @@ interface AppContextType {
   getWeeklyProgress: () => CheckInEntry[];
   hasCompletedToday: () => boolean;
   calculateCognitiveScore: () => number;
+  
+  // Chat
+  chatHistory: ChatMessage[];
+  addChatMessage: (message: ChatMessage) => void;
+  
+  // Settings
+  userSettings: UserSettings;
+  updateUserSettings: (settings: Partial<UserSettings>) => void;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
 
 const defaultUserData: UserData = {
+  id: 'user-' + Math.random().toString(36).substr(2, 9),
   email: '',
   username: '',
   avatar: '👤',
@@ -81,6 +102,7 @@ const defaultUserData: UserData = {
   gameLevels: { sequence: 1, association: 1, reaction: 1 },
   testimonies: [],
   isPublicProfile: true,
+  frequencyData: [],
 };
 
 const milestones = [
@@ -108,6 +130,33 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     return stored ? { ...defaultTicketData, ...JSON.parse(stored) } : defaultTicketData;
   });
 
+  const [chatHistory, setChatHistory] = useState<ChatMessage[]>(() => {
+    const saved = localStorage.getItem('memoclarity-chat');
+    return saved ? JSON.parse(saved) : [];
+  });
+
+  const [userSettings, setUserSettings] = useState<UserSettings>(() => {
+    const saved = localStorage.getItem('memoclarity-settings');
+    return saved ? JSON.parse(saved) : {
+      notifications: {
+        doseReminder: { enabled: true, time: '09:00' },
+        scoreNudges: true,
+        raffleAlerts: true,
+        milestones: true
+      },
+      privacy: {
+        showInRankings: true,
+        shareTestimonies: true
+      },
+      general: {
+        language: 'pt' as const,
+        timezone: 'America/Sao_Paulo',
+        darkMode: false,
+        fontSize: 'medium' as const
+      }
+    };
+  });
+
   // Save to localStorage whenever userData changes
   useEffect(() => {
     localStorage.setItem('memoClarity-userData', JSON.stringify(userData));
@@ -117,6 +166,16 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   useEffect(() => {
     localStorage.setItem('memoClarity-ticketData', JSON.stringify(userTicketData));
   }, [userTicketData]);
+
+  // Save to localStorage whenever chatHistory changes
+  useEffect(() => {
+    localStorage.setItem('memoclarity-chat', JSON.stringify(chatHistory));
+  }, [chatHistory]);
+
+  // Save to localStorage whenever userSettings changes
+  useEffect(() => {
+    localStorage.setItem('memoclarity-settings', JSON.stringify(userSettings));
+  }, [userSettings]);
 
   // Update monthly tickets when month changes
   useEffect(() => {
@@ -424,10 +483,30 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     return todayCheckIn?.completed || false;
   };
 
+  const addChatMessage = (message: ChatMessage) => {
+    setChatHistory(prev => {
+      const newHistory = [...prev, message];
+      // Keep only last 50 messages
+      return newHistory.slice(-50);
+    });
+  };
+
+  const updateUserSettings = (settings: Partial<UserSettings>) => {
+    setUserSettings(prev => ({
+      ...prev,
+      ...settings,
+      notifications: settings.notifications ? { ...prev.notifications, ...settings.notifications } : prev.notifications,
+      privacy: settings.privacy ? { ...prev.privacy, ...settings.privacy } : prev.privacy,
+      general: settings.general ? { ...prev.general, ...settings.general } : prev.general
+    }));
+  };
+
   return (
     <AppContext.Provider value={{
       userData,
       userTicketData,
+      gameData: { sessions: userData.gameResults || [] },
+      raffleData: { userTickets: userTicketData.currentMonthTickets },
       updateUserData,
       completeOnboarding,
       loginWithEmail,
@@ -439,6 +518,14 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
       getWeeklyProgress,
       hasCompletedToday,
       calculateCognitiveScore,
+      
+      // Chat
+      chatHistory,
+      addChatMessage,
+      
+      // Settings
+      userSettings,
+      updateUserSettings,
     }}>
       {children}
     </AppContext.Provider>

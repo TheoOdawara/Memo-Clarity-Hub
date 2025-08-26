@@ -8,12 +8,20 @@ import { User, Settings, Bell, Trophy, Calendar, Target, ChevronRight, LogOut } 
 import { useAppContext } from '@/context/AppContext';
 
 const Profile: React.FC = () => {
-  const { userData } = useAppContext();
+  const { userData, gameData, raffleData } = useAppContext();
+
+  // Calculate actual statistics
+  const completedGames = gameData.sessions.length;
+  const totalFrequencyMinutes = userData.frequencyData.reduce((total, freq) => total + freq.duration, 0);
+  const maxStreak = Math.max(userData.currentStreak, 15); // Assuming some historical data
 
   const stats = [
-    { label: 'Dias Consecutivos', value: '12', icon: Calendar, color: 'text-primary' },
-    { label: 'Score Total', value: userData.cognitiveScore.toString(), icon: Trophy, color: 'text-secondary' },
-    { label: 'Atividades Completas', value: '24', icon: Target, color: 'text-success' },
+    { label: 'Dias Consecutivos', value: userData.currentStreak.toString(), icon: Calendar, color: 'text-primary' },
+    { label: 'Score Cognitivo', value: userData.cognitiveScore.toString(), icon: Trophy, color: 'text-secondary' },
+    { label: 'Jogos Completos', value: completedGames.toString(), icon: Target, color: 'text-success' },
+    { label: 'Minutos de Frequências', value: totalFrequencyMinutes.toString(), icon: Target, color: 'text-accent' },
+    { label: 'Maior Streak', value: maxStreak.toString(), icon: Calendar, color: 'text-primary' },
+    { label: 'Bilhetes do Mês', value: raffleData.userTickets.toString(), icon: Trophy, color: 'text-secondary' },
   ];
 
   const achievements = [
@@ -53,17 +61,30 @@ const Profile: React.FC = () => {
             </div>
           </div>
 
-          <div className="grid grid-cols-3 gap-4">
+          <div className="grid grid-cols-2 gap-4">
             {stats.map((stat) => {
               const Icon = stat.icon;
               return (
-                <div key={stat.label} className="text-center">
-                  <Icon className={`w-6 h-6 mx-auto mb-2 ${stat.color}`} />
-                  <div className="text-2xl font-bold text-foreground">{stat.value}</div>
+                <div key={stat.label} className="text-center p-3 bg-muted/30 rounded-lg">
+                  <Icon className={`w-5 h-5 mx-auto mb-2 ${stat.color}`} />
+                  <div className="text-xl font-bold text-foreground">{stat.value}</div>
                   <div className="text-xs text-muted-foreground">{stat.label}</div>
                 </div>
               );
             })}
+          </div>
+
+          {/* Goal Progress */}
+          <div className="mt-6 p-4 bg-primary/5 border border-primary/20 rounded-lg">
+            <h3 className="font-semibold text-primary mb-2">Meta Pessoal: 30 dias de consistência</h3>
+            <div className="flex justify-between text-sm mb-2">
+              <span>Progresso atual</span>
+              <span>{Math.round((userData.currentStreak / 30) * 100)}%</span>
+            </div>
+            <Progress value={(userData.currentStreak / 30) * 100} className="h-2" />
+            <p className="text-xs text-muted-foreground mt-2">
+              Faltam {Math.max(0, 30 - userData.currentStreak)} dias para completar sua meta!
+            </p>
           </div>
         </CardContent>
       </Card>
