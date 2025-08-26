@@ -30,7 +30,7 @@ const Profile: React.FC = () => {
   ];
 
   return (
-    <div className="p-4 space-y-6 animate-fade-in">
+    <div className="space-y-6 animate-fade-in">
       {/* Profile Header */}
       <Card className="shadow-card">
         <CardContent className="p-6">

@@ -51,7 +51,7 @@ const Activities: React.FC = () => {
   ];
 
   return (
-    <div className="p-4 space-y-6 animate-fade-in">
+    <div className="space-y-6 animate-fade-in">
       <div className="space-y-2">
         <h2 className="text-2xl font-bold text-foreground">Atividades Cognitivas</h2>
         <p className="text-muted-foreground">Complete suas atividades diárias para maximizar os resultados</p>

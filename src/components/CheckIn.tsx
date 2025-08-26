@@ -77,7 +77,7 @@ const CheckIn: React.FC = () => {
 
   if (showSuccess) {
     return (
-      <div className="p-4 flex items-center justify-center min-h-[50vh] animate-fade-in">
+      <div className="flex items-center justify-center min-h-[50vh] animate-fade-in">
         <Card className="shadow-elevated max-w-md w-full">
           <CardContent className="p-8 text-center">
             <div className="w-20 h-20 mx-auto mb-4 bg-success rounded-full flex items-center justify-center animate-pulse-soft">
@@ -92,7 +92,7 @@ const CheckIn: React.FC = () => {
   }
 
   return (
-    <div className="p-4 space-y-6 animate-fade-in">
+    <div className="space-y-6 animate-fade-in">
       {/* Header */}
       <div className="text-center space-y-2">
         <div className="flex items-center justify-center gap-2 mb-2">

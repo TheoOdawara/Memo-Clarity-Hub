@@ -68,7 +68,7 @@ const Home: React.FC = () => {
   ];
 
   return (
-    <div className="p-4 space-y-6 animate-fade-in">
+    <div className="space-y-6 animate-fade-in">
       {/* Check-in Card */}
       <Card className="shadow-card">
         <CardContent className="p-6">
