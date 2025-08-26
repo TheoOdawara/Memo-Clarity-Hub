@@ -6,10 +6,6 @@ import {
   Users, 
   User, 
   Brain,
-  Headphones,
-  Gamepad2,
-  Trophy,
-  Calendar,
   Settings,
   ChevronRight,
   ChevronLeft
@@ -19,6 +15,12 @@ import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
+
+// Import realistic images
+import headphonesRealistic from '@/assets/headphones-realistic.png';
+import gamepadRealistic from '@/assets/gamepad-realistic.png';
+import trophyRealistic from '@/assets/trophy-realistic.png';
+import calendarRealistic from '@/assets/calendar-realistic.png';
 
 interface AppSidebarProps {
   activeTab: string;
@@ -36,10 +38,10 @@ const mainItems = [
 ];
 
 const quickAccessItems = [
-  { id: 'frequency', title: 'Frequência do Dia', icon: Headphones, subtitle: '15 min', color: 'text-electric-blue' },
-  { id: 'games', title: 'Jogos Cognitivos', icon: Gamepad2, subtitle: 'Memória', color: 'text-neon-pink' },
-  { id: 'ranking', title: 'Ranking Global', icon: Trophy, subtitle: 'Top 100', color: 'text-electric-orange' },
-  { id: 'calendar', title: 'Calendário', icon: Calendar, subtitle: 'Progresso', color: 'text-electric-green' },
+  { id: 'frequency', title: 'Frequência do Dia', image: headphonesRealistic, subtitle: '15 min', color: 'text-electric-blue' },
+  { id: 'games', title: 'Jogos Cognitivos', image: gamepadRealistic, subtitle: 'Memória', color: 'text-neon-pink' },
+  { id: 'ranking', title: 'Ranking Global', image: trophyRealistic, subtitle: 'Top 100', color: 'text-electric-orange' },
+  { id: 'calendar', title: 'Calendário', image: calendarRealistic, subtitle: 'Progresso', color: 'text-electric-green' },
 ];
 
 export function AppSidebar({ activeTab, onTabChange, collapsed, onToggleCollapsed }: AppSidebarProps) {
@@ -117,8 +119,14 @@ export function AppSidebar({ activeTab, onTabChange, collapsed, onToggleCollapse
                 variant="ghost"
                 className="w-full justify-start h-auto p-3 hover:bg-muted/50 group transition-all duration-300 hover:bg-gradient-to-r hover:from-transparent hover:to-muted/30"
               >
-                <item.icon className={cn("w-4 h-4 flex-shrink-0 transition-all duration-300 group-hover:scale-110", item.color)} />
-                <div className="ml-3 flex-1 min-w-0 text-left">
+                <div className="w-6 h-6 flex-shrink-0 transition-all duration-300 group-hover:scale-110 mr-3">
+                  <img 
+                    src={item.image} 
+                    alt={item.title}
+                    className="w-full h-full object-contain"
+                  />
+                </div>
+                <div className="flex-1 min-w-0 text-left">
                   <p className="text-sm font-medium truncate group-hover:text-foreground transition-colors">{item.title}</p>
                   <p className="text-xs text-muted-foreground group-hover:text-muted-foreground/80 transition-colors">{item.subtitle}</p>
                 </div>
