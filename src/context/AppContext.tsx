@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react';
+import { GameResult } from '@/types/games';
 
 interface CheckInEntry {
   date: string; // YYYY-MM-DD format
@@ -30,6 +31,8 @@ interface UserData {
   currentStreak: number;
   maxStreak: number;
   badges: Badge[];
+  gameResults?: GameResult[];
+  gameLevels?: { [gameType: string]: number };
 }
 
 interface AppContextType {
@@ -38,6 +41,7 @@ interface AppContextType {
   completeOnboarding: () => void;
   loginWithEmail: (email: string) => void;
   completeDailyCheckIn: (testimony?: string, isPublic?: boolean) => Badge | null;
+  saveGameResult: (result: GameResult) => void;
   getTodayCheckIn: () => CheckInEntry | null;
   getWeeklyProgress: () => CheckInEntry[];
   hasCompletedToday: () => boolean;
@@ -61,6 +65,8 @@ const defaultUserData: UserData = {
   currentStreak: 0,
   maxStreak: 0,
   badges: [],
+  gameResults: [],
+  gameLevels: { sequence: 1, association: 1, reaction: 1 },
 };
 
 const milestones = [
@@ -157,11 +163,46 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
 
   const calculateCognitiveScore = (): number => {
     const streakWeight = userData.currentStreak * 0.8; // máximo ~30 pontos
-    const gamesWeight = userData.avgGameScore * 0.5; // máximo ~35 pontos  
-    const frequenciesWeight = userData.weeklyFrequencyMinutes * 0.2; // máximo ~35 pontos
+    
+    // Calculate average game score from recent results
+    let gameScore = userData.avgGameScore;
+    if (userData.gameResults && userData.gameResults.length > 0) {
+      const recentGames = userData.gameResults.slice(-10);
+      gameScore = recentGames.reduce((sum, game) => sum + game.score, 0) / recentGames.length;
+    }
+    const gamesWeight = gameScore * 0.5; // máximo ~50 pontos (increased weight for games)
+    
+    const frequenciesWeight = userData.weeklyFrequencyMinutes * 0.1; // máximo ~20 pontos
     
     const rawScore = Math.min(100, streakWeight + gamesWeight + frequenciesWeight);
     return Math.round(rawScore);
+  };
+
+  const saveGameResult = (result: GameResult) => {
+    setUserData(prev => {
+      const newGameResults = [...(prev.gameResults || []), result];
+      
+      // Keep only last 50 results to avoid storage bloat
+      const trimmedResults = newGameResults.slice(-50);
+      
+      // Update average game score
+      const recentGames = trimmedResults.slice(-10);
+      const newAvgGameScore = recentGames.length > 0 ? 
+        recentGames.reduce((sum, game) => sum + game.score, 0) / recentGames.length : prev.avgGameScore;
+      
+      // Calculate new cognitive score
+      const streakWeight = prev.currentStreak * 0.8;
+      const gamesWeight = newAvgGameScore * 0.5;
+      const frequenciesWeight = prev.weeklyFrequencyMinutes * 0.1;
+      const newCognitiveScore = Math.round(Math.min(100, streakWeight + gamesWeight + frequenciesWeight));
+      
+      return {
+        ...prev,
+        gameResults: trimmedResults,
+        avgGameScore: Math.round(newAvgGameScore),
+        cognitiveScore: newCognitiveScore
+      };
+    });
   };
 
   const completeDailyCheckIn = (testimony?: string, isPublic?: boolean): Badge | null => {
@@ -257,6 +298,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
       completeOnboarding,
       loginWithEmail,
       completeDailyCheckIn,
+      saveGameResult,
       getTodayCheckIn,
       getWeeklyProgress,
       hasCompletedToday,

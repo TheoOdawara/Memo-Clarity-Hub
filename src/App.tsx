@@ -13,6 +13,7 @@ import Activities from './components/Activities';
 import Community from './components/Community';
 import Profile from './components/Profile';
 import Frequencies from './components/Frequencies';
+import CognitiveGames from './components/CognitiveGames';
 
 const queryClient = new QueryClient();
 
@@ -39,6 +40,8 @@ const AppContent = () => {
         return <Profile />;
       case 'frequencies':
         return <Frequencies />;
+      case 'games':
+        return <CognitiveGames />;
       default:
         return <Home />;
     }
