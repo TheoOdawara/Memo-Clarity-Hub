@@ -20,6 +20,8 @@ interface UserData {
   reminderTime: string;
   goal: string;
   cognitiveScore: number;
+  avgGameScore: number; // 0-70 average score from cognitive games
+  weeklyFrequencyMinutes: number; // total minutes of audio frequencies this week
   dailyCheckInComplete: boolean;
   onboardingComplete: boolean;
   checkIns: CheckInEntry[];
@@ -36,6 +38,7 @@ interface AppContextType {
   getTodayCheckIn: () => CheckInEntry | null;
   getWeeklyProgress: () => CheckInEntry[];
   hasCompletedToday: () => boolean;
+  calculateCognitiveScore: () => number;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -45,6 +48,8 @@ const defaultUserData: UserData = {
   reminderTime: '',
   goal: '',
   cognitiveScore: 67,
+  avgGameScore: 50, // Initial average game score
+  weeklyFrequencyMinutes: 120, // Initial weekly frequency minutes (2 hours)
   dailyCheckInComplete: false,
   onboardingComplete: false,
   checkIns: [],
@@ -136,6 +141,15 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     return { current: currentStreak, max: Math.max(maxStreak, currentStreak) };
   };
 
+  const calculateCognitiveScore = (): number => {
+    const streakWeight = userData.currentStreak * 0.8; // máximo ~30 pontos
+    const gamesWeight = userData.avgGameScore * 0.5; // máximo ~35 pontos  
+    const frequenciesWeight = userData.weeklyFrequencyMinutes * 0.2; // máximo ~35 pontos
+    
+    const rawScore = Math.min(100, streakWeight + gamesWeight + frequenciesWeight);
+    return Math.round(rawScore);
+  };
+
   const completeDailyCheckIn = (testimony?: string, isPublic?: boolean): Badge | null => {
     const today = getTodayString();
     
@@ -171,14 +185,24 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
         updatedBadges.push(newBadge);
       }
       
-      return {
+      const updatedData = {
         ...prev,
         checkIns: newCheckIns,
         currentStreak: current,
         maxStreak: max,
         dailyCheckInComplete: true,
         badges: updatedBadges,
-        cognitiveScore: prev.cognitiveScore + 5 // Bonus points for check-in
+      };
+      
+      // Calculate cognitive score with updated data
+      const streakWeight = current * 0.8;
+      const gamesWeight = updatedData.avgGameScore * 0.5;
+      const frequenciesWeight = updatedData.weeklyFrequencyMinutes * 0.2;
+      const rawScore = Math.min(100, streakWeight + gamesWeight + frequenciesWeight);
+      
+      return {
+        ...updatedData,
+        cognitiveScore: Math.round(rawScore)
       };
     });
     
@@ -221,6 +245,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
       getTodayCheckIn,
       getWeeklyProgress,
       hasCompletedToday,
+      calculateCognitiveScore,
     }}>
       {children}
     </AppContext.Provider>
