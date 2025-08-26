@@ -65,12 +65,26 @@ export default {
 					'accent-foreground': 'hsl(var(--sidebar-accent-foreground))',
 					border: 'hsl(var(--sidebar-border))',
 					ring: 'hsl(var(--sidebar-ring))'
+				},
+				electric: {
+					blue: 'hsl(var(--electric-blue))',
+					purple: 'hsl(var(--electric-purple))',
+					cyan: 'hsl(var(--electric-cyan))',
+					green: 'hsl(var(--electric-green))',
+					orange: 'hsl(var(--electric-orange))',
+					red: 'hsl(var(--electric-red))'
+				},
+				neon: {
+					pink: 'hsl(var(--neon-pink))',
+					yellow: 'hsl(var(--neon-yellow))'
 				}
 			},
 			backgroundImage: {
 				'gradient-primary': 'var(--gradient-primary)',
 				'gradient-secondary': 'var(--gradient-secondary)',
-				'gradient-brain': 'var(--gradient-brain)'
+				'gradient-brain': 'var(--gradient-brain)',
+				'gradient-electric': 'var(--gradient-electric)',
+				'gradient-neon': 'var(--gradient-neon)'
 			},
 			boxShadow: {
 				'card': 'var(--shadow-card)',

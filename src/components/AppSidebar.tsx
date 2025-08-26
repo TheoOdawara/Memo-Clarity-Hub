@@ -36,10 +36,10 @@ const mainItems = [
 ];
 
 const quickAccessItems = [
-  { id: 'frequency', title: 'Frequência do Dia', icon: Headphones, subtitle: '15 min' },
-  { id: 'games', title: 'Jogos Cognitivos', icon: Gamepad2, subtitle: 'Memória' },
-  { id: 'ranking', title: 'Ranking Global', icon: Trophy, subtitle: 'Top 100' },
-  { id: 'calendar', title: 'Calendário', icon: Calendar, subtitle: 'Progresso' },
+  { id: 'frequency', title: 'Frequência do Dia', icon: Headphones, subtitle: '15 min', color: 'text-electric-blue' },
+  { id: 'games', title: 'Jogos Cognitivos', icon: Gamepad2, subtitle: 'Memória', color: 'text-neon-pink' },
+  { id: 'ranking', title: 'Ranking Global', icon: Trophy, subtitle: 'Top 100', color: 'text-electric-orange' },
+  { id: 'calendar', title: 'Calendário', icon: Calendar, subtitle: 'Progresso', color: 'text-electric-green' },
 ];
 
 export function AppSidebar({ activeTab, onTabChange, collapsed, onToggleCollapsed }: AppSidebarProps) {
@@ -115,14 +115,14 @@ export function AppSidebar({ activeTab, onTabChange, collapsed, onToggleCollapse
               <Button
                 key={item.id}
                 variant="ghost"
-                className="w-full justify-start h-auto p-3 hover:bg-muted/50"
+                className="w-full justify-start h-auto p-3 hover:bg-muted/50 group transition-all duration-300 hover:bg-gradient-to-r hover:from-transparent hover:to-muted/30"
               >
-                <item.icon className="w-4 h-4 flex-shrink-0" />
+                <item.icon className={cn("w-4 h-4 flex-shrink-0 transition-all duration-300 group-hover:scale-110", item.color)} />
                 <div className="ml-3 flex-1 min-w-0 text-left">
-                  <p className="text-sm font-medium truncate">{item.title}</p>
-                  <p className="text-xs text-muted-foreground">{item.subtitle}</p>
+                  <p className="text-sm font-medium truncate group-hover:text-foreground transition-colors">{item.title}</p>
+                  <p className="text-xs text-muted-foreground group-hover:text-muted-foreground/80 transition-colors">{item.subtitle}</p>
                 </div>
-                <ChevronRight className="w-4 h-4 text-muted-foreground flex-shrink-0" />
+                <ChevronRight className="w-4 h-4 text-muted-foreground flex-shrink-0 group-hover:text-foreground transition-all duration-300" />
               </Button>
             ))}
 

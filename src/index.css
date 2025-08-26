@@ -39,9 +39,21 @@ All colors MUST be HSL.
     --success: 142 76% 36%;
     --success-foreground: 0 0% 100%;
 
+    /* Electric Colors */
+    --electric-blue: 195 100% 50%;
+    --electric-purple: 280 100% 70%;
+    --electric-cyan: 180 100% 60%;
+    --electric-green: 120 100% 50%;
+    --electric-orange: 30 100% 65%;
+    --neon-pink: 320 100% 70%;
+    --neon-yellow: 54 100% 70%;
+    --electric-red: 0 100% 60%;
+
     --gradient-primary: linear-gradient(135deg, hsl(201 67% 42%), hsl(201 67% 52%));
     --gradient-secondary: linear-gradient(135deg, hsl(48 77% 60%), hsl(48 77% 70%));
     --gradient-brain: linear-gradient(135deg, hsl(201 67% 42%), hsl(264 67% 52%));
+    --gradient-electric: linear-gradient(135deg, hsl(var(--electric-blue)), hsl(var(--electric-purple)));
+    --gradient-neon: linear-gradient(135deg, hsl(var(--neon-pink)), hsl(var(--neon-yellow)));
 
     --shadow-card: 0 4px 6px -1px hsl(210 20% 85% / 0.4), 0 2px 4px -1px hsl(210 20% 85% / 0.3);
     --shadow-elevated: 0 10px 15px -3px hsl(210 20% 80% / 0.3), 0 4px 6px -2px hsl(210 20% 80% / 0.25);
@@ -96,6 +108,16 @@ All colors MUST be HSL.
     
     --success: 142 76% 36%;
     --success-foreground: 0 0% 100%;
+    
+    /* Electric Colors - Dark Mode */
+    --electric-blue: 195 100% 60%;
+    --electric-purple: 280 100% 80%;
+    --electric-cyan: 180 100% 70%;
+    --electric-green: 120 100% 60%;
+    --electric-orange: 30 100% 75%;
+    --neon-pink: 320 100% 80%;
+    --neon-yellow: 54 100% 80%;
+    --electric-red: 0 100% 70%;
 
     --sidebar-background: 240 5.9% 10%;
     --sidebar-foreground: 240 4.8% 95.9%;
