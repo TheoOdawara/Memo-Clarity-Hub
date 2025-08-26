@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { useAppContext } from '@/context/AppContext';
+import { createTicketAction } from '@/utils/ticketSystem';
 import { cn } from '@/lib/utils';
 
 interface Frequency {
@@ -54,7 +55,7 @@ const categoryColors = {
 };
 
 const Frequencies: React.FC = () => {
-  const { updateUserData, userData } = useAppContext();
+  const { updateUserData, userData, awardTickets } = useAppContext();
   const [activeFrequency, setActiveFrequency] = useState<string | null>(null);
   const [selectedDuration, setSelectedDuration] = useState<number>(0);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -121,8 +122,11 @@ const Frequencies: React.FC = () => {
       audioRef.current.currentTime = 0;
     }
 
-    // Update weekly frequency minutes
+    // Award ticket and update weekly frequency minutes
     if (selectedDuration > 0) {
+      const ticketAction = createTicketAction('frequency', `Frequência ${frequencies.find(f => f.id === activeFrequency)?.title || 'sonora'} - ${selectedDuration}min`);
+      awardTickets(ticketAction);
+      
       updateUserData({
         weeklyFrequencyMinutes: userData.weeklyFrequencyMinutes + selectedDuration
       });

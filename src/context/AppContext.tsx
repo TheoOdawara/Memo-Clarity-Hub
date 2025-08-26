@@ -1,6 +1,8 @@
 import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react';
 import { GameResult } from '@/types/games';
 import { Testimony } from '@/types/community';
+import { UserTicketData, TicketAction } from '@/types/raffles';
+import { createTicketAction, getCurrentDate, getCurrentMonth } from '@/utils/ticketSystem';
 
 interface CheckInEntry {
   date: string; // YYYY-MM-DD format
@@ -42,12 +44,14 @@ interface UserData {
 
 interface AppContextType {
   userData: UserData;
+  userTicketData: UserTicketData;
   updateUserData: (data: Partial<UserData>) => void;
   completeOnboarding: () => void;
   loginWithEmail: (email: string) => void;
   completeDailyCheckIn: (testimony?: string, isPublic?: boolean) => Badge | null;
   saveGameResult: (result: GameResult) => void;
   saveTestimony: (testimony: Testimony) => void;
+  awardTickets: (action: TicketAction) => void;
   getTodayCheckIn: () => CheckInEntry | null;
   getWeeklyProgress: () => CheckInEntry[];
   hasCompletedToday: () => boolean;
@@ -92,10 +96,104 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     return stored ? { ...defaultUserData, ...JSON.parse(stored) } : defaultUserData;
   });
 
+  const [userTicketData, setUserTicketData] = useState<UserTicketData>(() => {
+    const stored = localStorage.getItem('memoClarity-ticketData');
+    const defaultTicketData: UserTicketData = {
+      currentMonthTickets: 0,
+      totalLifetimeTickets: 0,
+      ticketHistory: [],
+      dailyActions: {},
+      monthlyStats: {}
+    };
+    return stored ? { ...defaultTicketData, ...JSON.parse(stored) } : defaultTicketData;
+  });
+
   // Save to localStorage whenever userData changes
   useEffect(() => {
     localStorage.setItem('memoClarity-userData', JSON.stringify(userData));
   }, [userData]);
+
+  // Save to localStorage whenever userTicketData changes
+  useEffect(() => {
+    localStorage.setItem('memoClarity-ticketData', JSON.stringify(userTicketData));
+  }, [userTicketData]);
+
+  // Update monthly tickets when month changes
+  useEffect(() => {
+    const currentMonth = getCurrentMonth();
+    const lastStoredMonth = localStorage.getItem('memoClarity-lastMonth');
+    
+    if (lastStoredMonth !== currentMonth) {
+      setUserTicketData(prev => ({
+        ...prev,
+        currentMonthTickets: 0,
+        monthlyStats: {
+          ...prev.monthlyStats,
+          [lastStoredMonth || currentMonth]: {
+            totalTickets: prev.currentMonthTickets,
+            actions: prev.ticketHistory.filter(action => 
+              action.date.startsWith(lastStoredMonth || currentMonth)
+            )
+          }
+        }
+      }));
+      localStorage.setItem('memoClarity-lastMonth', currentMonth);
+    }
+  }, []);
+
+  const awardTickets = (action: TicketAction) => {
+    const today = getCurrentDate();
+    
+    setUserTicketData(prev => {
+      const todayActions = prev.dailyActions[today] || {
+        checkin: false,
+        frequency: false,
+        game: false,
+        ticketsEarned: 0
+      };
+
+      // Check daily limits (excluding bonus actions)
+      const isBonus = action.type === 'testimony' || action.type === 'perfect_week';
+      const dailyTickets = todayActions.ticketsEarned;
+      
+      if (!isBonus && dailyTickets >= 3) {
+        return prev; // Daily limit reached
+      }
+
+      // Check if action already completed today
+      if (!isBonus) {
+        switch (action.type) {
+          case 'checkin':
+            if (todayActions.checkin) return prev;
+            break;
+          case 'frequency':
+            if (todayActions.frequency) return prev;
+            break;
+          case 'game':
+            if (todayActions.game) return prev;
+            break;
+        }
+      }
+
+      // Update daily actions
+      const updatedDailyActions = {
+        ...prev.dailyActions,
+        [today]: {
+          ...todayActions,
+          [action.type]: true,
+          ticketsEarned: dailyTickets + action.tickets
+        }
+      };
+
+      return {
+        ...prev,
+        currentMonthTickets: prev.currentMonthTickets + action.tickets,
+        totalLifetimeTickets: prev.totalLifetimeTickets + action.tickets,
+        ticketHistory: [action, ...prev.ticketHistory].slice(0, 100), // Keep last 100 actions
+        dailyActions: updatedDailyActions
+      };
+    });
+  };
 
   const updateUserData = (data: Partial<UserData>) => {
     setUserData(prev => ({ ...prev, ...data }));
@@ -119,6 +217,12 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   };
 
   const saveTestimony = (testimony: Testimony) => {
+    // Award bonus tickets for milestone testimonies
+    if (testimony.milestone) {
+      const ticketAction = createTicketAction('testimony', `Depoimento marco ${testimony.milestone} dias`, true);
+      awardTickets(ticketAction);
+    }
+    
     setUserData(prev => ({
       ...prev,
       testimonies: [...(prev.testimonies || []), testimony]
@@ -200,6 +304,10 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   };
 
   const saveGameResult = (result: GameResult) => {
+    // Award ticket for playing game
+    const ticketAction = createTicketAction('game', `Jogo ${result.gameType} completado`);
+    awardTickets(ticketAction);
+    
     setUserData(prev => {
       const newGameResults = [...(prev.gameResults || []), result];
       
@@ -228,6 +336,10 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
 
   const completeDailyCheckIn = (testimony?: string, isPublic?: boolean): Badge | null => {
     const today = getTodayString();
+    
+    // Award ticket for check-in
+    const ticketAction = createTicketAction('checkin', 'Check-in diário completado');
+    awardTickets(ticketAction);
     
     setUserData(prev => {
       const existingCheckIn = prev.checkIns.find(c => c.date === today);
@@ -273,7 +385,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
       // Calculate cognitive score with updated data
       const streakWeight = current * 0.8;
       const gamesWeight = updatedData.avgGameScore * 0.5;
-      const frequenciesWeight = updatedData.weeklyFrequencyMinutes * 0.2;
+      const frequenciesWeight = updatedData.weeklyFrequencyMinutes * 0.1;
       const rawScore = Math.min(100, streakWeight + gamesWeight + frequenciesWeight);
       
       return {
@@ -315,12 +427,14 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   return (
     <AppContext.Provider value={{
       userData,
+      userTicketData,
       updateUserData,
       completeOnboarding,
       loginWithEmail,
       completeDailyCheckIn,
       saveGameResult,
       saveTestimony,
+      awardTickets,
       getTodayCheckIn,
       getWeeklyProgress,
       hasCompletedToday,

@@ -14,6 +14,7 @@ import Community from './components/Community';
 import Profile from './components/Profile';
 import Frequencies from './components/Frequencies';
 import CognitiveGames from './components/CognitiveGames';
+import Raffles from './components/Raffles';
 
 const queryClient = new QueryClient();
 
@@ -42,6 +43,8 @@ const AppContent = () => {
         return <Frequencies />;
       case 'games':
         return <CognitiveGames />;
+      case 'raffles':
+        return <Raffles />;
       default:
         return <Home />;
     }

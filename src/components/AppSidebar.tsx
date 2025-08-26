@@ -6,6 +6,7 @@ import {
   Users, 
   User, 
   Brain,
+  Trophy,
   Settings,
   ChevronRight,
   ChevronLeft
@@ -32,6 +33,7 @@ interface AppSidebarProps {
 const mainItems = [
   { id: 'home', title: 'Página Inicial', icon: Home },
   { id: 'checkin', title: 'Check-in Diário', icon: CheckCircle },
+  { id: 'raffles', title: 'Sorteio Mensal', icon: Trophy },
   { id: 'activities', title: 'Atividades', icon: Activity },
   { id: 'community', title: 'Comunidade', icon: Users },
   { id: 'profile', title: 'Perfil', icon: User },
