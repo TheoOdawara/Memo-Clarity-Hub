@@ -57,15 +57,9 @@ const Auth = () => {
         window.location.href = '/';
       }
     } catch (error: any) {
-      let errorMessage = error.message || "Erro ao fazer login. Tente novamente.";
-      
-      if (error.message?.includes("Email not confirmed")) {
-        errorMessage = "Por favor, verifique seu email e clique no link de confirmação antes de fazer login.";
-      }
-      
       toast({
         title: "Erro no login",
-        description: errorMessage,
+        description: error.message || "Erro ao fazer login. Tente novamente.",
         variant: "destructive",
       });
     } finally {
@@ -97,13 +91,10 @@ const Auth = () => {
     setIsLoading(true);
 
     try {
-      const redirectUrl = `${window.location.origin}/`;
-      
       const { data, error } = await supabase.auth.signUp({
         email: signupData.email,
         password: signupData.password,
         options: {
-          emailRedirectTo: redirectUrl,
           data: {
             username: signupData.username
           }
@@ -115,8 +106,13 @@ const Auth = () => {
       if (data.user) {
         toast({
           title: "Cadastro realizado!",
-          description: "Verifique seu email para confirmar a conta.",
+          description: "Sua conta foi criada com sucesso. Fazendo login...",
         });
+        
+        // Auto login após cadastro
+        setTimeout(() => {
+          window.location.href = '/';
+        }, 1000);
       }
     } catch (error: any) {
       toast({
