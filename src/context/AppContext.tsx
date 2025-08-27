@@ -118,6 +118,7 @@ const milestones = [
 export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
+  const [isLoadingProfile, setIsLoadingProfile] = useState(false);
   const [userData, setUserData] = useState<UserData>(() => {
     const stored = localStorage.getItem('memoClarity-userData');
     return stored ? { ...defaultUserData, ...JSON.parse(stored) } : defaultUserData;
@@ -164,22 +165,62 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
 
   const isAuthenticated = !!session?.user;
 
+  const loadUserProfile = async (userId: string) => {
+    try {
+      // Prevent multiple simultaneous calls
+      if (isLoadingProfile) return;
+      setIsLoadingProfile(true);
+      
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('user_id', userId)
+        .maybeSingle();
+      
+      if (profile) {
+        setUserData(prev => {
+          // Only update if actually different to prevent unnecessary re-renders  
+          if (prev.username !== profile.username || !prev.onboardingComplete) {
+            return { 
+              ...prev, 
+              username: profile.username || prev.username,
+              onboardingComplete: true 
+            };
+          }
+          return prev;
+        });
+      }
+    } catch (error) {
+      console.error('Error loading user profile:', error);
+    } finally {
+      setIsLoadingProfile(false);
+    }
+  };
+
   // Auth state management
   useEffect(() => {
+    let mounted = true;
+    
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      if (!mounted) return;
+      
       setSession(session);
       setUser(session?.user ?? null);
       
       if (event === 'SIGNED_IN' && session?.user) {
         // Defer data loading to prevent deadlocks
         setTimeout(() => {
-          loadUserProfile(session.user.id);
+          if (mounted) {
+            loadUserProfile(session.user.id);
+          }
         }, 0);
       }
     });
 
-    // Check for existing session
+    // Check for existing session only once
     supabase.auth.getSession().then(({ data: { session } }) => {
+      if (!mounted) return;
+      
       setSession(session);
       setUser(session?.user ?? null);
       
@@ -188,7 +229,10 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
       }
     });
 
-    return () => subscription.unsubscribe();
+    return () => {
+      mounted = false;
+      subscription.unsubscribe();
+    };
   }, []);
 
   // Save to localStorage whenever userData changes
@@ -233,26 +277,6 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
       localStorage.setItem('memoClarity-lastMonth', currentMonth);
     }
   }, []);
-
-  const loadUserProfile = async (userId: string) => {
-    try {
-      const { data: profile } = await supabase
-        .from('profiles')
-        .select('*')
-        .eq('user_id', userId)
-        .maybeSingle();
-      
-      if (profile) {
-        setUserData(prev => ({ 
-          ...prev, 
-          username: profile.username || prev.username,
-          onboardingComplete: true 
-        }));
-      }
-    } catch (error) {
-      console.error('Error loading user profile:', error);
-    }
-  };
 
   const signOut = async () => {
     try {
