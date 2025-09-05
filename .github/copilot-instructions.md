@@ -1,0 +1,170 @@
+# GitHub Copilot Instructions
+
+## Project Overview
+MemoClarity MVP is a memory monitoring and cognitive health platform designed for middle-aged and elderly users. The goal is to reduce refund rates by 40% through increased engagement and perceived value.
+
+**🇺🇸 IMPORTANT: ALL CONTENT MUST BE IN ENGLISH** 
+This product will be sold in the United States market. All user-facing text, comments, variable names, and documentation must be in English only. No Portuguese, Spanish, or other languages should be used in the user interface or code.
+
+## Development Guidelines
+
+### Language Requirements
+- **ALL USER-FACING TEXT**: Must be in English (buttons, labels, messages, placeholders)
+- **CODE COMMENTS**: Write in English only
+- **VARIABLE NAMES**: Use English words and standard naming conventions
+- **ERROR MESSAGES**: All error messages and validation text in English
+- **DOCUMENTATION**: All docs, README files, and comments in English
+- **CONSOLE LOGS**: Any debug messages should be in English (though should be removed before production)
+
+### Code Style
+- Use TypeScript for all new code
+- Follow React best practices and hooks patterns
+- Use Tailwind CSS for styling
+- Implement component composition over inheritance
+- Write self-documenting code with clear variable names
+- **NO ANY TYPES**: Never use `any` type - use specific types, `unknown`, or proper interfaces
+- **TYPE SAFETY**: All variables, functions, and props must be properly typed
+- **STRICT TYPESCRIPT**: Enable strict mode and fix all type errors immediately
+- **MOBILE FIRST**: Always design for mobile screens first, then adapt for desktop using breakpoints
+- **CLEAN CODE**: Remove unused files, components, and imports regularly
+- **ACCESSIBILITY**: Design for elderly users and those with cognitive challenges (larger buttons, simple navigation, clear text)
+
+### Architecture Principles
+- Component-based architecture with clear separation of concerns
+- Custom hooks for business logic
+- Context API for global state management
+- Service layer for API integrations
+- Utility functions for reusable logic
+- **SIMPLIFIED UX**: No sidebar navigation - use card-based navigation for elderly users
+- **LARGE TOUCH TARGETS**: Buttons and interactive elements must be large and easy to tap
+- **CLEAR VISUAL HIERARCHY**: High contrast, large fonts, obvious call-to-action buttons
+
+### Project Structure
+```
+src/
+├── components/
+│   ├── ui/           # Base components (shadcn/ui)
+│   ├── layout/       # Layout components (SimpleLayout for accessibility)
+│   └── features/     # Feature-specific components
+├── pages/            # Page components
+├── hooks/            # Custom hooks
+├── services/         # API integrations (Supabase)
+├── context/          # Context providers (AuthContext)
+├── utils/            # Utility functions
+├── types/            # TypeScript definitions
+└── styles/           # Global styles
+
+**DEPRECATED COMPONENTS TO REMOVE:**
+- Complex sidebar layouts
+- Small navigation elements
+- Debug utilities after development
+- Unused layout components
+```
+
+### Technology Stack
+- **Frontend:** React 18 + TypeScript + Vite
+- **Styling:** Tailwind CSS + shadcn/ui
+- **Backend:** Supabase (Auth, Database, Storage)
+- **Routing:** React Router v6
+- **State Management:** Context API + useState/useReducer
+- **Testing:** Jest + React Testing Library
+
+### Development Process
+1. Follow the Sprint-based roadmap in docs/ROADMAP.md
+2. Check docs/NEXT_STEPS.md for immediate tasks
+3. Update documentation as features are implemented
+4. Write tests for critical functionality
+5. Ensure responsive design for all components
+6. **MOBILE FIRST**: Test on mobile devices primarily, desktop is secondary
+7. **CLEAN AS YOU GO**: Remove unused files, imports, and debug code immediately
+8. **ACCESSIBILITY FIRST**: Consider elderly users in every design decision
+
+### Terminal Commands
+- Always use PowerShell syntax for terminal commands
+- Use PowerShell-specific syntax: `;` for command chaining, `&&` alternatives
+- Prefer PowerShell native commands when available
+- Example: `cd path; npm install` instead of `cd path && npm install`
+
+### Code Cleanup Guidelines
+- **REMOVE IMMEDIATELY**: Debug files, test utilities, unused components after development
+- **REGULAR CLEANUP**: Check for unused imports, variables, functions weekly
+- **FILE ORGANIZATION**: Remove deprecated layout components when new ones are implemented
+- **IMPORT CLEANUP**: Remove unused imports with each commit
+- **CONSOLE LOGS**: Remove all console.log statements before production
+- **COMMENT CLEANUP**: Remove TODO comments when tasks are completed
+- **TYPE SAFETY**: Replace any `any` types with proper TypeScript types immediately
+- **LINT COMPLIANCE**: Code must pass ESLint with zero errors and warnings
+
+### User Experience Guidelines
+- **TARGET AUDIENCE**: Middle-aged and elderly users, some with early-stage Alzheimer's
+- **SIMPLICITY**: Minimize cognitive load - fewer options, clearer paths
+- **LARGE UI ELEMENTS**: All buttons minimum 44px tap target, prefer 60px+
+- **HIGH CONTRAST**: Use clear color differences for accessibility
+- **CONSISTENT NAVIGATION**: Same navigation pattern across all pages
+- **MINIMAL TEXT**: Use icons with labels, avoid lengthy explanations
+- **ERROR PREVENTION**: Clear validation, helpful error messages
+- **DEMO MODE**: Always provide demo/test functionality for easy onboarding
+### Key Features to Implement
+1. **Authentication System** - Supabase Auth integration with demo mode
+2. **Daily Check-in** - Mood, sleep, energy tracking (simplified interface)
+3. **Cognitive Games** - Memory tests and brain training (large buttons, clear instructions)
+4. **Progress Dashboard** - Analytics and insights (visual, easy to understand)
+5. **Gamification** - Badges, streaks, achievements (motivational, not overwhelming)
+6. **Community Features** - Simulated social interactions (optional, simple)
+
+### Code Quality Standards
+- TypeScript strict mode enabled
+- ESLint and Prettier configured
+- Component props properly typed
+- Error boundaries implemented
+- Loading states for async operations
+- Accessible UI components (WCAG guidelines)
+- **NO ANY TYPES**: Forbidden to use `any` - use proper TypeScript types
+- **TYPE DEFINITIONS**: Create specific interfaces and types for all data structures
+- **NO UNUSED CODE**: Remove unused imports, components, files immediately
+- **CLEAN BUILDS**: Zero warnings in production builds
+- **MOBILE PERFORMANCE**: Optimize for mobile devices primarily
+
+### Performance Considerations
+- Lazy load routes and heavy components
+- Optimize images and assets
+- Implement proper caching strategies
+- Use React.memo for expensive components
+- Monitor bundle size and Core Web Vitals
+
+### Security Guidelines
+- Implement Row Level Security (RLS) in Supabase
+- Validate all user inputs
+- Use HTTPS for all communications
+- Implement proper session management
+- Follow OWASP security practices
+
+### Testing Strategy
+- Unit tests for utility functions and hooks
+- Component tests for UI interactions
+- Integration tests for user flows
+- E2E tests for critical paths
+- Performance testing for optimization
+
+## Current Sprint Focus
+Focus on Sprint 1: Foundation and Authentication
+- Setup Vite + React + TypeScript project ✅
+- Configure Tailwind CSS and development tools ✅
+- Implement Supabase integration ✅
+- Create authentication system with demo mode ✅
+- Build simplified layout and navigation (no sidebar) ✅
+- Ensure mobile-first responsive design ✅
+
+## Important Decisions Made
+- **NO SIDEBAR**: Card-based navigation only for simplicity
+- **DEMO LOGIN**: Always provide demo mode for testing and onboarding
+- **MOBILE FIRST**: Primary focus on mobile experience
+- **ELDERLY-FRIENDLY**: Large buttons, simple navigation, high contrast
+- **CLEAN CODE**: Remove debug utilities and unused code regularly
+
+## Communication Style
+- Provide clear explanations for architectural decisions
+- Ask for confirmation before major changes
+- Suggest improvements and optimizations
+- Focus on MVP scope and avoid feature creep
+- Prioritize user experience and accessibility

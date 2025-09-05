@@ -1,73 +1,98 @@
-# Welcome to your Lovable project
+# 🧠 MemoClarity MVP
 
-## Project info
+## 📖 Sobre o Projeto
 
-**URL**: https://lovable.dev/projects/b5409825-088b-494e-859d-48d228c17162
+MemoClarity é uma plataforma inovadora de monitoramento de memória e saúde cognitiva, especialmente desenvolvida para pessoas de meia-idade e idosos. O MVP foca nas funcionalidades essenciais para validar o conceito e reduzir a taxa de reembolso do produto principal.
 
-## How can I edit this code?
+## 🎯 Objetivos do MVP
 
-There are several ways of editing your application.
+- **Reduzir 40% da taxa de reembolso** atual
+- **Aumentar engajamento** dos usuários através de gamificação
+- **Facilitar acompanhamento** da saúde cognitiva de forma simples
+- **Criar comunidade** de apoio e motivação
 
-**Use Lovable**
+## 🚀 Funcionalidades Principais
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/b5409825-088b-494e-859d-48d228c17162) and start prompting.
+### ✅ Core Features
+- 🔐 **Sistema de Autenticação** (Login/Registro)
+- 📝 **Check-in Diário** para monitoramento
+- 🧠 **Jogos Cognitivos** para treino de memória
+- 📊 **Dashboard de Progresso** personalizado
+- 🏆 **Sistema de Gamificação** (badges, streaks, pontos)
 
-Changes made via Lovable will be committed automatically to this repo.
+### 🔄 Features Secundárias
+- 👥 **Comunidade Simulada** com interações
+- 💬 **Chat de Suporte** em tempo real
+- 📈 **Relatórios Avançados** de progresso
+- 🎯 **Desafios Semanais** para engajamento
 
-**Use your preferred IDE**
+## 🛠️ Stack Tecnológica
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+- **Frontend:** React 18 + TypeScript + Vite
+- **Styling:** Tailwind CSS
+- **Backend:** Supabase (Auth + Database + Storage)
+- **Routing:** React Router v6
+- **Deploy:** Vercel/Netlify
+- **Analytics:** Supabase Analytics
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+## 📁 Estrutura do Projeto
 
-Follow these steps:
+```
+MVP/
+├── docs/                    # Documentação completa
+│   ├── ROADMAP.md          # Roadmap detalhado por sprints
+│   ├── NEXT_STEPS.md       # Próximos passos imediatos
+│   └── ARCHITECTURE.md     # Arquitetura técnica
+├── src/                    # Código fonte (será criado)
+├── public/                 # Assets públicos (será criado)
+├── .github/               # Configurações GitHub
+└── README.md              # Este arquivo
+```
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+## 🏃‍♂️ Quick Start
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+```bash
+# 1. Clone o repositório
+git clone [url-do-repo]
+cd MVP
 
-# Step 3: Install the necessary dependencies.
-npm i
+# 2. Instale dependências
+npm install
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
+# 3. Configure variáveis de ambiente
+cp .env.example .env.local
+# Edite .env.local com suas credenciais
+
+# 4. Execute em desenvolvimento
 npm run dev
 ```
 
-**Edit a file directly in GitHub**
+## 📚 Documentação
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+- 📋 [Próximos Passos](./docs/NEXT_STEPS.md) - Tarefas imediatas
+- 🗺️ [Roadmap](./docs/ROADMAP.md) - Planejamento completo
+- 🏗️ [Arquitetura](./docs/ARCHITECTURE.md) - Decisões técnicas
 
-**Use GitHub Codespaces**
+## 🎯 Status Atual
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+**Sprint 1:** 🔄 Configuração Inicial
+- [ ] Configurar projeto base
+- [ ] Implementar autenticação
+- [ ] Criar estrutura de navegação
 
-## What technologies are used for this project?
+## 📊 Métricas de Sucesso
 
-This project is built with:
+- 📉 **40% redução** na taxa de reembolso
+- 📈 **80% dos usuários** fazem check-in 5x por semana
+- ⏰ **15+ minutos** de tempo médio de sessão
+- 🔄 **70% retenção** em 30 dias
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+## 🤝 Contribuição
 
-## How can I deploy this project?
+Este projeto segue um roadmap estruturado em sprints. Consulte os documentos em `docs/` para entender o planejamento e próximos passos.
 
-Simply open [Lovable](https://lovable.dev/projects/b5409825-088b-494e-859d-48d228c17162) and click on Share -> Publish.
+---
 
-## Can I connect a custom domain to my Lovable project?
-
-Yes, you can!
-
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
-
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)
+**Última atualização:** Setembro 2025  
+**Versão:** MVP v1.0  
+**Status:** 🚧 Em desenvolvimento
