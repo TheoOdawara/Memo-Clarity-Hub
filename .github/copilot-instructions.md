@@ -6,6 +6,50 @@ MemoClarity MVP is a memory monitoring and cognitive health platform designed fo
 **🇺🇸 IMPORTANT: ALL CONTENT MUST BE IN ENGLISH** 
 This product will be sold in the United States market. All user-facing text, comments, variable names, and documentation must be in English only. No Portuguese, Spanish, or other languages should be used in the user interface or code.
 
+## Visual Identity Guidelines
+
+### Color Palette
+The color palette has been carefully selected based on color psychology to evoke the right emotions: trust, hope, vitality, and renewal.
+
+**Primary Color | Trust and Stability**
+- Deep Teal Blue: `#0B4F6C`
+- Usage: Main brand color. Ideal for titles, primary buttons, highlight areas, and logo body. Conveys seriousness, calm, intelligence, and the scientific foundation of treatment.
+
+**Secondary Color | Hope and Optimism**
+- Vibrant Gold: `#FCA311`
+- Usage: Point of light and hope. Perfect for important icons, call-to-action (CTAs), and highlighting "clarity" elements in logo and website. Symbolizes sunrise and the energy of rediscovery.
+
+**Accent Color | Warmth and Vitality**
+- Soft Coral: `#FF6F61`
+- Usage: To bring a touch of human warmth and care. Use moderately in interaction elements, testimonials, or areas that need a more personal and vibrant feeling.
+
+**Stimulating Color | Renewal and Well-being**
+- Soft Aqua Green: `#A7D9D3`
+- Usage: Represents freshness, growth, and health. Great for section backgrounds, information cards, or elements that need to convey calm and renewal.
+
+**Neutrals | Clarity and Readability**
+- Soft White: `#F8F9FA`
+- Usage: Main background color. More comfortable for eyes than pure white, ideal for older audiences and long reading sessions.
+- Dark Gray (Text): `#212529`
+- Usage: Body text color. Offers high contrast and excellent readability without the harshness of absolute black.
+
+### Typography
+Font combination chosen to be modern, highly readable, and with a human touch, ensuring accessibility and a pleasant reading experience.
+
+**Heading Font: Poppins**
+- Why: Clean, geometric font with rounded corners that makes it friendly and welcoming. Conveys professionalism without being cold. Great for menus, section titles, and any highlight text.
+- Suggested weight: SemiBold or Bold for main titles, Regular for subtitles.
+
+**Body Text Font: Nunito Sans**
+- Why: One of the most readable fonts for screen. Its rounded endings give a soft and friendly sensation, making long paragraph reading a comfortable and effortless experience.
+- Suggested weight: Regular for all body text.
+
+### Implementation in Code
+- Use Tailwind CSS custom colors: `text-teal-800`, `bg-amber-400`, `text-coral-500`, `bg-aqua-200`
+- Import Google Fonts: Poppins (400, 600, 700) and Nunito Sans (400, 600)
+- Ensure WCAG accessibility standards with color contrasts
+- Maintain consistent spacing and typography scales
+
 ## Development Guidelines
 
 ### Language Requirements
@@ -161,6 +205,10 @@ Focus on Sprint 1: Foundation and Authentication
 - **MOBILE FIRST**: Primary focus on mobile experience
 - **ELDERLY-FRIENDLY**: Large buttons, simple navigation, high contrast
 - **CLEAN CODE**: Remove debug utilities and unused code regularly
+- **ENGLISH ONLY**: All content for US market
+- **NO ANY TYPES**: Strict TypeScript typing without any
+- **CONVENTIONAL COMMITS**: Clear, meaningful commit messages for better project history
+- **VISUAL IDENTITY**: Follow MemoClarity color palette and typography guidelines consistently
 
 ## Communication Style
 - Provide clear explanations for architectural decisions

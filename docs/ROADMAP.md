@@ -16,35 +16,46 @@ Estabelecer a base sólida do projeto com estrutura, autenticação e navegaçã
 ### 📋 Tarefas
 
 #### Configuração Inicial
-- [ ] Configurar projeto Vite com React + TypeScript
-- [ ] Configurar Tailwind CSS + PostCSS
-- [ ] Configurar ESLint + Prettier
-- [ ] Configurar estrutura de pastas conforme padrão
-- [ ] Configurar variáveis de ambiente (.env)
-- [ ] Configurar Supabase no projeto
+- ✅ Configurar projeto Vite com React + TypeScript
+- ✅ Configurar Tailwind CSS + PostCSS
+- ✅ Configurar ESLint + Prettier com regras strict
+- ✅ Configurar estrutura de pastas conforme padrão
+- ✅ Configurar variáveis de ambiente (.env)
+- ✅ Configurar Supabase no projeto
+- ✅ Limpeza de código e remoção de arquivos vazios
+- ✅ Criação de .gitignore adequado
 
 #### Sistema de Autenticação
-- [ ] Integrar autenticação com Supabase Auth
-- [ ] Criar página de Login/Registro com validação
-- [ ] Implementar login com email/senha
-- [ ] Implementar login social (Google)
-- [ ] Criar sistema de proteção de rotas
-- [ ] Implementar logout e gestão de sessão
-- [ ] Criar validação de sessão automática
+- ✅ Integrar autenticação com Supabase Auth
+- ✅ Criar página de Login/Registro com validação
+- ✅ Implementar login com email/senha
+- ⏳ Implementar login social (Google)
+- ✅ Criar sistema de proteção de rotas
+- ✅ Implementar logout e gestão de sessão
+- ✅ Criar validação de sessão automática
 
 #### Navegação e Layout
-- [ ] Criar componente de Layout principal
-- [ ] Implementar sistema de roteamento (React Router)
-- [ ] Criar navegação lateral/header responsiva
-- [ ] Implementar navegação dinâmica
-- [ ] Criar página de perfil básica
-- [ ] Implementar breadcrumbs
+- ✅ Criar componente de Layout principal
+- ✅ Implementar sistema de roteamento (React Router)
+- ✅ Criar navegação lateral/header responsiva
+- ✅ Implementar navegação dinâmica
+- ⏳ Criar página de perfil básica
+- ⏳ Implementar breadcrumbs
+
+#### Identidade Visual
+- ✅ Mover logos para estrutura correta (src/assets)
+- 🔄 Implementar MemoClarity logo na página de login
+- ⏳ Aplicar paleta de cores oficial
+- ⏳ Implementar tipografia Poppins/Nunito Sans
+- ⏳ Criar componentes UI consistentes
 
 ### 🎯 **Entregáveis Sprint 1**
 - ✅ Usuário pode se registrar e fazer login
 - ✅ Dashboard básico funcional
 - ✅ Navegação entre páginas
 - ✅ Layout responsivo
+- ✅ Código limpo e organizado
+- 🔄 Identidade visual implementada
 
 ---
 

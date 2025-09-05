@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useAuth } from '@/hooks/useAuth'
+import LogoMemoClarity from '@/assets/LogoParaQualquerFundo.png'
 
 export default function LoginPage() {
   const { signIn, signUp, loginDemo, loading, error } = useAuth()
@@ -36,12 +37,12 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-violet-900 via-purple-900 to-indigo-900 relative overflow-hidden">
-      {/* Background decorativo animado */}
+    <div className="min-h-screen bg-gradient-to-br from-teal-900 via-slate-800 to-indigo-900 relative overflow-hidden">
+      {/* Background decorativo com cores da marca */}
       <div className="absolute inset-0">
-        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-gradient-to-r from-purple-400 to-pink-400 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob"></div>
+        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-gradient-to-r from-teal-400 to-cyan-400 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob"></div>
         <div className="absolute top-1/3 right-1/4 w-96 h-96 bg-gradient-to-r from-yellow-400 to-orange-400 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob animation-delay-2000"></div>
-        <div className="absolute bottom-1/4 left-1/3 w-96 h-96 bg-gradient-to-r from-blue-400 to-green-400 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob animation-delay-4000"></div>
+        <div className="absolute bottom-1/4 left-1/3 w-96 h-96 bg-gradient-to-r from-emerald-400 to-teal-400 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob animation-delay-4000"></div>
       </div>
 
       {/* Padrão de pontos */}
@@ -50,25 +51,27 @@ export default function LoginPage() {
       <div className="relative z-10 min-h-screen flex items-center justify-center p-6">
         {/* Formulário centralizado */}
         <div className="w-full max-w-md">
-          {/* Logo */}
+          {/* Logo MemoClarity */}
           <div className="text-center mb-8">
-            <div className="w-20 h-20 mx-auto mb-4 bg-gradient-to-br from-pink-400 via-purple-400 to-indigo-400 rounded-3xl flex items-center justify-center shadow-2xl">
-              <svg className="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
-              </svg>
+            <div className="w-32 h-32 mx-auto mb-6 flex items-center justify-center">
+              <img 
+                src={LogoMemoClarity} 
+                alt="MemoClarity Logo" 
+                className="w-full h-full object-contain filter drop-shadow-2xl"
+              />
             </div>
-            <h1 className="text-4xl font-bold text-white mb-2">MemoClarity</h1>
-            <p className="text-purple-200">Welcome back</p>
+            <h1 className="text-4xl font-bold text-white mb-2 font-sans">MemoClarity</h1>
+            <p className="text-teal-200 text-lg">Enhance Your Memory, Brighten Your Mind</p>
           </div>
 
           {/* Card do formulário */}
           <div className="bg-white/10 backdrop-blur-xl rounded-3xl p-8 shadow-2xl border border-white/20">
             <div className="text-center mb-8">
               <h2 className="text-2xl font-bold text-white mb-2">
-                {isSignUp ? '✨ Create Account' : '🚀 Sign In'}
+                {isSignUp ? 'Create Account' : 'Sign In'}
               </h2>
-              <p className="text-purple-200">
-                {isSignUp ? 'Join our community' : 'Continue your journey'}
+              <p className="text-teal-200">
+                {isSignUp ? 'Join our memory enhancement platform' : 'Welcome back to your cognitive journey'}
               </p>
             </div>
 
@@ -84,8 +87,8 @@ export default function LoginPage() {
               <form onSubmit={handleSubmit} className="space-y-6">
                 <div className="space-y-4">
                   <div>
-                    <label htmlFor="email" className="block text-sm font-semibold text-purple-100 mb-2">
-                      📧 Email
+                    <label htmlFor="email" className="block text-sm font-semibold text-teal-100 mb-2">
+                      Email Address
                     </label>
                     <input
                       id="email"
@@ -93,13 +96,13 @@ export default function LoginPage() {
                       type="email"
                       required
                       placeholder="your@email.com"
-                      className="w-full px-4 py-4 bg-white/10 border border-white/20 rounded-2xl focus:outline-none focus:ring-2 focus:ring-purple-400 focus:border-transparent transition-all duration-300 placeholder-purple-200 text-white backdrop-blur-sm"
+                      className="w-full px-4 py-4 bg-white/10 border border-white/20 rounded-2xl focus:outline-none focus:ring-2 focus:ring-teal-400 focus:border-transparent transition-all duration-300 placeholder-teal-200 text-white backdrop-blur-sm"
                     />
                   </div>
                   
                   <div>
-                    <label htmlFor="password" className="block text-sm font-semibold text-purple-100 mb-2">
-                      🔐 Password
+                    <label htmlFor="password" className="block text-sm font-semibold text-teal-100 mb-2">
+                      Password
                     </label>
                     <input
                       id="password"
@@ -107,7 +110,7 @@ export default function LoginPage() {
                       type="password"
                       required
                       placeholder="••••••••"
-                      className="w-full px-4 py-4 bg-white/10 border border-white/20 rounded-2xl focus:outline-none focus:ring-2 focus:ring-purple-400 focus:border-transparent transition-all duration-300 placeholder-purple-200 text-white backdrop-blur-sm"
+                      className="w-full px-4 py-4 bg-white/10 border border-white/20 rounded-2xl focus:outline-none focus:ring-2 focus:ring-teal-400 focus:border-transparent transition-all duration-300 placeholder-teal-200 text-white backdrop-blur-sm"
                     />
                   </div>
                 </div>
@@ -115,7 +118,7 @@ export default function LoginPage() {
                 <button
                   type="submit"
                   disabled={loading}
-                  className="w-full py-4 px-6 bg-gradient-to-r from-purple-500 to-pink-500 text-white font-bold rounded-2xl hover:from-purple-600 hover:to-pink-600 focus:outline-none focus:ring-2 focus:ring-purple-400 focus:ring-offset-2 focus:ring-offset-transparent disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 shadow-xl hover:shadow-2xl transform hover:scale-105"
+                  className="w-full py-4 px-6 bg-gradient-to-r from-teal-600 to-teal-700 text-white font-bold rounded-2xl hover:from-teal-700 hover:to-teal-800 focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:ring-offset-2 focus:ring-offset-transparent disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 shadow-xl hover:shadow-2xl transform hover:scale-105"
                 >
                   {loading ? (
                     <div className="flex items-center justify-center space-x-2">
@@ -126,7 +129,7 @@ export default function LoginPage() {
                       <span>{isSignUp ? 'Creating account...' : 'Signing in...'}</span>
                     </div>
                   ) : (
-                    isSignUp ? '✨ Create Account' : '🚀 Sign In Now'
+                    isSignUp ? 'Create Account' : 'Sign In'
                   )}
                 </button>
               </form>
@@ -135,11 +138,11 @@ export default function LoginPage() {
               <div className="mt-6 text-center">
                 <button
                   onClick={() => setIsSignUp(!isSignUp)}
-                  className="text-sm text-purple-200 hover:text-white font-medium hover:underline transition-colors"
+                  className="text-sm text-teal-200 hover:text-yellow-300 font-medium hover:underline transition-colors"
                 >
                   {isSignUp 
-                    ? '👋 Already have an account? Sign In' 
-                    : '🆕 No account? Create one now'
+                    ? 'Already have an account? Sign In' 
+                    : 'Need an account? Create one now'
                   }
                 </button>
               </div>
@@ -147,16 +150,18 @@ export default function LoginPage() {
               {/* Divisor */}
               <div className="my-6 flex items-center">
                 <div className="flex-1 border-t border-white/20"></div>
-                <span className="px-4 text-sm text-purple-200">or</span>
+                <span className="px-4 text-sm text-teal-200">or</span>
                 <div className="flex-1 border-t border-white/20"></div>
               </div>
 
               {/* Botão Demo */}
               <button
                 onClick={handleDemoLogin}
-                className="w-full py-3 px-4 bg-white/10 text-white font-medium rounded-2xl hover:bg-white/20 focus:outline-none focus:ring-2 focus:ring-white/50 transition-all duration-300 flex items-center justify-center space-x-2 backdrop-blur-sm border border-white/20"
+                className="w-full py-3 px-4 bg-yellow-500/20 text-yellow-100 font-medium rounded-2xl hover:bg-yellow-500/30 focus:outline-none focus:ring-2 focus:ring-yellow-400/50 transition-all duration-300 flex items-center justify-center space-x-2 backdrop-blur-sm border border-yellow-400/30"
               >
-                <span className="text-xl">🎭</span>
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                </svg>
                 <span>Demo Mode</span>
               </button>
 
@@ -164,18 +169,18 @@ export default function LoginPage() {
               <div className="mt-6 pt-6 border-t border-white/20">
                 <button
                   onClick={runTests}
-                  className="w-full py-2 px-4 text-sm text-purple-200 bg-white/5 hover:bg-white/10 rounded-xl transition-colors flex items-center justify-center space-x-2 backdrop-blur-sm"
+                  className="w-full py-2 px-4 text-sm text-teal-200 bg-white/5 hover:bg-teal-500/10 rounded-xl transition-colors flex items-center justify-center space-x-2 backdrop-blur-sm"
                 >
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                   </svg>
-                  <span>🔧 Test System</span>
+                  <span>Test System</span>
                 </button>
                 
                 {testResults && (
-                  <div className="mt-3 p-3 bg-white/5 rounded-xl backdrop-blur-sm border border-white/10">
-                    <pre className="text-xs text-purple-100 whitespace-pre-wrap">
+                  <div className="mt-3 p-3 bg-teal-500/10 rounded-xl backdrop-blur-sm border border-teal-400/20">
+                    <pre className="text-xs text-teal-100 whitespace-pre-wrap">
                       {testResults}
                     </pre>
                   </div>
@@ -185,8 +190,8 @@ export default function LoginPage() {
 
           {/* Footer simplificado */}
           <div className="text-center mt-8">
-            <p className="text-sm text-purple-300">
-              💜 Memory care platform
+            <p className="text-sm text-teal-300">
+              Enhance Your Memory, Brighten Your Mind
             </p>
           </div>
         </div>
