@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
+import { Brain, ArrowUpRight } from 'lucide-react';
 
 export default function ProfessionalDashboard() {
   const [checkedIn, setCheckedIn] = useState(false);
@@ -68,13 +69,32 @@ export default function ProfessionalDashboard() {
             {/* Grid dos cards com ordem lógica no desktop */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 grid-rows-6 sm:grid-rows-3 lg:grid-rows-2 gap-8 w-full max-w-3xl">
               {/* Coluna 1 */}
-              <button
-                className="flex flex-col items-center justify-center w-full h-[220px] rounded-2xl bg-gradient-to-br from-teal-400 via-teal-300 to-teal-500 text-white font-bold shadow-xl hover:scale-105 hover:shadow-2xl transition-all text-lg drop-shadow focus:outline-none focus:ring-2 focus:ring-teal-400 border-2 border-teal-200"
-                onClick={() => window.location.href = '/games'}
-              >
-                <span className="mb-2 text-3xl">🧠</span>
-                Go to Test Page
-                <span className="text-xs font-normal mt-1">Challenge your mind</span>
+              {/* Go to Test Page - Estilo Criativo */}
+              <button className="relative flex flex-col items-center justify-center w-full h-[220px] rounded-2xl bg-teal-500 text-white font-bold shadow-xl overflow-hidden transition-all duration-300 ease-in-out hover:shadow-2xl hover:scale-105 focus:outline-none focus:ring-2 focus:ring-teal-300" onClick={() => window.location.href = '/games'}>
+                <div className="absolute -top-4 -right-4 w-24 h-24 bg-white/10 rounded-full animate-pulse"></div>
+                <div className="absolute -bottom-8 -left-8 w-32 h-32 bg-white/10 rounded-lg rotate-45"></div>
+                <span className="mb-4 z-10">
+                  <div className="relative w-[76px] h-[76px]">
+                    {/* Glow tint */}
+                    <div className="absolute inset-0 rounded-full bg-cyan-200/30 blur-md"></div>
+                    {/* Outer frame (colored) */}
+                    <div className="absolute inset-0 rounded-full border-[2.5px] border-cyan-200" />
+                    {/* Inner frame (neutral) */}
+                    <div className="absolute inset-1 rounded-full border-2 border-white/60" />
+                    {/* Soft inner fill */}
+                    <div className="absolute inset-2 rounded-full bg-white/10 backdrop-blur-[1px]" />
+                    {/* Brain icon */}
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <Brain size={36} strokeWidth={2.5} className="text-white" />
+                    </div>
+                    {/* Corner badge arrow (clean) */}
+                    <div className="absolute -right-1 -top-1 bg-white rounded-full p-1 shadow-sm">
+                      <ArrowUpRight size={18} strokeWidth={2.5} className="text-teal-600" />
+                    </div>
+                  </div>
+                </span>
+                <span className="z-10">Go to Test Page</span>
+                <span className="text-xs font-normal mt-1 z-10">Challenge your mind</span>
               </button>
               <div className="flex flex-col items-center justify-center w-full h-[220px] rounded-2xl bg-white/80 backdrop-blur shadow-xl border-2 border-yellow-200">
                 <span className="mb-2 text-3xl text-yellow-500">📝</span>
