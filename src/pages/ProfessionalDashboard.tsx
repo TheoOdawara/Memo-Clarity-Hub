@@ -63,30 +63,60 @@ export default function ProfessionalDashboard() {
           </div>
         </section>
         {/* Stats and actions below check-in card */}
-        <section className="w-full max-w-5xl mx-auto mt-8 flex flex-col md:flex-row items-stretch gap-6 px-4">
-          <div className="flex flex-col md:flex-row gap-6 flex-1">
-            <div className="flex-1 flex flex-col items-center justify-center bg-white/80 backdrop-blur rounded-2xl shadow-lg border border-gray-100 p-6 mb-4 md:mb-0">
-              <span className="text-xs text-gray-500 mb-1">Highest Score</span>
-              <span className="text-3xl font-extrabold text-teal-700 mb-2">1280</span>
+        <section className="w-full flex justify-center items-center mt-8 px-4">
+          <div className="flex flex-col lg:flex-row gap-10 w-full max-w-6xl items-center justify-center">
+            {/* Grid dos cards com ordem lógica no desktop */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 grid-rows-6 sm:grid-rows-3 lg:grid-rows-2 gap-8 w-full max-w-3xl">
+              {/* Coluna 1 */}
+              <button
+                className="flex flex-col items-center justify-center w-full h-[220px] rounded-2xl bg-gradient-to-br from-teal-400 via-teal-300 to-teal-500 text-white font-bold shadow-xl hover:scale-105 hover:shadow-2xl transition-all text-lg drop-shadow focus:outline-none focus:ring-2 focus:ring-teal-400 border-2 border-teal-200"
+                onClick={() => window.location.href = '/games'}
+              >
+                <span className="mb-2 text-3xl">🧠</span>
+                Go to Test Page
+                <span className="text-xs font-normal mt-1">Challenge your mind</span>
+              </button>
+              <div className="flex flex-col items-center justify-center w-full h-[220px] rounded-2xl bg-white/80 backdrop-blur shadow-xl border-2 border-yellow-200">
+                <span className="mb-2 text-3xl text-yellow-500">📝</span>
+                <span className="text-base font-bold text-gray-900 tracking-tight mb-1 font-sans">Tests Taken</span>
+                <span className="text-5xl font-extrabold text-teal-700 drop-shadow mb-2 font-sans">14</span>
+              </div>
+              {/* Coluna 2 */}
+              <button
+                className="flex flex-col items-center justify-center w-full h-[220px] rounded-2xl bg-gradient-to-br from-yellow-500 via-yellow-400 to-yellow-600 text-white font-bold shadow-xl hover:scale-105 hover:shadow-2xl transition-all text-lg drop-shadow focus:outline-none focus:ring-2 focus:ring-yellow-400 border-2 border-yellow-200"
+                onClick={() => window.location.href = '/raffles'}
+              >
+                <span className="mb-2 text-3xl">🎁</span>
+                Go to Raffle Page
+                <span className="text-xs font-normal mt-1">Win exclusive prizes</span>
+              </button>
+              <button
+                className="flex flex-col items-center justify-center w-full h-[220px] rounded-2xl bg-gradient-to-br from-yellow-400 via-yellow-300 to-yellow-500 text-white font-bold shadow-xl hover:scale-105 hover:shadow-2xl transition-all text-lg drop-shadow focus:outline-none focus:ring-2 focus:ring-yellow-400 border-2 border-yellow-200"
+                onClick={() => alert('Track action')}
+              >
+                <span className="mb-2 text-3xl">📈</span>
+                Track
+                <span className="text-xs font-normal mt-1">Monitor your progress</span>
+              </button>
+              {/* Coluna 3 */}
+              <div className="flex flex-col items-center justify-center w-full h-[220px] rounded-2xl bg-white/80 backdrop-blur shadow-xl border-2 border-teal-200">
+                <span className="mb-2 text-3xl text-teal-600">🏆</span>
+                <span className="text-base font-bold text-gray-900 tracking-tight mb-1 font-sans">Highest Score</span>
+                <span className="text-5xl font-extrabold text-teal-700 drop-shadow mb-2 font-sans">1280</span>
+              </div>
+              <button
+                className="flex flex-col items-center justify-center w-full h-[220px] rounded-2xl bg-gradient-to-br from-teal-500 via-teal-400 to-teal-600 text-white font-bold shadow-xl hover:scale-105 hover:shadow-2xl transition-all text-lg drop-shadow focus:outline-none focus:ring-2 focus:ring-teal-400 border-2 border-teal-200"
+                onClick={() => alert('Support action')}
+              >
+                <span className="mb-2 text-3xl">💬</span>
+                Support
+                <span className="text-xs font-normal mt-1">Get help and guidance</span>
+              </button>
             </div>
-            <div className="flex-1 flex flex-col items-center justify-center bg-white/80 backdrop-blur rounded-2xl shadow-lg border border-gray-100 p-6 mb-4 md:mb-0">
-              <span className="text-xs text-gray-500 mb-1">Tests Taken</span>
-              <span className="text-3xl font-extrabold text-teal-700 mb-2">14</span>
+            {/* Área reservada para vídeo, alinhada verticalmente ao grid dos cards */}
+            <div className="flex items-center justify-center w-full lg:w-[340px] min-h-[460px] bg-white/40 rounded-2xl border-2 border-dashed border-teal-200 shadow-xl">
+              <span className="text-gray-400 text-lg">Área reservada para vídeo</span>
             </div>
-          </div>
-          <div className="flex flex-col items-center justify-center gap-4 flex-1 bg-white/80 backdrop-blur rounded-2xl shadow-lg border border-gray-100 p-6">
-            <button
-              className="w-full px-4 py-3 rounded-xl bg-teal-600 text-white font-bold shadow hover:bg-teal-700 transition-all text-base"
-              onClick={() => window.location.href = '/games'}
-            >
-              Go to Test Page
-            </button>
-            <button
-              className="w-full px-4 py-3 rounded-xl bg-yellow-500 text-white font-bold shadow hover:bg-yellow-600 transition-all text-base"
-              onClick={() => window.location.href = '/raffles'}
-            >
-              Go to Raffle Page
-            </button>
           </div>
         </section>
       </div>
