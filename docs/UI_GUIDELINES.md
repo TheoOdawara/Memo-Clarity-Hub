@@ -1,38 +1,38 @@
 # MemoClarity UI Guidelines (Draft)
 
-> Este documento serve como referência inicial para manter consistência visual e estrutural nas telas do MemoClarity. O foco é padronizar containers, tipografia, cores, espaçamento e componentes base. O refinamento de UI/UX será feito posteriormente.
+> This document serves as an initial reference to maintain visual and structural consistency across MemoClarity screens. The focus is to standardize containers, typography, colors, spacing, and base components. UI/UX refinement will be done later.
 
-## Estrutura Base
-- Container centralizado: `max-w-2xl mx-auto w-full px-4 py-6`
-- Espaçamento vertical entre seções: `mb-6` ou `space-y-6`
-- Responsividade: mobile first, depois desktop
+## Base Structure
+- Centered container: `max-w-2xl mx-auto w-full px-4 py-6`
+- Vertical spacing between sections: `mb-6` or `space-y-6`
+- Responsiveness: mobile first, then desktop
 
-## Tipografia
-- Títulos: `font-sans font-bold text-2xl sm:text-3xl text-teal-900`
-- Subtítulos: `font-sans font-semibold text-lg text-gray-700`
-- Texto corpo: `font-sans text-base text-gray-600`
-- Pequeno: `text-sm text-gray-500`
+## Typography
+- Titles: `font-sans font-bold text-2xl sm:text-3xl text-teal-900`
+- Subtitles: `font-sans font-semibold text-lg text-gray-700`
+- Body text: `font-sans text-base text-gray-600`
+- Small: `text-sm text-gray-500`
 
-## Paleta de Cores
-- Fundo principal: `bg-gray-50` ou `bg-white/80 backdrop-blur`
-- Cores da marca: Teal (`#0B4F6C`), Gold (`#FCA311`), Coral (`#FF6F61`), Aqua (`#A7D9D3`)
-- Botões principais: `bg-teal-600 text-white`, hover `bg-teal-700`
-- Botões secundários: `bg-yellow-500 text-white`, hover `bg-yellow-600`
+## Color Palette
+- Main background: `bg-gray-50` or `bg-white/80 backdrop-blur`
+- Brand colors: Teal (`#0B4F6C`), Gold (`#FCA311`), Coral (`#FF6F61`), Aqua (`#A7D9D3`)
+- Primary buttons: `bg-teal-600 text-white`, hover `bg-teal-700`
+- Secondary buttons: `bg-yellow-500 text-white`, hover `bg-yellow-600`
 
-## Bordas, Sombras e Efeitos
-- Bordas arredondadas: `rounded-xl` ou `rounded-3xl`
-- Sombra leve: `shadow-lg` ou `shadow-xl`
-- Glassmorphism: `bg-white/80 backdrop-blur` para cards principais
+## Borders, Shadows, and Effects
+- Rounded borders: `rounded-xl` or `rounded-3xl`
+- Light shadow: `shadow-lg` or `shadow-xl`
+- Glassmorphism: `bg-white/80 backdrop-blur` for main cards
 
-## Logo e Ícones
-- Sempre usar a logo oficial em destaque no topo ou cards principais
-- Ícones SVG minimalistas, alinhados à paleta
+## Logo and Icons
+- Always use the official logo highlighted at the top or main cards
+- Minimalist SVG icons, aligned to the palette
 
-## Botões e Inputs
-- Botões: `px-6 py-3 rounded-xl font-semibold shadow transition-colors`
+## Buttons and Inputs
+- Buttons: `px-6 py-3 rounded-xl font-semibold shadow transition-colors`
 - Inputs: `rounded-xl px-4 py-3 border focus:ring-2`
 
-## Exemplo de Card Padrão
+## Example of Standard Card
 ```jsx
 <section className="bg-white/80 backdrop-blur rounded-3xl shadow-xl border border-gray-100 p-6 flex flex-col sm:flex-row items-center justify-between mb-6">
   <div className="flex items-center gap-4">

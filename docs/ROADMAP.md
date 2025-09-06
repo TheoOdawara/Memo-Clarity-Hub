@@ -1,43 +1,43 @@
 # 🗺️ Roadmap - MemoClarity MVP
 
-## 📊 Visão Geral
+## 📊 Overview
 
-Este roadmap está dividido em sprints de desenvolvimento, organizados por prioridade e dependências técnicas. Cada sprint tem duração estimada de 1-2 semanas com foco em entregar valor incremental.
+This roadmap is divided into development sprints, organized by priority and technical dependencies. Each sprint is estimated to last 1-2 weeks, focusing on delivering incremental value.
 
-**Objetivo Principal:** Reduzir 40% da taxa de reembolso através de maior engajamento e valor percebido.
+**Main Goal:** Reduce refund rate by 40% through increased engagement and perceived value.
 
 ---
 
-## 🚀 Sprint 1: Fundação e Autenticação (Semana 1-2)
+## 🚀 Sprint 1: Foundation and Authentication (Week 1-2)
 
-### 🎯 Objetivo
-Estabelecer a base sólida do projeto com estrutura, autenticação e navegação básica.
+### 🎯 Goal
+Establish a solid project foundation with structure, authentication, and basic navigation.
 
-### 📋 Tarefas
+### 📋 Tasks
 
-#### Configuração Inicial
-- ✅ Configurar projeto Vite com React + TypeScript
-- ✅ Configurar Tailwind CSS + PostCSS
-- ✅ Configurar ESLint + Prettier com regras strict
-- ✅ Configurar estrutura de pastas conforme padrão
-- ✅ Configurar variáveis de ambiente (.env)
-- ✅ Configurar Supabase no projeto
-- ✅ Limpeza de código e remoção de arquivos vazios
-- ✅ Criação de .gitignore adequado
+#### Initial Setup
+- ✅ Set up Vite project with React + TypeScript
+- ✅ Set up Tailwind CSS + PostCSS
+- ✅ Set up ESLint + Prettier with strict rules
+- ✅ Organize folder structure according to standard
+- ✅ Set up environment variables (.env)
+- ✅ Integrate Supabase into the project
+- ✅ Clean up code and remove empty files
+- ✅ Create proper .gitignore
 
-#### Sistema de Autenticação
-- ✅ Integrar autenticação com Supabase Auth
-- ✅ Criar página de Login/Registro com validação
-- ✅ Implementar login com email/senha
-- ⏳ Implementar login social (Google)
-- ✅ Criar sistema de proteção de rotas
-- ✅ Implementar logout e gestão de sessão
-- ✅ Criar validação de sessão automática
+#### Authentication System
+- ✅ Integrate authentication with Supabase Auth
+- ✅ Create Login/Register page with validation
+- ✅ Implement email/password login
+- ⏳ Implement social login (Google)
+- ✅ Create route protection system
+- ✅ Implement logout and session management
+- ✅ Create automatic session validation
 
-#### Navegação e Layout
-- ✅ Criar componente de Layout principal
-- ✅ Implementar sistema de roteamento (React Router)
-- ✅ Criar navegação lateral/header responsiva
+#### Navigation and Layout
+- ✅ Create main Layout component
+- ✅ Implement routing system (React Router)
+- ✅ Create responsive sidebar/header navigation
 - ✅ Implementar navegação dinâmica
 - ⏳ Criar página de perfil básica
 - ⏳ Implementar breadcrumbs

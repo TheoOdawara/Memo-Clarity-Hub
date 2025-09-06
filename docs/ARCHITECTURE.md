@@ -1,73 +1,74 @@
-# 🏗️ Arquitetura - MemoClarity MVP
 
-## 📐 Visão Geral da Arquitetura
+# 🏗️ Architecture - MemoClarity MVP
 
-O MemoClarity MVP foi projetado com uma arquitetura moderna, escalável e de fácil manutenção, utilizando React + TypeScript no frontend e Supabase como backend-as-a-service.
+## 📐 Architecture Overview
 
-## 🎯 Princípios Arquiteturais
+MemoClarity MVP was designed with a modern, scalable, and easy-to-maintain architecture, using React + TypeScript on the frontend and Supabase as backend-as-a-service.
 
-### 1. **Separação de Responsabilidades**
-- Componentes focados em UI
-- Hooks customizados para lógica de negócio
-- Services para integração com APIs
-- Utils para funções auxiliares
+## 🎯 Architectural Principles
 
-### 2. **Escalabilidade**
-- Arquitetura modular por features
-- Componentes reutilizáveis
-- Estado gerenciado por contextos específicos
-- Lazy loading de rotas e componentes
+### 1. **Separation of Concerns**
+- Components focused on UI
+- Custom hooks for business logic
+- Services for API integration
+- Utils for helper functions
 
-### 3. **Manutenibilidade**
-- TypeScript para type safety
-- Estrutura de pastas consistente
-- Documentação inline
-- Testes automatizados
+### 2. **Scalability**
+- Modular architecture by features
+- Reusable components
+- State managed by specific contexts
+- Lazy loading of routes and components
+
+### 3. **Maintainability**
+- TypeScript for type safety
+- Consistent folder structure
+- Inline documentation
+- Automated tests
 
 ### 4. **Performance**
-- Code splitting automático
-- Otimização de imagens
-- Cache inteligente
+- Automatic code splitting
+- Image optimization
+- Smart caching
 - PWA capabilities
 
 ---
 
-## 🏢 Arquitetura de Alto Nível
+## 🏢 High-Level Architecture
 
 ```
 ┌─────────────────┐    ┌──────────────────┐    ┌─────────────────┐
 │   Frontend      │    │   Supabase       │    │  External APIs  │
-│   (React TS)    │◄──►│   (Backend)      │◄──►│   (Opcional)    │
+│   (React TS)    │◄──►│   (Backend)      │◄──►│   (Optional)    │
 └─────────────────┘    └──────────────────┘    └─────────────────┘
-         │                       │                       │
-         │                       │                       │
-    ┌────▼────┐            ┌─────▼──────┐         ┌──────▼─────┐
-    │ Vercel  │            │ PostgreSQL │         │ Analytics  │
-    │ Deploy  │            │ Database   │         │ Services   │
-    └─────────┘            └────────────┘         └────────────┘
+     │                       │                       │
+     │                       │                       │
+  ┌────▼────┐            ┌─────▼──────┐         ┌──────▼─────┐
+  │ Vercel  │            │ PostgreSQL │         │ Analytics  │
+  │ Deploy  │            │ Database   │         │ Services   │
+  └─────────┘            └────────────┘         └────────────┘
 ```
 
-## 📁 Estrutura de Diretórios
+## 📁 Directory Structure
 
 ```
 src/
-├── components/           # Componentes React
-│   ├── ui/              # Componentes base (shadcn/ui)
+├── components/           # React components
+│   ├── ui/              # Base components (shadcn/ui)
 │   │   ├── button.tsx
 │   │   ├── card.tsx
 │   │   ├── input.tsx
 │   │   └── ...
-│   ├── layout/          # Componentes de layout
+│   ├── layout/          # Layout components
 │   │   ├── Header.tsx
 │   │   ├── Sidebar.tsx
 │   │   ├── Footer.tsx
 │   │   └── Layout.tsx
-│   └── features/        # Componentes por feature
+│   └── features/        # Feature components
 │       ├── auth/
 │       ├── dashboard/
 │       ├── games/
 │       └── profile/
-├── pages/               # Páginas principais
+├── pages/               # Main pages
 │   ├── Auth/
 │   │   ├── Login.tsx
 │   │   ├── Register.tsx
@@ -85,7 +86,7 @@ src/
 │   ├── useLocalStorage.ts
 │   ├── useGame.ts
 │   └── useCheckIn.ts
-├── services/            # Integrações de API
+├── services/            # API integrations
 │   ├── supabase.ts
 │   ├── auth.ts
 │   ├── games.ts
@@ -94,29 +95,25 @@ src/
 │   ├── AuthContext.tsx
 │   ├── GameContext.tsx
 │   └── AppContext.tsx
-├── utils/               # Funções utilitárias
+├── utils/               # Utility functions
 │   ├── helpers.ts
 │   ├── constants.ts
 │   ├── validators.ts
 │   └── formatters.ts
-├── types/               # Definições TypeScript
+├── types/               # TypeScript definitions
 │   ├── auth.ts
 │   ├── games.ts
 │   ├── user.ts
 │   └── api.ts
-├── styles/              # Estilos globais
+├── styles/              # Global styles
 │   ├── globals.css
 │   ├── components.css
 │   └── tailwind.css
-└── assets/              # Recursos estáticos
-    ├── images/
-    ├── icons/
-    └── sounds/
+└── assets/              # Static assets
+  ├── images/
+  ├── icons/
+  └── sounds/
 ```
-
----
-
-## 🔧 Componentes da Arquitetura
 
 ### 🎨 **Frontend (React + TypeScript)**
 

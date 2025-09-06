@@ -2,8 +2,8 @@ import React, { useState } from 'react';
 
 export default function ProfessionalDashboard() {
   const [checkedIn, setCheckedIn] = useState(false);
-  const [checkins, setCheckins] = useState(3); // Exemplo: 3 check-ins feitos
-  const [weekChecks, setWeekChecks] = useState([true, false, true, false, false, false, false]); // Exemplo: dias da semana
+  const [checkins, setCheckins] = useState(3); // Example: 3 check-ins done
+  const [weekChecks, setWeekChecks] = useState([true, false, true, false, false, false, false]); // Example: week days
 
   return (
     <div className="min-h-screen w-full bg-gradient-to-br from-teal-50 via-white to-aqua-100 flex flex-col items-center pt-0">
@@ -23,9 +23,9 @@ export default function ProfessionalDashboard() {
                   : 'Mark your daily check-in to keep your streak.'}
               </p>
             </div>
-            {/* Calendário semanal bonito */}
+            {/* Beautiful weekly calendar */}
             <div className="flex flex-col items-center gap-2 bg-white/70 rounded-xl shadow p-4 mx-2">
-              <span className="text-xs text-gray-500 mb-2">Semana</span>
+              <span className="text-xs text-gray-500 mb-2">Week</span>
               <div className="flex gap-3">
                 {["S", "T", "Q", "Q", "S", "S", "D"].map((day, idx) => (
                   <button
@@ -45,7 +45,7 @@ export default function ProfessionalDashboard() {
                 ))}
               </div>
             </div>
-            {/* Mostrador de check-ins estilizado */}
+            {/* Stylish check-ins counter */}
             <div className="flex flex-col items-center justify-center bg-gradient-to-br from-teal-100 via-white to-yellow-100 rounded-xl shadow p-4 mx-2 min-w-[90px]">
               <span className="text-xs text-gray-500 mb-1">Check-ins</span>
               <span className="text-4xl font-extrabold text-teal-700 drop-shadow-lg tracking-tight">{checkins}</span>
@@ -57,12 +57,38 @@ export default function ProfessionalDashboard() {
                 onClick={() => setCheckedIn(true)}
                 disabled={checkedIn}
               >
-                {checkedIn ? "Check-in feito" : "Fazer Check-in"}
+                {checkedIn ? "Checked in" : "Check-in"}
               </button>
             </div>
           </div>
         </section>
-        {/* ...outros elementos do dashboard... */}
+        {/* Stats and actions below check-in card */}
+        <section className="w-full max-w-5xl mx-auto mt-8 flex flex-col md:flex-row items-stretch gap-6 px-4">
+          <div className="flex flex-col md:flex-row gap-6 flex-1">
+            <div className="flex-1 flex flex-col items-center justify-center bg-white/80 backdrop-blur rounded-2xl shadow-lg border border-gray-100 p-6 mb-4 md:mb-0">
+              <span className="text-xs text-gray-500 mb-1">Highest Score</span>
+              <span className="text-3xl font-extrabold text-teal-700 mb-2">1280</span>
+            </div>
+            <div className="flex-1 flex flex-col items-center justify-center bg-white/80 backdrop-blur rounded-2xl shadow-lg border border-gray-100 p-6 mb-4 md:mb-0">
+              <span className="text-xs text-gray-500 mb-1">Tests Taken</span>
+              <span className="text-3xl font-extrabold text-teal-700 mb-2">14</span>
+            </div>
+          </div>
+          <div className="flex flex-col items-center justify-center gap-4 flex-1 bg-white/80 backdrop-blur rounded-2xl shadow-lg border border-gray-100 p-6">
+            <button
+              className="w-full px-4 py-3 rounded-xl bg-teal-600 text-white font-bold shadow hover:bg-teal-700 transition-all text-base"
+              onClick={() => window.location.href = '/games'}
+            >
+              Go to Test Page
+            </button>
+            <button
+              className="w-full px-4 py-3 rounded-xl bg-yellow-500 text-white font-bold shadow hover:bg-yellow-600 transition-all text-base"
+              onClick={() => window.location.href = '/raffles'}
+            >
+              Go to Raffle Page
+            </button>
+          </div>
+        </section>
       </div>
     </div>
   );

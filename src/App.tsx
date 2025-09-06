@@ -26,22 +26,22 @@ function App() {
                     <Route path="/checkin" element={
                       <div className="bg-white rounded-xl border border-gray-200 p-8 text-center">
                         <div className="text-6xl mb-4">💭</div>
-                        <h1 className="text-2xl font-bold text-gray-900 mb-4">Como você está hoje?</h1>
-                        <p className="text-gray-600">Esta funcionalidade está sendo desenvolvida...</p>
+                        <h1 className="text-2xl font-bold text-gray-900 mb-4">How are you feeling today?</h1>
+                        <p className="text-gray-600">This feature is under development...</p>
                       </div>
                     } />
                     <Route path="/games" element={
                       <div className="bg-white rounded-xl border border-gray-200 p-8 text-center">
                         <div className="text-6xl mb-4">🧩</div>
                         <h1 className="text-2xl font-bold text-gray-900 mb-4">Exercícios Mentais</h1>
-                        <p className="text-gray-600">Jogos cognitivos estão chegando em breve...</p>
+                        <p className="text-gray-600">Cognitive games are coming soon...</p>
                       </div>
                     } />
                     <Route path="/progress" element={
                       <div className="bg-white rounded-xl border border-gray-200 p-8 text-center">
                         <div className="text-6xl mb-4">📊</div>
-                        <h1 className="text-2xl font-bold text-gray-900 mb-4">Seu Progresso</h1>
-                        <p className="text-gray-600">Relatórios detalhados em desenvolvimento...</p>
+                        <h1 className="text-2xl font-bold text-gray-900 mb-4">Your Progress</h1>
+                        <p className="text-gray-600">Detailed reports are under development...</p>
                       </div>
                     } />
                   </Routes>

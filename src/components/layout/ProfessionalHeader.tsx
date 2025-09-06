@@ -17,7 +17,7 @@ export function ProfessionalHeader({ title = "MemoClarity" }: ProfessionalHeader
           <img src={LogoParaQualquerFundo} alt="MemoClarity Logo" className="w-12 h-12 object-contain drop-shadow-xl" />
           <h1 className="text-2xl font-bold text-teal-900 font-sans tracking-tight">{title}</h1>
           {isDemoUser && (
-            <span className="px-2 py-1 text-xs bg-green-100 text-green-700 rounded-md font-medium">
+            <span className="px-2 py-1 text-xs text-green-700 font-medium">
               DEMO
             </span>
           )}
@@ -28,36 +28,36 @@ export function ProfessionalHeader({ title = "MemoClarity" }: ProfessionalHeader
           <div className="flex items-center space-x-2">
             {/* Botões de ação à esquerda do usuário */}
             <button
-              className="px-2 py-1 rounded-lg bg-teal-600 text-white font-medium shadow hover:bg-teal-700 transition-colors text-xs"
+              className="px-4 py-2 rounded-full bg-teal-600 text-white font-bold shadow hover:bg-teal-700 transition-all text-sm flex items-center justify-center gap-2"
               style={{ minWidth: 0 }}
             >
-              Suporte
+              Support
             </button>
             <button
-              className="px-2 py-1 rounded-lg bg-yellow-500 text-white font-medium shadow hover:bg-yellow-600 transition-colors text-xs"
+              className="px-4 py-2 rounded-full bg-yellow-500 text-white font-bold shadow hover:bg-yellow-600 transition-all text-sm flex items-center justify-center gap-2"
               style={{ minWidth: 0 }}
             >
-              Rastrear
+              Track
             </button>
             {/* Bloco do usuário */}
             <div className="hidden sm:block text-right mr-2">
-              <p className="text-sm font-medium text-gray-900">
-                {isDemoUser ? 'Usuário Demo' : user.email?.split('@')[0]}
+              <p className="text-sm font-semibold text-teal-800">
+                {isDemoUser ? 'Demo User' : user.email?.split('@')[0]}
               </p>
               <p className="text-xs text-gray-500">
-                {isDemoUser ? 'Conta de teste' : 'Membro ativo'}
+                {isDemoUser ? 'Test Account' : 'Active Member'}
               </p>
             </div>
-            <div className="w-8 h-8 bg-gray-300 rounded-full flex items-center justify-center">
-              <span className="text-sm font-medium text-gray-600">
+            <div className="w-9 h-9 bg-teal-200 rounded-full flex items-center justify-center border border-teal-300">
+              <span className="text-base font-bold text-teal-700">
                 {isDemoUser ? 'D' : user.email?.[0]?.toUpperCase()}
               </span>
             </div>
             <button
               onClick={signOut}
-              className="text-xs text-gray-600 hover:text-gray-900 transition-colors ml-2"
+              className="px-4 py-2 rounded-full bg-gray-100 text-teal-700 font-bold shadow hover:bg-gray-200 transition-all text-sm ml-2 border border-teal-200"
             >
-              Sair
+              Sign out
             </button>
           </div>
         )}
