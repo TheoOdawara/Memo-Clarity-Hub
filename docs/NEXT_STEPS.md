@@ -98,6 +98,11 @@
 - **Organização:** Estrutura bem definida desde o início
 - **Documentação:** Atualizar progresso conforme avanço
 
+### 🔧 Short-term Tasks (Today)
+- [ ] Align `Test Page` (games) with `docs/DASHBOARD.md` visual rules: SeriousCard framing, large controls, consistent icon layers.
+- [ ] Final visual QA for `ProfessionalDashboard`: confirm no horizontal overflow, animations confined, and readable text sizes.
+- [ ] Add placeholder routes `/games`, `/track`, `/support` for manual QA and to fast-switch during development.
+
 ---
 
 ## 🔄 Próximas Iterações (Semana 2)

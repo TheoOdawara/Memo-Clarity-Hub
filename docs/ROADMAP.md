@@ -100,6 +100,14 @@ Implementar a funcionalidade principal de check-in diário e dashboard de acompa
 - ✅ Dashboard com estatísticas básicas
 - ✅ Histórico de progresso
 
+### 🎨 Design & Patterns (added)
+- The dashboard visual language has been formalized (see `docs/DASHBOARD.md`).
+- Introduced `SeriousCard` pattern for information-focused cards and a layered icon framing system used across the 6 dashboard cards.
+- Keep the dashboard card sizes consistent and reserve a dedicated video area for future content.
+
+### 🔜 Immediate follow-up (Sprint 2 → Sprint 3 handoff)
+- Revamp the Test Page (games/test flow) to match the Dashboard Patterns: consistent icon framing, accessible large controls, mobile-first layout. See `docs/DASHBOARD.md` for visual rules and examples.
+
 ---
 
 ## 🧠 Sprint 3: Testes de Memória e Jogos Cognitivos (Semana 5-6)

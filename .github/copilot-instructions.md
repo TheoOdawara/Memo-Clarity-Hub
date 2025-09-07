@@ -50,6 +50,37 @@ Font combination chosen to be modern, highly readable, and with a human touch, e
 - Ensure WCAG accessibility standards with color contrasts
 - Maintain consistent spacing and typography scales
 
+### Iconography & Card Layering Pattern
+To ensure a consistent, premium visual language across dashboard cards, follow this layered icon pattern for feature cards (applies to the 6 main cards on the dashboard):
+
+- Structure (static, no animated progress by default):
+	- Outer frame (prominent): visible ring or border that uses a card-specific color (higher contrast). This outer frame should be the most noticeable part of the icon framing.
+	- Outer glow tint: subtle background tint or glow using a semi-transparent version of the outer frame color.
+	- Inner frame (neutral): thin secondary ring in a neutral tone (white/60) to create separation.
+	- Soft inner fill: a small translucent fill behind the icon to add depth (e.g. white/10 or soft aqua/10).
+	- Primary icon: monochrome vector icon (single color) centered inside the frames. Prefer stroke icons (lucide-react) with controlled strokeWidth.
+	- Corner badge (optional): small rounded badge placed in the top-right to indicate an action/state (e.g., arrow for progress, star for highlight). Keep it minimal (14–18px icon) and high contrast.
+
+- Sizes & spacing (recommended):
+	- Frame container: 72–80px square (use 76px in Tailwind classes for consistency).
+	- Primary icon size: 32–40px.
+	- Corner badge size: 14–18px (placed at -top-1 -right-1 with small padding).
+
+- Color mapping (suggested):
+	- Go to Test Page: outer frame = teal/aqua (use `cyan/teal` tones). Corner badge: ArrowUpRight (progress cue).
+	- Go to Raffle Page: outer frame = gold/amber (use `amber-300/400` hues). Corner badge: small star or gift highlight.
+	- Highest Score: outer frame = teal (accent), inner icon = trophy (monochrome).
+	- Tests Taken: outer frame = soft neutral (white/20 with yellow border), inner icon = checklist/paper.
+	- Track: outer frame = yellow/orange (chart accent), inner icon = bar-chart/line.
+	- Support: outer frame = teal-green, inner icon = life-buoy or chat bubble.
+
+- Implementation notes:
+	- Use `lucide-react` icons for consistency and accessibility. Prefer stroke icons and control strokeWidth.
+	- Keep icons monochrome (single hue) to avoid visual noise; use the framed layers for color and emphasis.
+	- Avoid adding animated progress arcs unless representing live progress. Use static arcs/rings only as decorative framing.
+	- Ensure sufficient contrast between icon and background (WCAG AA minimum).
+
+
 ## Development Guidelines
 
 ### Language Requirements

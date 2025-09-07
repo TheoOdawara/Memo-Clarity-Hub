@@ -93,13 +93,33 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const { data, error } = await authService.signUp(email, password, userData)
     
     if (error) {
-      setError(error.message)
-    } else if (data.user && !data.user.email_confirmed_at) {
-      // Usuário criado mas precisa confirmar email
-      setError('✅ Conta criada! ⚠️ Verifique seu email para confirmar antes de fazer login.')
-    } else {
-      // Login automático após cadastro (se não precisar confirmar email)
-      setUser(data.user as AuthUser)
+      if (error.message.includes('User already registered')) {
+        setError('❌ Este email já está cadastrado. Tente fazer login ou use "Esqueci minha senha".')
+      } else if (error.message.includes('already registered')) {
+        setError('❌ Este email já está cadastrado. Tente fazer login.')
+      } else {
+        setError(error.message)
+      }
+    } else if (data.user) {
+      if (!data.user.email_confirmed_at) {
+        // Usuário criado mas precisa confirmar email
+        setError('✅ Conta criada! ⚠️ Aguarde... tentando confirmar automaticamente...')
+        
+        // Tentar fazer login mesmo sem confirmação (para desenvolvimento)
+        setTimeout(async () => {
+          const { error: loginError } = await authService.signIn(email, password)
+          if (!loginError) {
+            setError('✅ Conta criada e ativada com sucesso!')
+            setUser(data.user as AuthUser)
+          } else {
+            setError('✅ Conta criada! Entre em contato para ativação manual.')
+          }
+        }, 2000)
+      } else {
+        // Login automático após cadastro
+        setUser(data.user as AuthUser)
+        setError('✅ Conta criada e ativada com sucesso!')
+      }
     }
     
     setLoading(false)
@@ -109,13 +129,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const signInWithGoogle = async () => {
     setLoading(true)
     setError(null)
-    
-    const { error } = await authService.signInWithGoogle()
-    
+    const { error: svcError } = await authService.signInWithGoogle()
+
+    // Normalize to JS Error or null to satisfy AuthContextType
+    const error = svcError ? new Error(svcError.message ?? 'Unknown error') : null
+
     if (error) {
       setError(error.message)
     }
-    
+
     setLoading(false)
     return { error }
   }

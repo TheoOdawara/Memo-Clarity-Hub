@@ -72,6 +72,7 @@ npm run dev
 - 📋 [Próximos Passos](./docs/NEXT_STEPS.md) - Tarefas imediatas
 - 🗺️ [Roadmap](./docs/ROADMAP.md) - Planejamento completo
 - 🏗️ [Arquitetura](./docs/ARCHITECTURE.md) - Decisões técnicas
+- 🖼️ [Dashboard Patterns](./docs/DASHBOARD.md) - Visual & interaction guidelines
 
 ## 🎯 Status Atual
 

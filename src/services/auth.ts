@@ -20,6 +20,23 @@ export const authService = {
         data: userData,
       },
     })
+
+    // Create profile after successful signup
+    if (data.user && !error) {
+      const { error: profileError } = await supabase
+        .from('profiles')
+        .insert({
+          user_id: data.user.id,
+          username: userData?.username as string || null,
+          avatar_url: null
+        })
+      
+      if (profileError) {
+        console.error('Error creating profile:', profileError)
+        // Don't fail the signup if profile creation fails
+      }
+    }
+
     return { data, error }
   },
 

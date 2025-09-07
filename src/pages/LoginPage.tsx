@@ -1,5 +1,7 @@
 import { useState } from 'react'
 import { useAuth } from '@/hooks/useAuth'
+import { supabase } from '@/integrations/supabase/client'
+import { migrationService } from '@/services/migration'
 import LogoMemoClarity from '@/assets/LogoParaQualquerFundo.png'
 
 export default function LoginPage() {
@@ -21,11 +23,74 @@ export default function LoginPage() {
   }
 
   const runTests = async () => {
-    setTestResults('Testing connection...')
+    setTestResults('Testing Supabase connection...')
     
     try {
-      // Teste simples de conectividade
-      setTestResults('✅ System working normally')
+      // Teste 1: Conectividade básica
+      const { data: { session } } = await supabase.auth.getSession()
+      let results = '🔗 Connection: ✅ Connected\n'
+      
+      if (session) {
+        results += `👤 Current user: ${session.user.email}\n`
+      } else {
+        results += '👤 Current user: Not logged in\n'
+      }
+
+      // Teste 2: Consultar tabelas
+      try {
+        const { data: profiles, error: profileError } = await supabase
+          .from('profiles')
+          .select('*')
+          .limit(5)
+        
+        results += `📋 Profiles table: ${profileError ? '❌ Error' : `✅ Found ${profiles?.length || 0} records`}\n`
+      } catch {
+        results += '📋 Profiles table: ❌ Table not found or no access\n'
+      }
+
+      try {
+        const { data: checkins, error: checkinError } = await supabase
+          .from('checkins')
+          .select('*')
+          .limit(5)
+        
+        results += `✅ Checkins table: ${checkinError ? '❌ Error' : `✅ Found ${checkins?.length || 0} records`}\n`
+      } catch {
+        results += '✅ Checkins table: ❌ Table not found or no access\n'
+      }
+
+      try {
+        const { data: tests, error: testError } = await supabase
+          .from('tests')
+          .select('*')
+          .limit(5)
+        
+        results += `🧠 Tests table: ${testError ? '❌ Error' : `✅ Found ${tests?.length || 0} records`}\n`
+      } catch {
+        results += '🧠 Tests table: ❌ Table not found or no access\n'
+      }
+
+      // Teste 3: Verificar se precisa executar migration
+      if (results.includes('❌ Error')) {
+        results += '\n⚠️ MIGRATION NEEDED:\n'
+        results += '1. Open Supabase project dashboard\n'
+        results += '2. Go to SQL Editor\n'
+        results += '3. Copy content from supabase-migration.sql\n'
+        results += '4. Run the SQL to create missing tables\n'
+        results += '\nAlternatively: use "Fix Database" button below'
+      } else {
+        results += '\n✅ Database setup looks good!'
+      }
+
+      setTestResults(results)
+
+      // Auto-check migration se necessário
+      if (results.includes('❌ Error')) {
+        const migrationCheck = await migrationService.checkMigrationNeeded()
+        if (migrationCheck.needsMigration) {
+          setTestResults(prev => prev + '\n\n🔧 Ready to run migration...')
+        }
+      }
     } catch (error) {
       setTestResults('❌ Connection error: ' + String(error))
     }

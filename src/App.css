@@ -9,3 +9,18 @@ body {
   padding: 0;
   font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
 }
+
+/* Ring pulse animation used by the Track card icon. Kept conservative so the pulse stays within the icon container */
+@keyframes ringPulse {
+  0% { transform: scale(0.6); opacity: 0.9; }
+  50% { transform: scale(0.95); opacity: 0.5; }
+  100% { transform: scale(1.15); opacity: 0; }
+}
+.ringPulse { transform-origin: center; animation: ringPulse 1200ms cubic-bezier(0,0,0.2,1) infinite; }
+.ringDelay0 { animation-delay: 0s; }
+.ringDelay1 { animation-delay: 0.26s; }
+.ringDelay2 { animation-delay: 0.52s; }
+.ringDelay3 { animation-delay: 0.78s; }
+
+/* Small helper to reduce the visual reach of borders when needed */
+.ring-clip { box-shadow: 0 0 0 4px rgba(255,255,255,0.85) inset; }
