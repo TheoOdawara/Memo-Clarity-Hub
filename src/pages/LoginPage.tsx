@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useAuth } from '@/hooks/useAuth'
-import { supabase } from '@/integrations/supabase/client'
+import { supabase } from '@local/supabase/client'
 import { migrationService } from '@/services/migration'
 import LogoMemoClarity from '@/assets/LogoParaQualquerFundo.png'
 

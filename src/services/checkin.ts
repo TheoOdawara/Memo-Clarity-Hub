@@ -1,4 +1,4 @@
-import { supabase } from '@/integrations/supabase/client'
+import { supabase } from '@local/supabase/client'
 
 export type CheckinData = {
   mood_score?: number

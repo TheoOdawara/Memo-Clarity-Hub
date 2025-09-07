@@ -1,4 +1,4 @@
-import { supabase } from '@/integrations/supabase/client'
+import { supabase } from '@local/supabase/client'
 
 // Auto-migration: cria tabelas se não existirem
 export const migrationService = {

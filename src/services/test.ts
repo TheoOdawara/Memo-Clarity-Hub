@@ -1,4 +1,4 @@
-import { supabase } from '@/integrations/supabase/client'
+import { supabase } from '@local/supabase/client'
 
 export type TestResult = {
   phase_scores: [number, number, number, number] // [sequence, association, reaction, memory]

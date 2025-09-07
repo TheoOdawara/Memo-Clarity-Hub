@@ -1,4 +1,4 @@
-import { supabase } from '@/integrations/supabase/client'
+import { supabase } from '@local/supabase/client'
 
 // Serviço para consultar dados do Supabase (útil para debug)
 export const debugService = {

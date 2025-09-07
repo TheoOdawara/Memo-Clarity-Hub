@@ -20,8 +20,9 @@
     
     "baseUrl": ".",
     "paths": {
-      "@/*": ["./src/*"]
-    }
+    "@/*": ["./src/*"],
+    "@local/supabase/*": ["./supabase/*"]
+      }
   },
-  "include": ["src"]
+  "include": ["src", "supabase/client.ts", "supabase/types.ts"]
 }
