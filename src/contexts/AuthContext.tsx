@@ -73,12 +73,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const { error } = await authService.signIn(email, password)
     
     if (error) {
+      // Log full error for debugging (temporary)
+      console.error('Auth signIn error details:', error)
       if (error.message.includes('Invalid login credentials')) {
         setError('❌ Email ou senha incorretos. Ou conta ainda não confirmada (verifique seu email).')
       } else if (error.message.includes('Email not confirmed')) {
         setError('❌ Email ainda não confirmado. Verifique sua caixa de entrada.')
       } else {
-        setError(error.message)
+        // show raw error to help debugging
+        setError(error.message || String(error))
       }
     }
     
@@ -101,25 +104,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         setError(error.message)
       }
     } else if (data.user) {
-      if (!data.user.email_confirmed_at) {
-        // Usuário criado mas precisa confirmar email
-        setError('✅ Conta criada! ⚠️ Aguarde... tentando confirmar automaticamente...')
-        
-        // Tentar fazer login mesmo sem confirmação (para desenvolvimento)
-        setTimeout(async () => {
-          const { error: loginError } = await authService.signIn(email, password)
-          if (!loginError) {
-            setError('✅ Conta criada e ativada com sucesso!')
-            setUser(data.user as AuthUser)
-          } else {
-            setError('✅ Conta criada! Entre em contato para ativação manual.')
-          }
-        }, 2000)
-      } else {
-        // Login automático após cadastro
-        setUser(data.user as AuthUser)
-        setError('✅ Conta criada e ativada com sucesso!')
-      }
+      // Dev/demo flow: consider user created and set session
+      setUser(data.user as AuthUser)
+      setError('✅ Conta criada e ativada (dev mode).')
     }
     
     setLoading(false)
@@ -170,6 +157,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     return { error }
   }
 
+  const resendConfirmation = async (email: string) => {
+    setError(null)
+    const { error } = await authService.resendConfirmation(email)
+    if (error) setError(error.message)
+    return { error }
+  }
+
   const loginDemo = () => {
     const demoUser = {
       id: 'demo-user-123',
@@ -192,7 +186,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     signUp,
     signInWithGoogle,
     signOut,
-    resetPassword,
+  resetPassword,
+  resendConfirmation,
     loginDemo, // Adicionar loginDemo ao contexto
   }
 

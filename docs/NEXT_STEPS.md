@@ -105,7 +105,76 @@
 
 ---
 
-## 🔄 Próximas Iterações (Semana 2)
+## � Plano Rápido: Backend (3 horas)
+
+Se você tem apenas 3 horas, siga esta sequência enxuta e testada para configurar o backend Supabase e integrar o frontend de forma segura.
+
+Resumo do objetivo
+- Aplicar schema mínimo (tabelas + RLS), criar um endpoint mínimo (Edge Function) para validação e garantir que o frontend consiga enviar attempts com fallback local.
+
+Tempo estimado: 3 horas (dividido em blocos práticos)
+
+Passos recomendados
+
+1) Preparação (10 min)
+ - Confirme acesso ao Supabase (Project URL, anon & service_role keys)
+ - Localize as migrations: `MVP/supabase/migrations` ou `MVP/supabase/supabase-migration.sql`
+
+2) Aplicar migrations e RLS (35–45 min)
+ - No SQL Editor do Supabase, cole e execute as migrations.
+ - Exemplo de tabela de attempts (ajuste conforme necessário):
+
+  create table if not exists public.test_attempts (
+    id uuid primary key default gen_random_uuid(),
+    user_id uuid references auth.users(id),
+    test_id uuid,
+    seed text,
+    client_score int,
+    server_score int,
+    status text default 'pending',
+    created_at timestamptz default now()
+  );
+
+ - Habilite RLS: ALTER TABLE public.test_attempts ENABLE ROW LEVEL SECURITY;
+ - Política exemplo para INSERT (ajuste):
+
+  create policy "Insert own attempts" on public.test_attempts
+    for insert using (auth.role() = 'authenticated') with check (auth.uid() = user_id::text);
+
+3) Edge Function mínima (45–60 min)
+ - Crie uma Edge Function `validate-attempt` (TypeScript) que aceite POST { attemptId, user_id, seed, actions }
+ - Inicialmente apenas valide formato e retorne { ok: true }
+ - Exemplo mínimo do handler:
+
+  export async function POST(req: Request) {
+    const body = await req.json();
+    // validate shape
+    return new Response(JSON.stringify({ ok: true }), { status: 200 });
+  }
+
+ - Teste com curl (substitua URL/KEY):
+
+  curl -X POST "https://<project>.functions.supabase.co/validate-attempt" -H "Content-Type: application/json" -H "Authorization: Bearer <anon_or_service_role>" -d '{"attemptId":"...","user_id":"...","seed":"abc","actions":[] }'
+
+4) Integrar frontend (35–45 min)
+ - Atualize `src/services/test.ts` para chamar a Edge Function para validação/submissão ao invés do insert direto.
+ - Garanta que o fallback localStorage/enqueue está habilitado e testado.
+ - Fluxo de smoke test: login → iniciar teste → finalizar → verificar `public.test_attempts` no Supabase.
+
+5) Smoke tests e correções (15–20 min)
+ - Criar 2 contas de teste e executar o fluxo completo.
+ - Conferir logs do Edge Function e tabela `test_attempts`.
+
+Fallback rápido se faltar tempo
+- Aplique somente o schema + RLS e deixe o frontend salvar `test_attempts` em modo 'pending' (sem validação server-side). Isso permite coleta de dados e posterior validação manual.
+
+Entregáveis após 3 horas
+- Schema aplicado com RLS básico
+- Edge Function mínima ou fallback frontend que enfileira tentativas
+- Fluxo end-to-end testado com pelo menos 2 contas
+
+
+## �🔄 Próximas Iterações (Semana 2)
 
 ### 🎨 Interface e Dashboard
 - [ ] **Criar Dashboard Principal**

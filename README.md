@@ -74,6 +74,48 @@ npm run dev
 - 🏗️ [Arquitetura](./docs/ARCHITECTURE.md) - Decisões técnicas
 - 🖼️ [Dashboard Patterns](./docs/DASHBOARD.md) - Visual & interaction guidelines
 
+## 🧭 Plano rápido: Backend (3 horas)
+
+Se você só tem ~3 horas, siga este plano enxuto e sequencial para garantir entrega segura do backend (Supabase) sem contratempos:
+
+- Duração total estimada: 3 horas
+- Objetivo: preparar schema, políticas RLS, endpoint de validação mínimo e integração frontend para salvar tentativas/testes.
+
+Passos (hora a hora)
+- 0 — Preparação (10 min)
+	- Confirme acesso ao projeto Supabase (URL + anon/service keys).
+	- Verifique que `MVP/supabase` contém `migrations/` ou `supabase-migration.sql` com as DDLs.
+
+- 1 — Migrar esquema e RLS (35–45 min)
+	- No Supabase SQL Editor cole e execute a migration principal (tabelas: `profiles`, `tests`, `test_attempts`, `test_actions`).
+	- Ative RLS e aplique policies mínimas (SELECT público em profiles, INSERT/SELECT/UPDATE em attempts apenas para auth.uid()).
+	- Teste com uma query simples (SELECT COUNT(*) FROM tests).
+
+- 2 — Implementar endpoint de validação (45–60 min)
+	- Crie uma Supabase Edge Function (TypeScript) que receba payload { attemptId, user_id, seed, actions } e execute replays determinísticos para gerar `serverScore`.
+	- Inicial: validar formato e retornar OK (pode processar score localmente em uma segunda iteração).
+	- Deploy e teste com curl/postman.
+
+- 3 — Integrar frontend (35–45 min)
+	- Ajuste `src/services/test.ts` para usar a Edge Function para submissão completa.
+	- Implementar fallback (enqueue em localStorage) e retry (já existe no frontend — confirm/ativar).
+	- Teste fluxo: iniciar teste → completar → ver tentativa em requests/console.
+
+- 4 — Testes rápidos e monitoração (15–20 min)
+	- Criar duas contas de teste; rodar fluxo end-to-end.
+	- Verificar logs do Edge Function e tabelas no Supabase.
+	- Remediar erros triviais e documentar passos executados.
+
+Riscos e mitigação
+- Se RLS bloquear inserções: use temporariamente uma policy aberta apenas para testes e reverta depois.
+- Se o Edge Function falhar: aceitar resultados cliente e marcar como "pendente" para revalidação posterior.
+
+Entregáveis após 3h
+- Esquema aplicado no Supabase com políticas RLS base.
+- Endpoint mínimo (Edge Function) para receber attempts.
+- Frontend salvando tentativas com fallback local.
+
+
 ## 🎯 Status Atual
 
 **Sprint 1:** 🔄 Configuração Inicial

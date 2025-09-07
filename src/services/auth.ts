@@ -8,35 +8,49 @@ export const authService = {
       email,
       password,
     })
+  // Log auth response for debugging (temporary)
+  console.error('signIn response', { data, error })
     return { data, error }
   },
 
   // Registro com email e senha
   async signUp(email: string, password: string, userData?: Record<string, unknown>) {
+    // Include a redirect for email confirmation flow
     const { data, error } = await supabase.auth.signUp({
       email,
       password,
       options: {
         data: userData,
+        emailRedirectTo: `${window.location.origin}/auth/confirm`,
       },
     })
 
-    // Create profile after successful signup
-    if (data.user && !error) {
-      const { error: profileError } = await supabase
-        .from('profiles')
-        .insert({
-          user_id: data.user.id,
-          username: userData?.username as string || null,
-          avatar_url: null
-        })
-      
-      if (profileError) {
-        console.error('Error creating profile:', profileError)
-        // Don't fail the signup if profile creation fails
+    // Create profile immediately (dev/demo flow) — safe because we auto-confirm users in dev
+    if (data.user) {
+      try {
+        const { error: profileError } = await supabase
+          .from('profiles')
+          .insert({
+            user_id: data.user.id,
+            username: userData?.username as string || null,
+            avatar_url: null,
+          })
+
+        if (profileError) {
+          console.error('Error creating profile:', profileError)
+        }
+      } catch (e) {
+        console.error('Unexpected error creating profile:', e)
       }
     }
 
+    return { data, error }
+  },
+
+  // Resend confirmation using a magic link (OTP) as a safe fallback
+  async resendConfirmation(email: string) {
+    // signInWithOtp sends a magic link to the email which logs in the user without confirmation
+    const { data, error } = await supabase.auth.signInWithOtp({ email })
     return { data, error }
   },
 

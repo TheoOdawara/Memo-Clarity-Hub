@@ -2,10 +2,12 @@ import { useState } from 'react'
 import { useAuth } from '@/hooks/useAuth'
 import { supabase } from '@local/supabase/client'
 import { migrationService } from '@/services/migration'
+import { startSessionLogging, stopSessionLogging } from '@/debug/sessionLogger'
+import { useRef } from 'react'
 import LogoMemoClarity from '@/assets/LogoParaQualquerFundo.png'
 
 export default function LoginPage() {
-  const { signIn, signUp, loginDemo, loading, error } = useAuth()
+  const { signIn, signUp, loginDemo, loading, error, resendConfirmation } = useAuth()
   const [isSignUp, setIsSignUp] = useState(false)
   const [testResults, setTestResults] = useState<string>('')
 
@@ -99,6 +101,17 @@ export default function LoginPage() {
   const handleDemoLogin = () => {
     setTestResults('🎭 Logging in as demo user...')
     loginDemo()
+  }
+
+  const sessionLoggingRef = useRef(false)
+  const handleToggleSessionLogging = () => {
+    if (sessionLoggingRef.current) {
+      stopSessionLogging()
+      sessionLoggingRef.current = false
+    } else {
+      startSessionLogging()
+      sessionLoggingRef.current = true
+    }
   }
 
   return (
@@ -197,7 +210,28 @@ export default function LoginPage() {
                     isSignUp ? 'Create Account' : 'Sign In'
                   )}
                 </button>
+                <div className="mt-3">
+                  <button onClick={handleToggleSessionLogging} className="w-full py-2 px-2 text-sm text-white bg-white/5 hover:bg-white/10 rounded-xl">
+                    Toggle Session Logging
+                  </button>
+                </div>
               </form>
+
+              {isSignUp && (
+                <div className="mt-4 text-center">
+                  <button
+                    onClick={async () => {
+                      const emailInput = (document.getElementById('email') as HTMLInputElement)
+                      const email = emailInput?.value
+                      if (!email) return
+                      await resendConfirmation(email)
+                    }}
+                    className="text-sm text-yellow-300 hover:underline"
+                  >
+                    Reenviar confirmação
+                  </button>
+                </div>
+              )}
 
               {/* Toggle entre Login e Signup */}
               <div className="mt-6 text-center">
