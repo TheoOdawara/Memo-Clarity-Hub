@@ -4,7 +4,7 @@
 MemoClarity MVP is a memory monitoring and cognitive health platform designed for middle-aged and elderly users. The goal is to reduce refund rates by 40% through increased engagement and perceived value.
 
 **🇺🇸 IMPORTANT: ALL CONTENT MUST BE IN ENGLISH** 
-This product will be sold in the United States market. All user-facing text, comments, variable names, and documentation must be in English only. No Portuguese, Spanish, or other languages should be used in the user interface or code.
+This product will be sold in the United States market. All user-facing text, comments, variable names, and documentation must be in English only. No Portuguese, Spanish, or other languages should be used in the user interface or code. But the laguage of communication with the developer has to be in Pt-Br.
 
 ## Visual Identity Guidelines
 

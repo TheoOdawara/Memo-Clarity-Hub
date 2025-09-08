@@ -1,16 +1,16 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Brain, ArrowUpRight, Gift, FileText, Truck, MessageSquare } from 'lucide-react';
+import { Brain, ArrowUpRight, Gift, Truck, MessageSquare, Info, Activity } from 'lucide-react';
 
 function SeriousCard({ title, subtitle, icon, onClick }: { title: string; subtitle?: string; icon: JSX.Element; onClick?: () => void }) {
   return (
     <button
       onClick={onClick}
-      className="group relative flex flex-col sm:flex-row items-center gap-4 w-full h-[160px] sm:h-[200px] lg:h-[220px] rounded-2xl bg-white/95 border border-teal-100 shadow-sm p-4 text-left transition-transform duration-200 hover:shadow-md hover:-translate-y-0.5 backdrop-blur-[2px]"
+  className="group relative flex flex-col sm:flex-row items-center gap-4 w-full h-[160px] sm:h-[200px] lg:h-[220px] rounded-2xl bg-white/95 border border-teal-100 shadow-sm p-4 text-left transition-transform duration-200 hover:shadow-md hover:-translate-y-0.5 backdrop-blur-[2px] ring-2 ring-teal-100/70"
     >
       {/* left accent stripe for seriousness without being dull; subtle grow on hover */}
       <div className="hidden sm:block w-1 h-full rounded-l-2xl bg-gradient-to-b from-teal-300 to-teal-100 mr-3 transition-all duration-250 group-hover:w-2" aria-hidden />
-      <div className="flex-none">
+      <div className="flex-none drop-shadow-lg transition-transform duration-150 group-hover:scale-105">
         {icon}
       </div>
       <div className="flex-1">
@@ -23,6 +23,7 @@ function SeriousCard({ title, subtitle, icon, onClick }: { title: string; subtit
 
 export default function ProfessionalDashboard() {
   const [checkedIn, setCheckedIn] = useState(false);
+  const [showInstructions, setShowInstructions] = useState(false);
   const navigate = useNavigate();
   const [checkins, setCheckins] = useState(3); // Example: 3 check-ins done
   const [weekChecks, setWeekChecks] = useState([true, false, true, false, false, false, false]); // Example: week days
@@ -31,7 +32,7 @@ export default function ProfessionalDashboard() {
     <div className="min-h-screen w-full bg-gradient-to-br from-teal-50 via-white to-aqua-100 flex flex-col items-center pt-0">
       <div className="w-full flex-1 flex flex-col items-center justify-start">
         {/* Card de Check-in do Dia - Glassmorphism */}
-  <section className="relative w-full bg-white/60 backdrop-blur-xl border-[3px] border-teal-200 rounded-3xl shadow-2xl p-0 overflow-hidden mt-0" style={{ marginTop: 0 }}>
+  <section className="relative w-full bg-white/60 backdrop-blur-xl rounded-3xl shadow-2xl p-0 overflow-hidden mt-0" style={{ marginTop: 0 }}>
           {/* Gradiente animado no topo, colada e preenchendo toda a largura */}
           <div className="w-full h-2 bg-gradient-to-r from-teal-400 via-yellow-300 to-aqua-400 animate-pulse rounded-t-3xl" style={{ position: 'absolute', top: 0, left: 0, right: 0 }} />
           <div className="flex flex-col lg:flex-row items-center lg:items-center justify-center gap-6 px-8 py-8">
@@ -117,32 +118,44 @@ export default function ProfessionalDashboard() {
                 <span className="z-10">Go to Test Page</span>
                 <span className="text-xs font-normal mt-1 z-10">Challenge your mind</span>
               </button>
-              <div className="flex flex-col items-center justify-center w-full h-[220px] rounded-2xl bg-white/90 backdrop-blur shadow-xl border-[3px] border-emerald-300">
+              {/* Sound Lab — attractive but distinct (indigo) */}
+              {/* Frequency Sessions — softened attractive card */}
+              <button
+                onClick={() => navigate('/sound')}
+                className="relative flex flex-col items-center justify-center w-full h-[220px] rounded-2xl bg-gradient-to-br from-indigo-600 via-violet-500 to-cyan-500 text-white font-bold shadow-lg overflow-hidden transition-transform duration-200 hover:shadow-2xl hover:scale-105 focus:outline-none focus:ring-2 focus:ring-indigo-300"
+                type="button"
+                aria-label="Open Frequency Sessions"
+              >
+                {/* background wave removed to avoid white line across card */}
+
                 <span className="mb-4 z-10">
                   <div className="relative w-[76px] h-[76px]">
-                    {/* Glow tint (emerald) */}
-                    <div className="absolute inset-0 rounded-full bg-emerald-100/30 blur-md"></div>
-                    {/* Outer frame (prominent, emerald) */}
-                    <div className="absolute inset-0 rounded-full border-[3px] border-emerald-400" />
+                    {/* Glow tint */}
+                    <div className="absolute inset-0 rounded-full bg-indigo-300/30 blur-md"></div>
+                    {/* Outer frame (colored) */}
+                    <div className="absolute inset-0 rounded-full border-[2.5px] border-indigo-300" />
                     {/* Inner frame (neutral) */}
                     <div className="absolute inset-1 rounded-full border-2 border-white/60" />
                     {/* Soft inner fill */}
-                    <div className="absolute inset-2 rounded-full bg-white/10" />
-                    {/* File icon (emerald accent) */}
+                    <div className="absolute inset-2 rounded-full bg-white/6" />
+                    {/* Activity icon centered */}
                     <div className="absolute inset-0 flex items-center justify-center">
-                      <FileText size={36} strokeWidth={2.5} className="text-emerald-500" />
+                      <Activity size={30} strokeWidth={1.8} className="text-white" />
+                    </div>
+                    {/* Corner badge arrow (clean) */}
+                    <div className="absolute -right-1 -top-1 bg-white rounded-full p-1 shadow-sm">
+                      <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg" className="text-indigo-600">
+                        <rect x="1" y="3" width="2" height="8" rx="0.5" fill="currentColor" />
+                        <rect x="6" y="1" width="2" height="10" rx="0.5" fill="currentColor" />
+                        <rect x="11" y="4" width="2" height="7" rx="0.5" fill="currentColor" />
+                      </svg>
                     </div>
                   </div>
                 </span>
-                <span className="text-base font-bold text-gray-900 tracking-tight mb-1 font-sans">Tests Taken</span>
-                <span className="text-5xl font-extrabold text-emerald-700 drop-shadow mb-2 font-sans">14</span>
-              </div>
-              {/* Coluna 2 */}
-              <div className="flex flex-col items-center justify-center w-full h-[220px] rounded-2xl bg-white/80 backdrop-blur shadow-xl border-[3px] border-teal-300">
-                <span className="mb-2 text-3xl text-teal-600">🏆</span>
-                <span className="text-base font-bold text-gray-900 tracking-tight mb-1 font-sans">Highest Score</span>
-                <span className="text-5xl font-extrabold text-teal-700 drop-shadow mb-2 font-sans">1280</span>
-              </div>
+
+                <div className="z-10 text-2xl text-white drop-shadow-md">Frequency Sessions</div>
+              </button>
+
               {/* Go to Raffle Page - Gift with layered frame, gradient background restored */}
               <button
                 className="relative flex flex-col items-center justify-center w-full h-[220px] rounded-2xl bg-gradient-to-br from-yellow-500 via-yellow-400 to-yellow-600 text-white font-bold shadow-xl overflow-hidden transition-all duration-300 ease-in-out hover:shadow-2xl hover:scale-105 focus:outline-none focus:ring-2 focus:ring-yellow-300 border-[3px] border-yellow-300"
@@ -173,6 +186,21 @@ export default function ProfessionalDashboard() {
                 <span className="z-10">Go to Raffle Page</span>
                 <span className="text-xs font-normal mt-1 z-10">Win exclusive prizes</span>
               </button>
+
+              {/* When / How to take it card (opens modal) - use SeriousCard visual language */}
+              <SeriousCard
+                title="When / How to take it"
+                subtitle="Read detailed instructions"
+                onClick={() => setShowInstructions(true)}
+                icon={
+                  <div className="relative w-14 h-14 flex items-center justify-center rounded-full bg-white border border-teal-50 shadow-inner overflow-hidden">
+                    <div className="absolute inset-0 rounded-full bg-teal-50/10" aria-hidden />
+                    <div className="absolute -inset-px rounded-full border-2 border-teal-100/60" aria-hidden />
+                    <div className="absolute inset-0 rounded-full blur-sm opacity-40 bg-gradient-to-br from-teal-100 to-white" aria-hidden />
+                    <Info size={20} strokeWidth={1.8} className="text-teal-600 relative z-10" />
+                  </div>
+                }
+              />
               {/* Coluna 3 */}
               <SeriousCard
                 title="Track"
@@ -203,6 +231,26 @@ export default function ProfessionalDashboard() {
             </div>
           </div>
         </section>
+        {showInstructions && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center">
+            <div className="absolute inset-0 bg-black/40" onClick={() => setShowInstructions(false)} />
+            <div className="relative bg-white rounded-2xl shadow-xl max-w-lg w-full mx-4 p-6 z-10">
+              <div className="flex items-start justify-between mb-4">
+                <h3 className="text-xl font-bold">When & How to take the Frequency Test</h3>
+                <button className="text-gray-500 hover:text-gray-700" onClick={() => setShowInstructions(false)}>Close</button>
+              </div>
+              <div className="text-sm text-gray-700 space-y-3">
+                <p>Prepare a quiet room with minimal background noise. Prefer using headphones for best results.</p>
+                <p>During the test you will hear tones at different frequencies. Stay still and avoid background conversations.</p>
+                <p>Ensure volume is comfortable but audible; do not set audio to maximum to avoid discomfort.</p>
+                <p>If using mobile, hold the device steady and use headphones when possible. Follow on-screen prompts and answer honestly.</p>
+              </div>
+              <div className="mt-6 flex justify-end">
+                <button onClick={() => setShowInstructions(false)} className="px-4 py-2 bg-teal-600 text-white rounded-lg">Got it</button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

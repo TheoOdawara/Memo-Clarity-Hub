@@ -1,38 +1,127 @@
-import { Shuffle } from 'lucide-react';
+import { FileText, Trophy } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { useEffect, useState } from 'react';
 
 export default function Games() {
   const navigate = useNavigate();
+  // raw values from storage (we animate displayed counters below)
+  // displayed counters for subtle count-up animation
+  const [displayedTaken, setDisplayedTaken] = useState<number>(0)
+  const [displayedBest, setDisplayedBest] = useState<number>(0)
+  const [mounted, setMounted] = useState(false)
+
+  useEffect(() => {
+  const taken = Number(localStorage.getItem('stats_tests_taken') || '0')
+  const best = Number(localStorage.getItem('stats_highest_score') || '0')
+
+    // animate counters (simple interval-based ease)
+    const animate = (from: number, to: number, setter: (v: number) => void) => {
+      const duration = 700
+      const stepMs = 30
+      const steps = Math.max(1, Math.floor(duration / stepMs))
+      const increment = (to - from) / steps
+      let current = from
+      setter(Math.round(current))
+      const id = setInterval(() => {
+        current += increment
+        if ((increment > 0 && current >= to) || (increment < 0 && current <= to)) {
+          setter(to)
+          clearInterval(id)
+        } else {
+          setter(Math.round(current))
+        }
+      }, stepMs)
+      return id
+    }
+
+    const id1 = animate(0, taken, setDisplayedTaken)
+    const id2 = animate(0, best, setDisplayedBest)
+    // mount animations
+    const t = setTimeout(() => setMounted(true), 80)
+    return () => {
+      clearInterval(id1)
+      clearInterval(id2)
+      clearTimeout(t)
+    }
+  }, [])
 
   return (
-    <div className="w-full p-8">
-      <div className="max-w-4xl mx-auto">
-        <div className="mb-6">
-          <div className="flex justify-start mb-2">
-            <button onClick={() => navigate('/dashboard')} className="px-3 py-2 rounded bg-gray-100">
-              Voltar
-            </button>
-          </div>
-          <header>
-            <h1 className="text-2xl font-extrabold text-gray-900">Cognitive Exercises</h1>
-            <p className="text-sm text-gray-500 mt-1">Short exercises to train memory and reaction time.</p>
-          </header>
-        </div>
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          <button
-            onClick={() => navigate('/games/test')}
-            className="col-span-1 sm:col-span-2 lg:col-span-3 flex flex-col items-center justify-center gap-3 rounded-2xl bg-white/95 border border-teal-100 shadow-md p-6 hover:shadow-lg transition"
-          >
-            <div className="relative w-20 h-20 flex items-center justify-center rounded-full bg-gradient-to-br from-indigo-50 to-white border border-indigo-100">
-              <div className="absolute inset-0 rounded-full bg-indigo-50/10" aria-hidden />
-              <Shuffle size={28} className="text-indigo-600" />
+    <div className="w-full min-h-screen bg-gradient-to-b from-white to-emerald-50 p-6 md:p-12">
+      <div className="max-w-7xl mx-auto">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
+          <main className="lg:col-span-9">
+            <div className="flex items-center gap-4 mb-6">
+              <button onClick={() => navigate('/dashboard')} className="px-3 py-2 rounded bg-white/90 hover:bg-white shadow-sm">Voltar</button>
+              <div>
+                <h1 className="text-3xl md:text-4xl font-extrabold text-emerald-800">Train your focus — feel the progress</h1>
+              </div>
             </div>
-            <div className="text-base font-semibold text-gray-900">Start Combined Test</div>
-            <div className="text-xs text-gray-500">4 phases: Sequence, Association, Reaction and Memory</div>
-          </button>
+
+            <section className="mb-8">
+              <div className={`rounded-3xl p-8 md:p-10 bg-gradient-to-r from-emerald-600 via-teal-400 to-cyan-400 shadow-2xl text-white relative overflow-hidden transform transition-all ${mounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'} duration-500`}>
+                <div className="grid grid-cols-1 md:grid-cols-12 gap-6 items-center">
+                  <div className="md:col-span-8">
+                    <h2 className="text-4xl md:text-5xl font-extrabold leading-tight">Start the test — sharpen your mind</h2>
+                    <p className="mt-3 text-white/95 max-w-2xl text-lg">Four short phases that train memory, reaction and association. Quick to start, clear progress each session.</p>
+                    <div className="mt-5 flex items-center gap-3">
+                      <span className="inline-flex items-center gap-2 bg-white/20 px-3 py-1 rounded-full text-sm">4 phases</span>
+                      <span className="inline-flex items-center gap-2 bg-white/10 px-3 py-1 rounded-full text-sm">2–5 min</span>
+                    </div>
+                  </div>
+
+                  <div className="md:col-span-4 flex justify-end">
+                    <div className="flex items-center justify-center w-full">
+                      <button onClick={() => navigate('/games/test?level=medium')} className="px-8 py-3 rounded-full bg-white text-emerald-700 font-semibold shadow-2xl hover:scale-105 transform-gpu transition-all duration-200 flex items-center gap-3 text-lg">
+                        <span>Start 5‑min test</span>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-emerald-700"><path d="M5 3v18l15-9z"></path></svg>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="pointer-events-none absolute -right-12 top-6 w-56 h-56 rounded-full bg-white/10 opacity-30 blur-3xl" />
+                <div className="pointer-events-none absolute -left-14 bottom-6 w-40 h-40 rounded-full bg-white/6 opacity-20 blur-2xl" />
+              </div>
+            </section>
+
+            <section>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className={`p-6 rounded-2xl bg-white shadow border border-emerald-100 transform transition-all duration-500 ${mounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
+                  <div className="flex items-center gap-4">
+                    <div className="p-2 rounded-full bg-emerald-50"><FileText size={20} className="text-emerald-700" /></div>
+                    <div>
+                      <div className="text-sm text-gray-600">Tests Taken</div>
+                      <div className="text-3xl font-extrabold text-emerald-800">{displayedTaken}</div>
+                    </div>
+                  </div>
+                  <div className="mt-3 text-xs text-emerald-700">Total sessions completed</div>
+                </div>
+
+                <div className={`p-6 rounded-2xl bg-white shadow border border-teal-100 transform transition-all duration-500 ${mounted ? 'opacity-100 translate-y-0 delay-150' : 'opacity-0 translate-y-4'}`}>
+                  <div className="flex items-center gap-4">
+                    <div className="p-2 rounded-full bg-teal-50"><Trophy size={20} className="text-teal-700" /></div>
+                    <div>
+                      <div className="text-sm text-gray-600">Highest Score</div>
+                      <div className="text-3xl font-extrabold text-teal-800">{displayedBest}</div>
+                    </div>
+                  </div>
+                  <div className="mt-3 text-xs text-teal-700">Best total score</div>
+                </div>
+              </div>
+            </section>
+          </main>
+
+          <aside className="lg:col-span-3">
+            <div className="sticky top-24 space-y-6">
+              <div className="p-6 rounded-2xl bg-white shadow border border-emerald-100">
+                <h3 className="text-sm font-semibold text-gray-700">Quick tips</h3>
+                <p className="mt-2 text-sm text-gray-600">Use headphones for Frequency sessions and prefer a quiet place.</p>
+              </div>
+
+            </div>
+          </aside>
         </div>
       </div>
     </div>
-  );
+  )
 }

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useLocation } from 'react-router-dom'
 import { testService } from '@/services/test'
 
 // Simple placeholder mini-games for each phase. Each phase returns a numeric score (0..100)
@@ -14,7 +14,7 @@ function PhaseContainer({ title, children }: { title: string; children: React.Re
   )
 }
 
-function SequencePhase({ onComplete }: { onComplete: (score: number) => void }) {
+function SequencePhase({ onComplete, autoPlay, level }: { onComplete: (score: number) => void; autoPlay?: boolean; level?: string }) {
   // placeholder: score is randomized after 'Play'
   const [started, setStarted] = useState(false)
   const [score, setScore] = useState<number | null>(null)
@@ -23,11 +23,19 @@ function SequencePhase({ onComplete }: { onComplete: (score: number) => void }) 
     setStarted(true)
     // simulate running the mini-game and finishing
     setTimeout(() => {
-      const s = Math.floor(60 + Math.random() * 40)
+      const base = 60
+      const modifier = level === 'easy' ? -10 : level === 'hard' ? 10 : 0
+      const range = level === 'hard' ? 50 : level === 'easy' ? 30 : 40
+      const s = Math.floor(base + modifier + Math.random() * range)
       setScore(s)
       onComplete(s)
     }, 800)
   }
+
+  useEffect(() => {
+    if (autoPlay && !started) play()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [autoPlay])
 
   return (
     <PhaseContainer title="Phase 1 — Sequence">
@@ -42,18 +50,26 @@ function SequencePhase({ onComplete }: { onComplete: (score: number) => void }) 
   )
 }
 
-function AssociationPhase({ onComplete }: { onComplete: (score: number) => void }) {
+function AssociationPhase({ onComplete, autoPlay, level }: { onComplete: (score: number) => void; autoPlay?: boolean; level?: string }) {
   const [started, setStarted] = useState(false)
   const [score, setScore] = useState<number | null>(null)
 
   function play() {
     setStarted(true)
     setTimeout(() => {
-      const s = Math.floor(50 + Math.random() * 50)
+      const base = 50
+      const modifier = level === 'easy' ? -8 : level === 'hard' ? 8 : 0
+      const range = level === 'hard' ? 55 : level === 'easy' ? 35 : 50
+      const s = Math.floor(base + modifier + Math.random() * range)
       setScore(s)
       onComplete(s)
     }, 800)
   }
+
+  useEffect(() => {
+    if (autoPlay && !started) play()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [autoPlay])
 
   return (
     <PhaseContainer title="Phase 2 — Association">
@@ -68,18 +84,26 @@ function AssociationPhase({ onComplete }: { onComplete: (score: number) => void 
   )
 }
 
-function ReactionPhase({ onComplete }: { onComplete: (score: number) => void }) {
+function ReactionPhase({ onComplete, autoPlay, level }: { onComplete: (score: number) => void; autoPlay?: boolean; level?: string }) {
   const [started, setStarted] = useState(false)
   const [score, setScore] = useState<number | null>(null)
 
   function play() {
     setStarted(true)
     setTimeout(() => {
-      const s = Math.floor(40 + Math.random() * 60)
+      const base = 40
+      const modifier = level === 'easy' ? -6 : level === 'hard' ? 12 : 0
+      const range = level === 'hard' ? 70 : level === 'easy' ? 34 : 60
+      const s = Math.floor(base + modifier + Math.random() * range)
       setScore(s)
       onComplete(s)
     }, 800)
   }
+
+  useEffect(() => {
+    if (autoPlay && !started) play()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [autoPlay])
 
   return (
     <PhaseContainer title="Phase 3 — Reaction">
@@ -94,18 +118,26 @@ function ReactionPhase({ onComplete }: { onComplete: (score: number) => void }) 
   )
 }
 
-function MemoryPhase({ onComplete }: { onComplete: (score: number) => void }) {
+function MemoryPhase({ onComplete, autoPlay, level }: { onComplete: (score: number) => void; autoPlay?: boolean; level?: string }) {
   const [started, setStarted] = useState(false)
   const [score, setScore] = useState<number | null>(null)
 
   function play() {
     setStarted(true)
     setTimeout(() => {
-      const s = Math.floor(55 + Math.random() * 45)
+      const base = 55
+      const modifier = level === 'easy' ? -8 : level === 'hard' ? 12 : 0
+      const range = level === 'hard' ? 55 : level === 'easy' ? 35 : 45
+      const s = Math.floor(base + modifier + Math.random() * range)
       setScore(s)
       onComplete(s)
     }, 800)
   }
+
+  useEffect(() => {
+    if (autoPlay && !started) play()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [autoPlay])
 
   return (
     <PhaseContainer title="Phase 4 — Memory">
@@ -122,15 +154,37 @@ function MemoryPhase({ onComplete }: { onComplete: (score: number) => void }) {
 
 export default function TestFlow() {
   const navigate = useNavigate()
+  const { search } = useLocation()
   const [phase, setPhase] = useState(0)
   const [scores, setScores] = useState<number[]>([0, 0, 0, 0])
+  // stats moved to dashboard; no per-page aggregated state needed here
+
+  // parse query params for level; this page always runs the full combined test automatically
+  const params = React.useMemo(() => new URLSearchParams(search), [search])
+  const level = params.get('level') || 'medium'
+  const autoMode = true
+  const [countdown, setCountdown] = useState<number | null>(null)
+  const [startedAfterCountdown, setStartedAfterCountdown] = useState(false)
 
   useEffect(() => {
-    // load previous aggregate if present (optional)
-    const existing = localStorage.getItem('test_last_total')
-    if (existing) {
-      // no-op for now; we show per-phase during the flow
-    }
+    // load previous aggregate if present (optional) - no-op
+    void localStorage.getItem('test_last_total')
+    // start a 3..1 countdown before auto-running (gives user a moment)
+    const initial = 3
+    setCountdown(initial)
+    const id = setInterval(() => {
+      setCountdown(c => {
+        if (c === null) return null
+        if (c <= 1) {
+          clearInterval(id)
+          setTimeout(() => setCountdown(null), 200)
+          setStartedAfterCountdown(true)
+          return null
+        }
+        return c - 1
+      })
+    }, 700)
+    return () => clearInterval(id)
   }, [])
 
   function handleComplete(s: number) {
@@ -139,6 +193,15 @@ export default function TestFlow() {
       next[phase] = s
       return next
     })
+    // auto-advance during combined autoMode
+    if (autoMode) {
+      if (phase < 3) {
+        setTimeout(() => setPhase(p => p + 1), 350)
+      } else {
+        // ensure scores updated before finish
+        setTimeout(() => finish(), 400)
+      }
+    }
   }
 
   function next() {
@@ -162,7 +225,16 @@ export default function TestFlow() {
     // Also save to localStorage for backward compatibility
     localStorage.setItem('test_last_total', String(total))
     localStorage.setItem('test_last_phase_scores', JSON.stringify(scores))
-    
+    // update simple stats: tests taken and highest score
+    const prevTaken = Number(localStorage.getItem('stats_tests_taken') || '0')
+    const newTaken = prevTaken + 1
+    localStorage.setItem('stats_tests_taken', String(newTaken))
+    // highest score aggregate updated in localStorage
+    const prevBest = Number(localStorage.getItem('stats_highest_score') || '0')
+    if (total > prevBest) {
+      localStorage.setItem('stats_highest_score', String(total))
+    }
+
     navigate('/games')
   }
 
@@ -177,11 +249,23 @@ export default function TestFlow() {
           <p className="text-sm text-gray-600">Four short phases. Your per-phase and total scores are saved locally when you finish.</p>
         </header>
 
+  {/* stats removed from this page; kept in /games dashboard */}
+
         <div className="space-y-4">
-          {phase === 0 && <SequencePhase onComplete={handleComplete} />}
-          {phase === 1 && <AssociationPhase onComplete={handleComplete} />}
-          {phase === 2 && <ReactionPhase onComplete={handleComplete} />}
-          {phase === 3 && <MemoryPhase onComplete={handleComplete} />}
+          {phase === 0 && <SequencePhase onComplete={handleComplete} autoPlay={autoMode && startedAfterCountdown} level={level} />}
+          {phase === 1 && <AssociationPhase onComplete={handleComplete} autoPlay={autoMode && startedAfterCountdown} level={level} />}
+          {phase === 2 && <ReactionPhase onComplete={handleComplete} autoPlay={autoMode && startedAfterCountdown} level={level} />}
+          {phase === 3 && <MemoryPhase onComplete={handleComplete} autoPlay={autoMode && startedAfterCountdown} level={level} />}
+
+        {/* Countdown overlay */}
+        {countdown !== null && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+            <div className="bg-white/90 rounded-xl p-8 text-center shadow-lg">
+              <div className="text-6xl font-extrabold text-emerald-700">{countdown}</div>
+              <div className="text-sm text-gray-600 mt-2">Get ready</div>
+            </div>
+          </div>
+        )}
         </div>
 
         <div className="flex items-center justify-between">
