@@ -1,27 +1,109 @@
-import { useState } from 'react'
-import { useAuth } from '@/hooks/useAuth'
+import { useState, useEffect } from 'react'
 import { supabase } from '@local/supabase/client'
 import { migrationService } from '@/services/migration'
 import { startSessionLogging, stopSessionLogging } from '@/debug/sessionLogger'
 import { useRef } from 'react'
+import { useNavigate } from 'react-router-dom'
 import LogoMemoClarity from '@/assets/LogoParaQualquerFundo.png'
 
 export default function LoginPage() {
-  const { signIn, signUp, loginDemo, loading, error, resendConfirmation } = useAuth()
+  const navigate = useNavigate()
   const [isSignUp, setIsSignUp] = useState(false)
   const [testResults, setTestResults] = useState<string>('')
+  const [loginData, setLoginData] = useState({ email: '', password: '' })
+  const [signupData, setSignupData] = useState({
+    name: '',
+    email: '',
+    password: '',
+    confirmPassword: ''
+  })
+  const [infoMessage, setInfoMessage] = useState<string | null>(null)
+  const [isLoading, setIsLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault()
-    const formData = new FormData(e.currentTarget)
-    const email = formData.get('email') as string
-    const password = formData.get('password') as string
-    
-    if (isSignUp) {
-      signUp(email, password)
-    } else {
-      signIn(email, password)
+  // Verificar sessão existente e redirecionar se logado
+  useEffect(() => {
+    const checkSession = async () => {
+      const { data: { session } } = await supabase.auth.getSession()
+      if (session?.user) {
+        console.warn('Session found, redirecting to dashboard...')
+        navigate('/')
+      }
     }
+    checkSession()
+
+    // Listener para mudanças de autenticação
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      console.warn('Auth state changed:', event, session?.user ? 'user logged in' : 'no user')
+      if (event === 'SIGNED_IN' && session?.user) {
+        console.warn('User signed in, redirecting to dashboard...')
+        navigate('/')
+      }
+    })
+
+    return () => subscription.unsubscribe()
+  }, [navigate])
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault()
+    setIsLoading(true)
+    setError(null)
+
+    if (isSignUp) {
+      // Validação de senha
+      if (signupData.password !== signupData.confirmPassword) {
+        setInfoMessage('As senhas não coincidem.')
+        setIsLoading(false)
+        return
+      }
+      if (signupData.password.length < 6) {
+        setInfoMessage('A senha deve ter pelo menos 6 caracteres.')
+        setIsLoading(false)
+        return
+      }
+
+      // Cadastro direto com Supabase
+      try {
+        const { error } = await supabase.auth.signUp({
+          email: signupData.email,
+          password: signupData.password,
+          options: {
+            data: {
+              name: signupData.name
+            },
+            emailRedirectTo: `${window.location.origin}/`,
+          },
+        })
+
+        if (error) {
+          setError(error.message)
+        } else {
+          setIsSignUp(false)
+          setInfoMessage('Conta criada! Confirme seu e-mail para poder fazer login.')
+        }
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'Erro ao criar conta')
+      }
+    } else {
+      // Login direto com Supabase
+      try {
+        const { data, error } = await supabase.auth.signInWithPassword({
+          email: loginData.email,
+          password: loginData.password,
+        })
+
+        if (error) {
+          setError(error.message)
+        } else if (data.user) {
+          // Redirecionamento será feito pelo useEffect
+          console.warn('Login successful, redirecting...')
+        }
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'Erro ao fazer login')
+      }
+    }
+
+    setIsLoading(false)
   }
 
   const runTests = async () => {
@@ -100,7 +182,16 @@ export default function LoginPage() {
 
   const handleDemoLogin = () => {
     setTestResults('🎭 Logging in as demo user...')
-    loginDemo()
+    // Simular login demo
+    const demoUser = {
+      id: 'demo-user-123',
+      email: 'demo@memoclarity.com',
+      email_confirmed_at: new Date().toISOString(),
+      created_at: new Date().toISOString(),
+    }
+    // Armazenar no localStorage como no contexto original
+    localStorage.setItem('demo-user', JSON.stringify(demoUser))
+    navigate('/')
   }
 
   const sessionLoggingRef = useRef(false)
@@ -163,7 +254,29 @@ export default function LoginPage() {
               )}
               
               <form onSubmit={handleSubmit} className="space-y-6">
+                {infoMessage && (
+                  <div className="mb-4 p-3 bg-yellow-500/20 border border-yellow-400/30 text-yellow-900 rounded-2xl">
+                    {infoMessage}
+                  </div>
+                )}
                 <div className="space-y-4">
+                  {isSignUp && (
+                    <div>
+                      <label htmlFor="name" className="block text-sm font-semibold text-teal-100 mb-2">
+                        Nome
+                      </label>
+                      <input
+                        id="name"
+                        name="name"
+                        type="text"
+                        required
+                        placeholder="Seu nome"
+                        value={signupData.name}
+                        onChange={e => setSignupData({ ...signupData, name: e.target.value })}
+                        className="w-full px-4 py-4 bg-white/10 border border-white/20 rounded-2xl focus:outline-none focus:ring-2 focus:ring-teal-400 focus:border-transparent transition-all duration-300 placeholder-teal-200 text-white backdrop-blur-sm"
+                      />
+                    </div>
+                  )}
                   <div>
                     <label htmlFor="email" className="block text-sm font-semibold text-teal-100 mb-2">
                       Email Address
@@ -174,10 +287,17 @@ export default function LoginPage() {
                       type="email"
                       required
                       placeholder="your@email.com"
+                      value={isSignUp ? signupData.email : loginData.email}
+                      onChange={(e) => {
+                        if (isSignUp) {
+                          setSignupData({ ...signupData, email: e.target.value })
+                        } else {
+                          setLoginData({ ...loginData, email: e.target.value })
+                        }
+                      }}
                       className="w-full px-4 py-4 bg-white/10 border border-white/20 rounded-2xl focus:outline-none focus:ring-2 focus:ring-teal-400 focus:border-transparent transition-all duration-300 placeholder-teal-200 text-white backdrop-blur-sm"
                     />
                   </div>
-                  
                   <div>
                     <label htmlFor="password" className="block text-sm font-semibold text-teal-100 mb-2">
                       Password
@@ -188,26 +308,51 @@ export default function LoginPage() {
                       type="password"
                       required
                       placeholder="••••••••"
+                      value={isSignUp ? signupData.password : loginData.password}
+                      onChange={(e) => {
+                        if (isSignUp) {
+                          setSignupData({ ...signupData, password: e.target.value })
+                        } else {
+                          setLoginData({ ...loginData, password: e.target.value })
+                        }
+                      }}
                       className="w-full px-4 py-4 bg-white/10 border border-white/20 rounded-2xl focus:outline-none focus:ring-2 focus:ring-teal-400 focus:border-transparent transition-all duration-300 placeholder-teal-200 text-white backdrop-blur-sm"
                     />
                   </div>
+                  {isSignUp && (
+                    <div>
+                      <label htmlFor="confirmPassword" className="block text-sm font-semibold text-teal-100 mb-2">
+                        Confirmar Senha
+                      </label>
+                      <input
+                        id="confirmPassword"
+                        name="confirmPassword"
+                        type="password"
+                        required
+                        placeholder="Confirme sua senha"
+                        value={signupData.confirmPassword}
+                        onChange={e => setSignupData({ ...signupData, confirmPassword: e.target.value })}
+                        className="w-full px-4 py-4 bg-white/10 border border-white/20 rounded-2xl focus:outline-none focus:ring-2 focus:ring-teal-400 focus:border-transparent transition-all duration-300 placeholder-teal-200 text-white backdrop-blur-sm"
+                      />
+                    </div>
+                  )}
                 </div>
 
                 <button
                   type="submit"
-                  disabled={loading}
+                  disabled={isLoading}
                   className="w-full py-4 px-6 bg-gradient-to-r from-teal-600 to-teal-700 text-white font-bold rounded-2xl hover:from-teal-700 hover:to-teal-800 focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:ring-offset-2 focus:ring-offset-transparent disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 shadow-xl hover:shadow-2xl transform hover:scale-105"
                 >
-                  {loading ? (
+                  {isLoading ? (
                     <div className="flex items-center justify-center space-x-2">
                       <svg className="animate-spin w-5 h-5" fill="none" viewBox="0 0 24 24">
                         <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                         <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                       </svg>
-                      <span>{isSignUp ? 'Creating account...' : 'Signing in...'}</span>
+                      <span>{isSignUp ? 'Criando conta...' : 'Entrando...'}</span>
                     </div>
                   ) : (
-                    isSignUp ? 'Create Account' : 'Sign In'
+                    isSignUp ? 'Criar Conta' : 'Entrar'
                   )}
                 </button>
                 <div className="mt-3">
@@ -224,7 +369,20 @@ export default function LoginPage() {
                       const emailInput = (document.getElementById('email') as HTMLInputElement)
                       const email = emailInput?.value
                       if (!email) return
-                      await resendConfirmation(email)
+
+                      try {
+                        const { error } = await supabase.auth.resend({
+                          type: 'signup',
+                          email: email
+                        })
+                        if (error) {
+                          setError(error.message)
+                        } else {
+                          setInfoMessage('Email de confirmação reenviado!')
+                        }
+                      } catch {
+                        setError('Erro ao reenviar confirmação')
+                      }
                     }}
                     className="text-sm text-yellow-300 hover:underline"
                   >
@@ -236,7 +394,16 @@ export default function LoginPage() {
               {/* Toggle entre Login e Signup */}
               <div className="mt-6 text-center">
                 <button
-                  onClick={() => setIsSignUp(!isSignUp)}
+                  onClick={() => {
+                    setIsSignUp(!isSignUp)
+                    setInfoMessage(null)
+                    // Limpar dados ao alternar modos
+                    if (!isSignUp) {
+                      setSignupData({ name: '', email: '', password: '', confirmPassword: '' })
+                    } else {
+                      setLoginData({ email: '', password: '' })
+                    }
+                  }}
                   className="text-sm text-teal-200 hover:text-yellow-300 font-medium hover:underline transition-colors"
                 >
                   {isSignUp 

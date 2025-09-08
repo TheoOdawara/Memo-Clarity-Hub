@@ -15,36 +15,35 @@ export const authService = {
 
   // Registro com email e senha
   async signUp(email: string, password: string, userData?: Record<string, unknown>) {
-    // Include a redirect for email confirmation flow
-    const { data, error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        data: userData,
-        emailRedirectTo: `${window.location.origin}/auth/confirm`,
-      },
-    })
+    console.warn('Starting signUp process...', { email, userData })
 
-    // Create profile immediately (dev/demo flow) — safe because we auto-confirm users in dev
-    if (data.user) {
-      try {
-        const { error: profileError } = await supabase
-          .from('profiles')
-          .insert({
-            user_id: data.user.id,
-            username: userData?.username as string || null,
-            avatar_url: null,
-          })
+    try {
+      // Primeiro, fazer o signUp no Supabase Auth
+      const { data, error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          data: userData,
+          emailRedirectTo: `${window.location.origin}/`,
+        },
+      })
 
-        if (profileError) {
-          console.error('Error creating profile:', profileError)
-        }
-      } catch (e) {
-        console.error('Unexpected error creating profile:', e)
+      console.warn('Supabase signUp response:', { data, error })
+
+      if (error) {
+        console.error('SignUp error:', error)
+        return { data: null, error }
       }
-    }
 
-    return { data, error }
+      // Para signUp, não criamos o profile imediatamente
+      // Ele será criado quando o usuário confirmar o email e fizer login
+      // Isso evita problemas com RLS e timing
+
+      return { data, error: null }
+    } catch (err) {
+      console.error('Unexpected error in signUp:', err)
+      return { data: null, error: err as Error }
+    }
   },
 
   // Resend confirmation using a magic link (OTP) as a safe fallback

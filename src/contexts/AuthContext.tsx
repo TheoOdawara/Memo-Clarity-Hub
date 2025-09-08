@@ -70,7 +70,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setLoading(true)
     setError(null)
     
-    const { error } = await authService.signIn(email, password)
+    const { data, error } = await authService.signIn(email, password)
     
     if (error) {
       // Log full error for debugging (temporary)
@@ -83,6 +83,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         // show raw error to help debugging
         setError(error.message || String(error))
       }
+    } else if (data?.user) {
+      // Login bem-sucedido - atualizar estado do usuário
+      setUser(data.user as AuthUser)
+      console.warn('User logged in successfully:', data.user)
     }
     
     setLoading(false)
@@ -103,10 +107,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       } else {
         setError(error.message)
       }
-    } else if (data.user) {
-      // Dev/demo flow: consider user created and set session
-      setUser(data.user as AuthUser)
-      setError('✅ Conta criada e ativada (dev mode).')
     }
     
     setLoading(false)
