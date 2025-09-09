@@ -6,9 +6,9 @@ import LoginPage from '@/pages/LoginPage'
 import ProfessionalDashboard from '@/pages/ProfessionalDashboard'
 import Games from '@/pages/Games'
 import TestFlow from './pages/games/Test';
-import SequenceGame from './pages/games/Sequence';
-import AssociationGame from './pages/games/Association';
-import ReactionGame from './pages/games/Reaction';
+import SequenceGame from './pages/games/Antigos/Sequence';
+import AssociationGame from './pages/games/Antigos/Association';
+import ReactionGame from './pages/games/Antigos/Reaction';
 import './App.css'
 
 function App() {

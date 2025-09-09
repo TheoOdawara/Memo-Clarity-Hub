@@ -1,4 +1,4 @@
-import { FileText, Trophy } from 'lucide-react';
+import { FileText, Trophy, Rocket } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 
@@ -53,7 +53,7 @@ export default function Games() {
             <div className="flex items-center gap-4 mb-6">
               <button onClick={() => navigate('/dashboard')} className="px-3 py-2 rounded bg-white/90 hover:bg-white shadow-sm">Voltar</button>
               <div>
-                <h1 className="text-3xl md:text-4xl font-extrabold text-emerald-800">Train your focus — feel the progress</h1>
+                  <h1 className="text-3xl md:text-4xl font-extrabold text-emerald-800">Train your brain — feel the progress</h1>
               </div>
             </div>
 
@@ -115,7 +115,23 @@ export default function Games() {
             <div className="sticky top-24 space-y-6">
               <div className="p-6 rounded-2xl bg-white shadow border border-emerald-100">
                 <h3 className="text-sm font-semibold text-gray-700">Quick tips</h3>
-                <p className="mt-2 text-sm text-gray-600">Use headphones for Frequency sessions and prefer a quiet place.</p>
+                <p className="mt-2 text-sm text-gray-600">Find a comfortable spot, focus on each mini-game, and try to improve your score every session. Consistency is key for cognitive progress!</p>
+              </div>
+
+              <div className="relative overflow-hidden p-7 rounded-2xl bg-gradient-to-br from-cyan-100 via-white to-emerald-50 shadow-xl border border-cyan-200 flex flex-col items-start animate-fade-in">
+                <div className="flex items-center gap-3 mb-3">
+                  <div className="p-3 rounded-full bg-cyan-600 shadow-lg flex items-center justify-center">
+                    <Rocket size={28} className="text-white" />
+                  </div>
+                  <h3 className="text-lg font-bold text-cyan-700 drop-shadow">10-Day Brain Challenge</h3>
+                </div>
+                <p className="text-base text-gray-700 mb-4 max-w-xs">Boost your cognitive power with a 10-day challenge! Get the ebook and daily exercises to stimulate your mind.</p>
+                <a href="https://globalhealthnews.online/ebook/" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-cyan-600 text-white font-semibold shadow-lg hover:bg-cyan-700 transition-all text-base hover:scale-105">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="white" strokeWidth="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                  Access Challenge
+                </a>
+                <div className="absolute right-0 bottom-0 w-24 h-24 bg-cyan-200 opacity-30 rounded-full blur-2xl" />
+                <div className="absolute left-0 top-0 w-16 h-16 bg-emerald-200 opacity-20 rounded-full blur-xl" />
               </div>
 
             </div>
