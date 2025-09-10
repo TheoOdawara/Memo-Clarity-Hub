@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
-import AssociationGame from '../../components/AssociationGame';
-import ReactionGame from '../../components/ReactionGame';
-import SequenceGame from '../../components/SequenceGame';
-import MemoryGame from '../../components/MemoryGame';
+import AssociationGame from '../../components/AssociationGame/AssociationGame';
+import ReactionGame from '../../components/ReactionGame/ReactionGame';
+import SequenceGame from '../../components/SequenceGame/SequenceGame';
+import MemoryGame from '../../components/MemoryGame/MemoryGame';
 
 const games = [
   { name: 'Associação', component: AssociationGame },

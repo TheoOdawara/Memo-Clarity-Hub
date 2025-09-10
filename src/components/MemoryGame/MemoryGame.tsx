@@ -9,7 +9,7 @@ const cards = ['🍎', '🍌', '🍇', '🍎', '🍌', '🍇'];
 const shuffle = (arr: string[]) => arr.sort(() => Math.random() - 0.5);
 
 const MemoryGame: React.FC<MemoryGameProps> = ({ onEnd }) => {
-  const [shuffled, setShuffled] = useState(() => shuffle(cards));
+  const [shuffled] = useState(() => shuffle(cards));
   const [flipped, setFlipped] = useState<number[]>([]);
   const [matched, setMatched] = useState<number[]>([]);
   const [score, setScore] = useState(0);
