@@ -13,8 +13,8 @@ const ALL_MISSIONS = [
     items: [
       { icon: '🐶', isCorrect: true }, { icon: '🦁', isCorrect: true }, { icon: '🐱', isCorrect: true }, { icon: '🐦', isCorrect: true },
       { icon: '🍎', isCorrect: false }, { icon: '🔧', isCorrect: false }, { icon: '🌳', isCorrect: false }, { icon: '🛡️', isCorrect: false },
-      { icon: '🍔', isCorrect: false }, { icon: '💡', isCorrect: false }, { icon: '⚡', isCorrect: false }, { icon: '�', isCorrect: false },
-      { icon: '🦉', isCorrect: true }, { icon: '�', isCorrect: true }, { icon: '🍌', isCorrect: false }, { icon: '🧠', isCorrect: false },
+      { icon: '🍔', isCorrect: false }, { icon: '💡', isCorrect: false }, { icon: '⚡', isCorrect: false }, { icon: '🎨', isCorrect: false },
+      { icon: '🦉', isCorrect: true }, { icon: '🐸', isCorrect: true }, { icon: '🍌', isCorrect: false }, { icon: '🎲', isCorrect: false },
     ],
   },
   {
@@ -31,7 +31,7 @@ const ALL_MISSIONS = [
     items: [
       { icon: '🔧', isCorrect: true }, { icon: '🛡️', isCorrect: true }, { icon: '🧰', isCorrect: true }, { icon: '🔨', isCorrect: true },
       { icon: '💡', isCorrect: false }, { icon: '🍎', isCorrect: false }, { icon: '🍔', isCorrect: false }, { icon: '🍌', isCorrect: false },
-      { icon: '🌳', isCorrect: false }, { icon: '🐶', isCorrect: false }, { icon: '🦁', isCorrect: false }, { icon: '�', isCorrect: false },
+      { icon: '🌳', isCorrect: false }, { icon: '🐶', isCorrect: false }, { icon: '🦁', isCorrect: false }, { icon: '🐱', isCorrect: false },
       { icon: '🐦', isCorrect: false }, { icon: '⚡', isCorrect: false }, { icon: '🎨', isCorrect: false }, { icon: '🦉', isCorrect: false },
     ],
   },
@@ -41,7 +41,7 @@ const ALL_MISSIONS = [
       { icon: '🟦', isCorrect: true }, { icon: '🟥', isCorrect: true }, { icon: '🟩', isCorrect: true }, { icon: '🟨', isCorrect: true },
       { icon: '🍎', isCorrect: false }, { icon: '🔧', isCorrect: false }, { icon: '🌳', isCorrect: false }, { icon: '🛡️', isCorrect: false },
       { icon: '🍔', isCorrect: false }, { icon: '💡', isCorrect: false }, { icon: '⚡', isCorrect: false }, { icon: '🎨', isCorrect: false },
-      { icon: '🦉', isCorrect: false }, { icon: '🐸', isCorrect: false }, { icon: '🍌', isCorrect: false }, { icon: '🧠', isCorrect: false },
+      { icon: '🦉', isCorrect: false }, { icon: '🐸', isCorrect: false }, { icon: '🍌', isCorrect: false }, { icon: '🎲', isCorrect: false },
     ],
   },
   {
@@ -50,7 +50,7 @@ const ALL_MISSIONS = [
       { icon: '🚗', isCorrect: true }, { icon: '🚕', isCorrect: true }, { icon: '✈️', isCorrect: true }, { icon: '🚲', isCorrect: true },
       { icon: '🍎', isCorrect: false }, { icon: '🔧', isCorrect: false }, { icon: '🌳', isCorrect: false }, { icon: '🛡️', isCorrect: false },
       { icon: '🍔', isCorrect: false }, { icon: '💡', isCorrect: false }, { icon: '⚡', isCorrect: false }, { icon: '🎨', isCorrect: false },
-      { icon: '🦉', isCorrect: false }, { icon: '🐸', isCorrect: false }, { icon: '🍌', isCorrect: false }, { icon: '�', isCorrect: false },
+      { icon: '🦉', isCorrect: false }, { icon: '🐸', isCorrect: false }, { icon: '🍌', isCorrect: false }, { icon: '🧀', isCorrect: false },
     ],
   },
   {
@@ -58,8 +58,8 @@ const ALL_MISSIONS = [
     items: [
       { icon: '🧰', isCorrect: true }, { icon: '🔨', isCorrect: true }, { icon: '💡', isCorrect: true }, { icon: '🛡️', isCorrect: true },
       { icon: '🍎', isCorrect: false }, { icon: '🍔', isCorrect: false }, { icon: '🍌', isCorrect: false }, { icon: '🌳', isCorrect: false },
-      { icon: '�', isCorrect: false }, { icon: '�', isCorrect: false }, { icon: '🐱', isCorrect: false }, { icon: '🐦', isCorrect: false },
-      { icon: '⚡', isCorrect: false }, { icon: '🎨', isCorrect: false }, { icon: '🦉', isCorrect: false }, { icon: '�', isCorrect: false },
+      { icon: '🐶', isCorrect: false }, { icon: '🦁', isCorrect: false }, { icon: '🐱', isCorrect: false }, { icon: '🐦', isCorrect: false },
+      { icon: '⚡', isCorrect: false }, { icon: '🎨', isCorrect: false }, { icon: '🦉', isCorrect: false }, { icon: '🐸', isCorrect: false },
     ],
   },
 ];
@@ -78,7 +78,14 @@ function getDailyMissions(): Array<{ title: string; items: Array<{ icon: string;
     }
     return a;
   }
-  return seededShuffle(ALL_MISSIONS).slice(0, 3); // 3 missões por dia
+  // Embaralha os itens de cada missão para aleatoriedade visual
+  function shuffle<T>(arr: T[]): T[] {
+    return arr.map(value => ({ value, sort: Math.random() })).sort((a, b) => a.sort - b.sort).map(({ value }) => value);
+  }
+  return seededShuffle(ALL_MISSIONS).slice(0, 3).map(mission => ({
+    ...mission,
+    items: shuffle(mission.items)
+  }));
 }
 
 const AssociationGame: React.FC<AssociationGameProps> = ({ onEnd }) => {
