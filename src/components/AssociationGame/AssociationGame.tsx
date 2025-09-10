@@ -91,12 +91,12 @@ function getDailyMissions(): Array<{ title: string; items: Array<{ icon: string;
 const AssociationGame: React.FC<AssociationGameProps> = ({ onEnd }) => {
   const [missions] = useState(getDailyMissions());
   const [missionIdx, setMissionIdx] = useState(0);
-  const items = missions[missionIdx]?.items || [];
+  const items = React.useMemo(() => missions[missionIdx]?.items || [], [missions, missionIdx]);
   const [marked, setMarked] = useState<boolean[]>(Array(items.length).fill(false));
   const [finished, setFinished] = useState(false);
   const [success, setSuccess] = useState(false);
 
-  // Atualiza grid ao trocar missão
+  // Update grid when mission changes
   React.useEffect(() => {
     setMarked(Array(items.length).fill(false));
     setFinished(false);

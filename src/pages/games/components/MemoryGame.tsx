@@ -4,12 +4,13 @@ interface MemoryGameProps {
   onEnd: (score: number) => void;
 }
 
-const cards = ['🍎', '🍌', '🍇', '🍎', '🍌', '🍇'];
+// 6 pairs (12 cards)
+const cards = ['🍎', '🍌', '🍇', '🍊', '🍓', '🍉', '🍎', '🍌', '🍇', '🍊', '🍓', '🍉'];
 
 const shuffle = (arr: string[]) => arr.sort(() => Math.random() - 0.5);
 
 const MemoryGame: React.FC<MemoryGameProps> = ({ onEnd }) => {
-  const [shuffled, setShuffled] = useState(() => shuffle(cards));
+  const [shuffled] = useState(() => shuffle(cards));
   const [flipped, setFlipped] = useState<number[]>([]);
   const [matched, setMatched] = useState<number[]>([]);
   const [score, setScore] = useState(0);
@@ -35,7 +36,7 @@ const MemoryGame: React.FC<MemoryGameProps> = ({ onEnd }) => {
   }, [matched, onEnd, score]);
 
   return (
-    <div className="grid grid-cols-3 gap-2">
+  <div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
       {shuffled.map((card, idx) => (
         <button
           key={idx}
@@ -46,7 +47,7 @@ const MemoryGame: React.FC<MemoryGameProps> = ({ onEnd }) => {
           {flipped.includes(idx) || matched.includes(idx) ? card : '?'}
         </button>
       ))}
-      <div className="col-span-3 mt-2">Pares encontrados: {score}</div>
+  <div className="col-span-3 mt-2">Pairs found: {score}</div>
     </div>
   );
 };

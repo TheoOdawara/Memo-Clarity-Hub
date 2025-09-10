@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from 'react';
+import { useState, useRef } from 'react';
 
 interface SequenceGameProps {
   onEnd: (score: number) => void;
@@ -11,7 +11,7 @@ const COLORS = [
   { id: 3, name: 'Blue', class: 'bg-blue-500', active: 'bg-blue-300' },
 ];
 
-const MAX_PHASES = 5;
+const MAX_PHASES = 10;
 
 function sleep(ms: number) {
   return new Promise(resolve => setTimeout(resolve, ms));
@@ -26,13 +26,9 @@ export default function SequenceGame({ onEnd }: SequenceGameProps) {
   const [error, setError] = useState(false);
   const [completed, setCompleted] = useState(false);
   const sequenceRef = useRef<number[]>([]);
+  const [started, setStarted] = useState(false);
 
-  // Start the first phase on mount (extend from empty sequence)
-  useEffect(() => {
-    // build first phase
-    startPhase(1, true);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  // Do not auto-start. The game begins when the player presses Start.
 
   // Helper to get a random color id
   function randColor() {
@@ -42,7 +38,7 @@ export default function SequenceGame({ onEnd }: SequenceGameProps) {
   // Start a phase. If `extend` is true we'll add one new random color to the existing sequence;
   // otherwise we'll ensure sequence length is targetPhase (used rarely).
   async function startPhase(targetPhase: number, extend: boolean) {
-    setShowing(true);
+  setShowing(true);
     setError(false);
     setPlayerIdx(0);
     setPhase(targetPhase);
@@ -72,7 +68,7 @@ export default function SequenceGame({ onEnd }: SequenceGameProps) {
 
   // Called when user clicks a quadrant
   async function handleClick(id: number) {
-    if (showing || completed) return;
+  if (!started || showing || completed) return;
 
     // Defensive: ensure sequence is ready
     const seq = sequenceRef.current;
@@ -107,20 +103,39 @@ export default function SequenceGame({ onEnd }: SequenceGameProps) {
     }
   }
 
-  // Restart helper
-  function handleRestart() {
-  sequenceRef.current = [];
-    setPhase(1);
-    setPlayerIdx(0);
+  // Restart helper removed (Reset button was removed from UI)
+
+  function handleStart() {
+    if (started) return;
     setError(false);
     setCompleted(false);
-  // reset any transient refs
+    setPlayerIdx(0);
+    setPhase(1);
+    sequenceRef.current = [];
+    setStarted(true);
     startPhase(1, true);
   }
 
   return (
     <div className="max-w-md mx-auto text-center">
-      <p className="mb-3 text-gray-600">Phase {phase} of {MAX_PHASES}</p>
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4 px-2">
+        <div className="text-left">
+          <div className="text-sm text-gray-500 font-nunito">Phase</div>
+          <div className="text-xl font-poppins font-semibold text-[#0B4F6C]">{phase} of {MAX_PHASES}</div>
+          <div className="mt-2 text-sm text-gray-600">Watch the sequence, then repeat it by tapping the tiles in order.</div>
+        </div>
+
+        <div className="flex items-center gap-3">
+          <button
+            onClick={handleStart}
+            disabled={started}
+            className={`min-w-[120px] px-6 py-3 rounded-xl text-lg font-poppins font-semibold shadow-lg transition transform ${started ? 'bg-gray-200 text-gray-700' : 'bg-[#0B4F6C] text-white hover:scale-105'}`}
+            aria-pressed={started}
+          >
+            {started ? 'Running' : 'Start'}
+          </button>
+        </div>
+      </div>
 
       <div className="w-80 h-80 mx-auto grid grid-cols-2 gap-4">
         {COLORS.map(c => {
@@ -132,7 +147,7 @@ export default function SequenceGame({ onEnd }: SequenceGameProps) {
               onClick={() => handleClick(c.id)}
               className={`w-full h-full rounded-lg shadow-md focus:outline-none transform transition-all relative overflow-hidden ${baseBg} ${extra}`}
               aria-label={c.name}
-              disabled={showing || completed}
+              disabled={!started || showing || completed}
             >
               {/* subtle bright overlay when active for clearer visibility */}
               <span
@@ -144,14 +159,12 @@ export default function SequenceGame({ onEnd }: SequenceGameProps) {
       </div>
 
       <div className="mt-6">
-        {showing && <div className="text-sm text-gray-500">Observe the sequence...</div>}
-        {error && <div className="text-sm text-red-600 font-semibold">Wrong — the sequence will be repeated</div>}
+  {showing && started && <div className="text-sm text-gray-500">Observe the sequence...</div>}
+  {error && <div className="text-sm text-red-600 font-semibold">Wrong — game over</div>}
         {completed && <div className="text-sm text-green-600 font-semibold">Well done — game complete!</div>}
       </div>
 
-      <div className="mt-4 flex justify-center gap-3">
-        <button onClick={handleRestart} className="px-4 py-2 bg-blue-600 text-white rounded">Restart</button>
-      </div>
+  {/* Reset button removed per UI change */}
     </div>
   );
 }
