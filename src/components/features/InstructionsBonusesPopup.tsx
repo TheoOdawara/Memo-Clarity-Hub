@@ -76,11 +76,10 @@ export default function InstructionsBonusesPopup({ open, onClose }: { open: bool
               <div className="text-base text-gray-700 mb-2 text-center max-w-md">{INSTRUCTION_PDF.description}</div>
               <a
                 href={INSTRUCTION_PDF.file}
-                target="_blank"
-                rel="noopener noreferrer"
+                download
                 className="flex items-center gap-2 px-6 py-3 rounded-xl bg-amber-400 text-teal-900 font-bold text-lg shadow-lg hover:bg-amber-500 transition-all focus:outline-none focus:ring-2 focus:ring-teal-800"
               >
-                <Download size={24} /> View PDF
+                <Download size={24} /> Download PDF
               </a>
             </div>
           ) : (
@@ -91,11 +90,10 @@ export default function InstructionsBonusesPopup({ open, onClose }: { open: bool
                   <div className="text-sm text-gray-600 text-center mb-2">{pdf.description}</div>
                   <a
                     href={pdf.file}
-                    target="_blank"
-                    rel="noopener noreferrer"
+                    download
                     className="flex items-center gap-2 px-5 py-2 rounded-lg bg-amber-400 text-teal-900 font-bold text-base shadow hover:bg-amber-500 transition-all focus:outline-none focus:ring-2 focus:ring-teal-800"
                   >
-                    <Download size={20} /> View PDF
+                    <Download size={20} /> Download PDF
                   </a>
                 </div>
               ))}

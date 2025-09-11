@@ -17,7 +17,7 @@ const TABS = [
   },
   {
     name: "USPS",
-    link: "https://tools.usps.com/go/TrackActiona",
+  link: "https://tools.usps.com/go/TrackAction",
     img: uspsImg,
     instructions: [
       "Click the link below to open USPS tracking.",

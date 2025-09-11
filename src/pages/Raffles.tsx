@@ -5,6 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { Gift, Calendar, Trophy, Plus, Edit, Users, Crown } from 'lucide-react';
+import { X } from 'lucide-react';
 import { RaffleForm } from '@/components/features/RaffleForm';
 import { WinnerSelectionModal } from '@/components/features/WinnerSelectionModal';
 import toast from 'react-hot-toast';
@@ -276,6 +277,7 @@ export default function Raffles() {
                           >
                             <Edit className="w-5 h-5 text-teal-800" />
                           </Button>
+                          {/* Botão de adicionar vencedor do sorteio (Crown) */}
                           {raffle.status === 'active' && raffle.entry_count && raffle.entry_count > 0 && (
                             <Button
                               size="sm"
@@ -284,9 +286,36 @@ export default function Raffles() {
                               title="Select Winner"
                               className="text-yellow-600 hover:text-yellow-700"
                             >
+                              <span className="sr-only">Add Winner</span>
                               <Crown className="w-5 h-5" />
                             </Button>
                           )}
+                          {/* Delete Raffle Button (Admin only) */}
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            onClick={async () => {
+                              if (window.confirm('Are you sure you want to delete this raffle? This action cannot be undone.')) {
+                                try {
+                                  const { error } = await supabase
+                                    .from('raffles')
+                                    .delete()
+                                    .eq('id', raffle.id);
+                                  if (error) throw error;
+                                  toast.success('Raffle deleted successfully');
+                                  fetchRaffles();
+                                } catch (error) {
+                                  console.error('Error deleting raffle:', error);
+                                  toast.error('Failed to delete raffle');
+                                }
+                              }
+                            }}
+                            title="Delete Raffle"
+                            className="hover:bg-red-100"
+                          >
+                            <span className="sr-only">Delete</span>
+                            <X className="w-5 h-5 text-red-500" />
+                          </Button>
                         </div>
                       )}
                     </div>
