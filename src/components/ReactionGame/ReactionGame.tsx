@@ -40,6 +40,13 @@ const ReactionGame: React.FC<ReactionGameProps> = ({ onEnd }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [spawnedCount, activeTarget, started]);
 
+  // Quando started muda para true, inicia o primeiro alvo
+  useEffect(() => {
+    if (started && spawnedCount === 0) {
+      spawnTarget();
+    }
+  }, [started, spawnedCount]);
+
   function clearExistingTimer() {
     if (timerRef.current) {
       window.clearTimeout(timerRef.current);
@@ -92,14 +99,20 @@ const ReactionGame: React.FC<ReactionGameProps> = ({ onEnd }) => {
   }
 
   function handleStart() {
-    if (started) return;
-    setStarted(true);
-    setSpawnedCount(0);
-    setActiveTarget(null);
-    setHits(0);
-    setMisses(0);
-    setReactionTimes([]);
-    startNext();
+  if (started) return;
+  setStarted(true);
+  setSpawnedCount(0);
+  setActiveTarget(null);
+  setHits(0);
+  setMisses(0);
+  setReactionTimes([]);
+  // Removido spawnTarget daqui, será disparado pelo useEffect
+  // Quando started muda para true, inicia o primeiro alvo
+  useEffect(() => {
+    if (started && spawnedCount === 0) {
+      spawnTarget();
+    }
+  }, [started]);
   }
 
   function handleTargetClick(t: Target) {
