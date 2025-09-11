@@ -91,9 +91,10 @@ export function WinnerSelectionModal({ raffle, onClose, onWinnerSelected }: Winn
 
     setLoading(true);
     try {
+      // Use username as priority, fallback to full_name if username not available
       const winnerUsername = selectedWinner.profiles?.username || 
                            selectedWinner.profiles?.full_name || 
-                           'Unknown User';
+                           `User ${selectedWinner.user_id.substring(0, 8)}`;
 
       const { error } = await supabase
         .from('raffles')
@@ -126,9 +127,10 @@ export function WinnerSelectionModal({ raffle, onClose, onWinnerSelected }: Winn
     const randomWinner = entries[randomIndex];
     setSelectedWinner(randomWinner);
     
+    // Use username as priority for display
     const winnerName = randomWinner.profiles?.username || 
                       randomWinner.profiles?.full_name || 
-                      'Unknown User';
+                      `User ${randomWinner.user_id.substring(0, 8)}`;
     toast.success(`Randomly selected: ${winnerName}`);
   };
 
@@ -221,7 +223,7 @@ export function WinnerSelectionModal({ raffle, onClose, onWinnerSelected }: Winn
                   <p className="text-yellow-700">
                     {selectedWinner.profiles?.username || 
                      selectedWinner.profiles?.full_name || 
-                     'Unknown User'}
+                     `User ${selectedWinner.user_id.substring(0, 8)}`}
                   </p>
                 </div>
               )}
