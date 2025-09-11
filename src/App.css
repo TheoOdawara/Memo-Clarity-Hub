@@ -1,42 +1,26 @@
 #root {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
-  text-align: center;
+  max-width: 100%;
+  margin: 0;
+  padding: 0;
 }
 
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
-}
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-.logo.react:hover {
-  filter: drop-shadow(0 0 2em #61dafbaa);
+body {
+  margin: 0;
+  padding: 0;
+  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
 }
 
-@keyframes logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+/* Ring pulse animation used by the Track card icon. Kept conservative so the pulse stays within the icon container */
+@keyframes ringPulse {
+  0% { transform: scale(0.6); opacity: 0.9; }
+  50% { transform: scale(0.95); opacity: 0.5; }
+  100% { transform: scale(1.15); opacity: 0; }
 }
+.ringPulse { transform-origin: center; animation: ringPulse 1200ms cubic-bezier(0,0,0.2,1) infinite; }
+.ringDelay0 { animation-delay: 0s; }
+.ringDelay1 { animation-delay: 0.26s; }
+.ringDelay2 { animation-delay: 0.52s; }
+.ringDelay3 { animation-delay: 0.78s; }
 
-@media (prefers-reduced-motion: no-preference) {
-  a:nth-of-type(2) .logo {
-    animation: logo-spin infinite 20s linear;
-  }
-}
-
-.card {
-  padding: 2em;
-}
-
-.read-the-docs {
-  color: #888;
-}
+/* Small helper to reduce the visual reach of borders when needed */
+.ring-clip { box-shadow: 0 0 0 4px rgba(255,255,255,0.85) inset; }

@@ -1,0 +1,61 @@
+/* AssociationGame styles */
+.animate-fadein {
+    animation: fadein 0.7s;
+  }
+  .animate-pop {
+    animation: pop 0.4s;
+  }
+  .animate-correct {
+    animation: correct 0.5s;
+  }
+  .animate-wrong {
+    animation: wrong 0.5s;
+  }
+  .animate-progress {
+    animation: progress 0.7s;
+  }
+  @keyframes fadein {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+  @keyframes pop {
+    0% {
+      transform: scale(0.8);
+    }
+    80% {
+      transform: scale(1.1);
+    }
+    100% {
+      transform: scale(1);
+    }
+  }
+  @keyframes correct {
+    0% {
+      background: #34d399;
+    }
+    100% {
+      background: linear-gradient(to right, #34d399, #10b981);
+    }
+  }
+  @keyframes wrong {
+    0% {
+      background: #f87171;
+    }
+    100% {
+      background: linear-gradient(to right, #f87171, #ec4899);
+    }
+  }
+  @keyframes progress {
+    from {
+      width: 0;
+    }
+    to {
+      width: 100%;
+    }
+  }
