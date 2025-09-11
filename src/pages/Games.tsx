@@ -8,11 +8,24 @@ export default function Games() {
   // displayed counters for subtle count-up animation
   const [displayedTaken, setDisplayedTaken] = useState<number>(0)
   const [displayedBest, setDisplayedBest] = useState<number>(0)
+  const [recentScores, setRecentScores] = useState<number[]>([]);
   const [mounted, setMounted] = useState(false)
 
   useEffect(() => {
   const taken = Number(localStorage.getItem('stats_tests_taken') || '0')
   const best = Number(localStorage.getItem('stats_highest_score') || '0')
+  // Recupera histórico dos últimos 3 melhores scores
+  const scoresRaw = localStorage.getItem('stats_scores_history') || '[]';
+  let scores: number[] = [];
+  try {
+    scores = JSON.parse(scoresRaw);
+    if (!Array.isArray(scores)) scores = [];
+  } catch {
+    scores = [];
+  }
+  // Ordena e pega os 3 maiores
+  const top3 = scores.sort((a, b) => b - a).slice(0, 3);
+  setRecentScores(top3);
 
     // animate counters (simple interval-based ease)
     const animate = (from: number, to: number, setter: (v: number) => void) => {
@@ -106,6 +119,50 @@ export default function Games() {
                     </div>
                   </div>
                   <div className="mt-3 text-xs text-teal-700">Best total score</div>
+                </div>
+              </div>
+              {/* Histórico dos 3 melhores */}
+              <div className="mt-8">
+                <div className="rounded-3xl bg-gradient-to-r from-emerald-600 via-teal-400 to-cyan-400 shadow-2xl p-8 md:p-10 text-white relative overflow-hidden">
+                  <h3 className="text-2xl font-extrabold mb-6 flex items-center gap-2">
+                    <Trophy className="text-yellow-300" size={32} /> Top 3 Scores
+                  </h3>
+                  <div className="flex flex-col md:flex-row gap-6 justify-center items-center">
+                    {recentScores.length === 0 && (
+                      <span className="text-white/80 text-lg">No history yet.</span>
+                    )}
+                    {recentScores.map((score, idx) => (
+                      <div
+                        key={idx}
+                        className={
+                          `flex flex-col items-center justify-center px-6 py-6 rounded-2xl shadow-lg border-2 ` +
+                          (idx === 0
+                            ? 'bg-yellow-300/90 border-yellow-400 text-yellow-900 scale-105 drop-shadow-xl'
+                            : idx === 1
+                            ? 'bg-gray-200/80 border-gray-400 text-gray-700'
+                            : 'bg-amber-100/80 border-amber-300 text-amber-800')
+                        }
+                        style={{ minWidth: 120 }}
+                      >
+                        <Trophy
+                          size={40}
+                          className={
+                            idx === 0
+                              ? 'text-yellow-500 mb-2'
+                              : idx === 1
+                              ? 'text-gray-400 mb-2'
+                              : 'text-amber-400 mb-2'
+                          }
+                        />
+                        <div className="text-3xl font-extrabold mb-1">{score}</div>
+                        <div className="text-sm font-semibold uppercase tracking-wide">
+                          {idx === 0 ? '1st Place' : idx === 1 ? '2nd Place' : '3rd Place'}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                  <div className="pointer-events-none absolute -right-12 top-6 w-56 h-56 rounded-full bg-white/10 opacity-30 blur-3xl" />
+                  <div className="pointer-events-none absolute -left-14 bottom-6 w-40 h-40 rounded-full bg-white/6 opacity-20 blur-2xl" />
                 </div>
               </div>
             </section>
