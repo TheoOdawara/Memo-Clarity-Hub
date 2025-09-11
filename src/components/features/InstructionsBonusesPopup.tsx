@@ -46,13 +46,13 @@ export default function InstructionsBonusesPopup({ open, onClose }: { open: bool
         className="bg-gradient-to-br from-teal-50 via-aqua-200 to-white rounded-3xl shadow-2xl p-8 w-[98vw] max-w-xl border-4 border-teal-800 focus:outline-none relative animate-fadein"
         style={{ fontFamily: 'Nunito Sans, Arial, sans-serif' }}
       >
-        <button
-          onClick={onClose}
-          aria-label="Close instructions popup"
-          className="absolute top-5 right-5 text-teal-800 bg-aqua-200 rounded-full p-3 focus:outline-none focus:ring-2 focus:ring-amber-400 shadow-lg"
-        >
-          <X size={32} strokeWidth={2.5} />
-        </button>
+              <button
+                onClick={onClose}
+                aria-label="Close instructions popup"
+                className="absolute top-1 right-2 text-teal-800 bg-aqua-200 rounded-full p-1 focus:outline-none focus:ring-2 focus:ring-amber-400 shadow-lg"
+              >
+                <X size={22} strokeWidth={2.5} />
+              </button>
         <div className="flex gap-3 mb-6 justify-center">
           <button
             onClick={() => setActiveTab(0)}
