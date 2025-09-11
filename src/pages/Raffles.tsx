@@ -50,6 +50,9 @@ export default function Raffles() {
 
   const fetchRaffles = async () => {
     try {
+      // First, update any expired raffles
+      await updateExpiredRaffles();
+
       const { data: rafflesData, error } = await supabase
         .from('raffles')
         .select('*')
@@ -100,6 +103,22 @@ export default function Raffles() {
       toast.error('Failed to load raffles');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const updateExpiredRaffles = async () => {
+    try {
+      const now = new Date().toISOString();
+      
+      const { error } = await supabase
+        .from('raffles')
+        .update({ status: 'completed' })
+        .eq('status', 'active')
+        .lt('end_date', now);
+
+      if (error) throw error;
+    } catch (error) {
+      console.error('Error updating expired raffles:', error);
     }
   };
 
