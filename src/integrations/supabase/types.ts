@@ -125,6 +125,7 @@ export type Database = {
           status: string
           title: string
           updated_at: string
+          winner_description: string | null
           winner_image_url: string | null
           winner_user_id: string | null
           winner_username: string | null
@@ -141,6 +142,7 @@ export type Database = {
           status?: string
           title: string
           updated_at?: string
+          winner_description?: string | null
           winner_image_url?: string | null
           winner_user_id?: string | null
           winner_username?: string | null
@@ -157,6 +159,7 @@ export type Database = {
           status?: string
           title?: string
           updated_at?: string
+          winner_description?: string | null
           winner_image_url?: string | null
           winner_user_id?: string | null
           winner_username?: string | null

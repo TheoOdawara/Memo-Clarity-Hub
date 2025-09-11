@@ -20,6 +20,7 @@ interface Raffle {
   winner_user_id?: string;
   winner_username?: string;
   winner_image_url?: string;
+  winner_description?: string;
   status: 'active' | 'completed' | 'cancelled';
   created_at: string;
   entry_count?: number;
@@ -299,6 +300,9 @@ export default function Raffles() {
                           />
                         )}
                       </div>
+                      {raffle.winner_description && (
+                        <p className="text-xs text-gray-500 mt-1 italic">"{raffle.winner_description}"</p>
+                      )}
                     </div>
                   )}
                 </div>

@@ -24,7 +24,8 @@ export function WinnerSelectionModal({ raffle, onClose, onWinnerSelected }: Winn
   const [previewUrl, setPreviewUrl] = useState<string>('');
   const [formData, setFormData] = useState({
     winner_name: '',
-    winner_image_url: ''
+    winner_image_url: '',
+    winner_description: ''
   });
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -89,7 +90,8 @@ export function WinnerSelectionModal({ raffle, onClose, onWinnerSelected }: Winn
         .update({
           status: 'completed',
           winner_username: formData.winner_name.trim(),
-          winner_image_url: winnerImageUrl || null
+          winner_image_url: winnerImageUrl || null,
+          winner_description: formData.winner_description.trim() || null
         })
         .eq('id', raffle.id);
 
@@ -200,6 +202,19 @@ export function WinnerSelectionModal({ raffle, onClose, onWinnerSelected }: Winn
                 </div>
               )}
             </div>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Winner Description (Optional)
+            </label>
+            <textarea
+              value={formData.winner_description}
+              onChange={(e) => setFormData(prev => ({ ...prev, winner_description: e.target.value }))}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
+              placeholder="Add any additional information about the winner..."
+              rows={3}
+            />
           </div>
 
           <div className="flex gap-3 pt-4 border-t">
