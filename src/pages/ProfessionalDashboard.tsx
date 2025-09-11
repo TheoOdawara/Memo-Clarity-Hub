@@ -228,7 +228,7 @@ export default function ProfessionalDashboard() {
               {/* Go to Raffle Page - Gift with layered frame, gradient background restored */}
               <button
                 className="relative flex flex-col items-center justify-center w-full h-[220px] rounded-2xl bg-gradient-to-br from-yellow-500 via-yellow-400 to-yellow-600 text-white font-bold shadow-xl overflow-hidden transition-all duration-300 ease-in-out hover:shadow-2xl hover:scale-105 focus:outline-none focus:ring-2 focus:ring-yellow-300 border-[3px] border-yellow-300"
-                onClick={() => window.location.href = '/raffles'}
+                onClick={() => navigate('/raffles')}
               >
                 <span className="mb-4 z-10">
                   <div className="relative w-[76px] h-[76px]">
