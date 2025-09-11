@@ -206,8 +206,16 @@ export default function LoginPage() {
               {isResetPassword ? (
                 <form onSubmit={handleResetPassword} className="space-y-6">
                   {infoMessage && (
-                    <div className="mb-4 p-3 bg-green-500/20 border border-green-400/30 text-green-100 rounded-2xl">
-                      {infoMessage}
+                    <div className="mb-6 p-4 bg-green-500/30 border-2 border-green-400 text-green-100 rounded-2xl backdrop-blur-sm flex items-center space-x-3 shadow-xl">
+                      <div className="flex-shrink-0">
+                        <svg className="w-6 h-6 text-green-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                      </div>
+                      <div>
+                        <p className="text-sm font-semibold text-green-100">{infoMessage}</p>
+                        <p className="text-xs text-green-200 mt-1">Check your email inbox and click the confirmation link.</p>
+                      </div>
                     </div>
                   )}
                   <div>
@@ -260,8 +268,16 @@ export default function LoginPage() {
               ) : (
                 <form onSubmit={handleSubmit} className="space-y-6">
                 {infoMessage && (
-                  <div className="mb-4 p-3 bg-yellow-500/20 border border-yellow-400/30 text-yellow-900 rounded-2xl">
-                    {infoMessage}
+                  <div className="mb-6 p-4 bg-green-500/30 border-2 border-green-400 text-green-100 rounded-2xl backdrop-blur-sm flex items-center space-x-3 shadow-xl">
+                    <div className="flex-shrink-0">
+                      <svg className="w-6 h-6 text-green-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                    </div>
+                    <div>
+                      <p className="text-sm font-semibold text-green-100">{infoMessage}</p>
+                      <p className="text-xs text-green-200 mt-1">Check your email inbox and click the confirmation link.</p>
+                    </div>
                   </div>
                 )}
                 <div className="space-y-4">
