@@ -23,6 +23,64 @@ export const testService = {
     return { data, error }
   },
 
+  async cleanupDuplicateTests() {
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) throw new Error('User not authenticated')
+
+    try {
+      // Get all tests ordered by creation time
+      const { data: tests } = await supabase
+        .from('tests')
+        .select('*')
+        .eq('user_id', user.id)
+        .order('completed_at', { ascending: true })
+
+      if (!tests || tests.length <= 1) return { data: null, error: null }
+
+      // Group tests by total_score and find potential duplicates
+      const duplicateGroups = new Map<number, typeof tests>()
+      
+      for (const test of tests) {
+        const key = test.total_score
+        if (!duplicateGroups.has(key)) {
+          duplicateGroups.set(key, [])
+        }
+        duplicateGroups.get(key)!.push(test)
+      }
+
+      // Find tests that were created very close together (likely duplicates)
+      const toDelete: string[] = []
+      for (const [, group] of duplicateGroups) {
+        if (group.length > 1) {
+          // Sort by completed_at and keep only the first one
+          group.sort((a, b) => new Date(a.completed_at).getTime() - new Date(b.completed_at).getTime())
+          
+          for (let i = 1; i < group.length; i++) {
+            const timeDiff = new Date(group[i].completed_at).getTime() - new Date(group[0].completed_at).getTime()
+            // If created within 10 seconds, likely a duplicate
+            if (timeDiff < 10000) {
+              toDelete.push(group[i].id)
+            }
+          }
+        }
+      }
+
+      if (toDelete.length > 0) {
+        const { error } = await supabase
+          .from('tests')
+          .delete()
+          .in('id', toDelete)
+
+        return { data: `Removed ${toDelete.length} duplicate tests`, error }
+      }
+
+      return { data: 'No duplicates found', error: null }
+    } catch (error) {
+      console.error('Error cleaning up duplicates:', error)
+      return { data: null, error }
+    }
+  },
+
   async getUserTests(limit = 10) {
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) throw new Error('User not authenticated')
