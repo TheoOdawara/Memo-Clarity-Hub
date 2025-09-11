@@ -58,6 +58,16 @@ export const checkinService = {
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) throw new Error('User not authenticated')
 
+    // If user has no checkins yet, streak must be 0
+    const { count, error: countError } = await supabase
+      .from('checkins')
+      .select('id', { count: 'exact', head: true })
+      .eq('user_id', user.id)
+
+    if (countError) return { data: 0, error: countError }
+    if (!count || count === 0) return { data: 0, error: null }
+
+    // Otherwise, read current streak from profile (kept by DB logic)
     const { data, error } = await supabase
       .from('profiles')
       .select('streak_count, last_checkin_date')
