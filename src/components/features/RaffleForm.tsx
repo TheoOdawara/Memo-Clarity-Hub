@@ -28,6 +28,8 @@ interface RaffleFormProps {
 export function RaffleForm({ raffle, onClose, onSubmit }: RaffleFormProps) {
   const { user } = useAuth();
   const [loading, setLoading] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [formData, setFormData] = useState({
     title: '',
     description: '',
@@ -64,17 +66,61 @@ export function RaffleForm({ raffle, onClose, onSubmit }: RaffleFormProps) {
     }
   }, [raffle]);
 
+  const uploadFile = async (file: File): Promise<string> => {
+    const fileExt = file.name.split('.').pop();
+    const fileName = `${Math.random().toString(36).substring(2)}.${fileExt}`;
+    
+    const { error } = await supabase.storage
+      .from('raffle-images')
+      .upload(fileName, file);
+
+    if (error) throw error;
+
+    const { data: publicData } = supabase.storage
+      .from('raffle-images')
+      .getPublicUrl(fileName);
+
+    return publicData.publicUrl;
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      // Validate file type
+      if (!file.type.startsWith('image/')) {
+        toast.error('Please select an image file');
+        return;
+      }
+      // Validate file size (max 5MB)
+      if (file.size > 5 * 1024 * 1024) {
+        toast.error('File size must be less than 5MB');
+        return;
+      }
+      setSelectedFile(file);
+      setFormData(prev => ({ ...prev, image_url: '' })); // Clear URL when file is selected
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!user) return;
 
     setLoading(true);
     try {
+      let imageUrl = formData.image_url;
+      
+      // Upload file if selected
+      if (selectedFile) {
+        setUploading(true);
+        imageUrl = await uploadFile(selectedFile);
+        setUploading(false);
+      }
+
       const raffleData = {
         title: formData.title,
         description: formData.description || null,
         prize: formData.prize,
-        image_url: formData.image_url || null,
+        image_url: imageUrl || null,
         start_date: formData.start_date,
         end_date: formData.end_date,
         winner_username: formData.winner_username || null,
@@ -107,6 +153,7 @@ export function RaffleForm({ raffle, onClose, onSubmit }: RaffleFormProps) {
       toast.error('Failed to save raffle');
     } finally {
       setLoading(false);
+      setUploading(false);
     }
   };
 
@@ -165,15 +212,65 @@ export function RaffleForm({ raffle, onClose, onSubmit }: RaffleFormProps) {
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                Image URL
+                Image
               </label>
-              <input
-                type="url"
-                value={formData.image_url}
-                onChange={(e) => setFormData(prev => ({ ...prev, image_url: e.target.value }))}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
-                placeholder="Enter image URL"
-              />
+              
+              {/* File Upload */}
+              <div className="mb-3">
+                <label className="block text-xs text-gray-500 mb-1">Upload file</label>
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleFileChange}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary text-sm"
+                />
+                {selectedFile && (
+                  <p className="text-xs text-green-600 mt-1">
+                    Selected: {selectedFile.name}
+                  </p>
+                )}
+              </div>
+              
+              {/* URL Input */}
+              <div>
+                <label className="block text-xs text-gray-500 mb-1">Or enter URL</label>
+                <input
+                  type="url"
+                  value={formData.image_url}
+                  onChange={(e) => {
+                    setFormData(prev => ({ ...prev, image_url: e.target.value }));
+                    setSelectedFile(null); // Clear file when URL is entered
+                  }}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
+                  placeholder="Enter image URL"
+                  disabled={!!selectedFile}
+                />
+              </div>
+              
+              {/* Preview */}
+              {(formData.image_url || selectedFile) && (
+                <div className="mt-3">
+                  <label className="block text-xs text-gray-500 mb-1">Preview</label>
+                  <div className="w-full max-w-xs">
+                    {selectedFile ? (
+                      <img
+                        src={URL.createObjectURL(selectedFile)}
+                        alt="Preview"
+                        className="w-full h-32 object-cover rounded-md border"
+                      />
+                    ) : formData.image_url ? (
+                      <img
+                        src={formData.image_url}
+                        alt="Preview"
+                        className="w-full h-32 object-cover rounded-md border"
+                        onError={(e) => {
+                          e.currentTarget.style.display = 'none';
+                        }}
+                      />
+                    ) : null}
+                  </div>
+                </div>
+              )}
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -235,8 +332,8 @@ export function RaffleForm({ raffle, onClose, onSubmit }: RaffleFormProps) {
             </div>
 
             <div className="flex gap-3 pt-4">
-              <Button type="submit" disabled={loading} className="flex-1">
-                {loading ? 'Saving...' : (raffle ? 'Update Raffle' : 'Create Raffle')}
+              <Button type="submit" disabled={loading || uploading} className="flex-1">
+                {uploading ? 'Uploading...' : loading ? 'Saving...' : (raffle ? 'Update Raffle' : 'Create Raffle')}
               </Button>
               <Button type="button" variant="outline" onClick={onClose}>
                 Cancel
