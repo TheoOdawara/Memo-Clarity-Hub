@@ -39,31 +39,42 @@ export function WinnerSelectionModal({ raffle, onClose, onWinnerSelected }: Winn
 
   const fetchEntries = async () => {
     try {
-      const { data, error } = await supabase
+      // First, get all raffle entries
+      const { data: entriesData, error: entriesError } = await supabase
         .from('raffle_entries')
-        .select(`
-          id,
-          user_id,
-          created_at,
-          profiles:user_id (
-            username,
-            full_name
-          )
-        `)
+        .select('id, user_id, created_at')
         .eq('raffle_id', raffle.id)
         .order('created_at', { ascending: true });
 
-      if (error) throw error;
-      
-      // Transform the data to handle the array structure from Supabase
-      const transformedData = (data || []).map((entry: any) => ({
-        id: entry.id,
-        user_id: entry.user_id,
-        created_at: entry.created_at,
-        profiles: Array.isArray(entry.profiles) && entry.profiles.length > 0 ? entry.profiles[0] : null
-      }));
-      
-      setEntries(transformedData);
+      if (entriesError) throw entriesError;
+
+      if (!entriesData || entriesData.length === 0) {
+        setEntries([]);
+        return;
+      }
+
+      // Get user profiles for the user_ids
+      const userIds = entriesData.map(entry => entry.user_id);
+      const { data: profilesData, error: profilesError } = await supabase
+        .from('profiles')
+        .select('user_id, username, full_name')
+        .in('user_id', userIds);
+
+      if (profilesError) {
+        console.warn('Error fetching profiles:', profilesError);
+        // Continue without profiles data
+      }
+
+      // Combine entries with profile data
+      const entriesWithProfiles = entriesData.map(entry => {
+        const profile = profilesData?.find(p => p.user_id === entry.user_id);
+        return {
+          ...entry,
+          profiles: profile || null
+        };
+      });
+
+      setEntries(entriesWithProfiles);
     } catch (error) {
       console.error('Error fetching entries:', error);
       toast.error('Failed to load raffle entries');
