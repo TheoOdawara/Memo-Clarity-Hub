@@ -129,7 +129,7 @@ const AssociationGame: React.FC<AssociationGameProps> = ({ onEnd }) => {
   {/* Título removido conforme solicitado */}
       <div className="max-w-xl w-full mx-auto bg-soft-white rounded-3xl shadow-2xl flex flex-col gap-8 border-4 border-teal-800 p-6 animate-pop-in">
   <h3 className="mb-2 text-xl font-poppins font-semibold text-[#0B4F6C] text-center animate-fade-in">{missions[missionIdx].title}</h3>
-        <div className="grid grid-cols-3 gap-8 mt-4">
+        <div className="grid grid-cols-3 gap-8 mt-4 justify-items-center">
           {items.map((item, idx) => (
             <button
               key={idx}
