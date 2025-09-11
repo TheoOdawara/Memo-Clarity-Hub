@@ -1,4 +1,7 @@
 import { useState, useEffect } from 'react';
+import SupportPopup from '@/components/features/SupportPopup';
+import TrackPopup from '@/components/features/TrackPopup';
+import InstructionsBonusesPopup from '@/components/features/InstructionsBonusesPopup';
 import { useNavigate } from 'react-router-dom';
 import { Brain, ArrowUpRight, Gift, Truck, MessageSquare, Info, Activity } from 'lucide-react';
 import { checkinService } from '@/services/checkin';
@@ -27,6 +30,9 @@ export default function ProfessionalDashboard() {
   const [checkedIn, setCheckedIn] = useState(false);
   const [showInstructions, setShowInstructions] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [showSupportPopup, setShowSupportPopup] = useState(false);
+  const [showTrackPopup, setShowTrackPopup] = useState(false);
+  const [showInstructionsBonusesPopup, setShowInstructionsBonusesPopup] = useState(false);
   const navigate = useNavigate();
   const [streakCount, setStreakCount] = useState(0);
   const [weekChecks, setWeekChecks] = useState([false, false, false, false, false, false, false]);
@@ -250,17 +256,17 @@ export default function ProfessionalDashboard() {
                 <span className="text-xs font-normal mt-1 z-10">Win exclusive prizes</span>
               </button>
 
-              {/* When / How to take it card (opens modal) - use SeriousCard visual language */}
+              {/* Instructions & Bonuses card (opens premium modal) */}
               <SeriousCard
-                title="When / How to take it"
-                subtitle="Read detailed instructions"
-                onClick={() => setShowInstructions(true)}
+                title="Instructions & Bonuses"
+                subtitle="Guides and exclusive resources"
+                onClick={() => setShowInstructionsBonusesPopup(true)}
                 icon={
-                  <div className="relative w-14 h-14 flex items-center justify-center rounded-full bg-white border border-teal-50 shadow-inner overflow-hidden">
-                    <div className="absolute inset-0 rounded-full bg-teal-50/10" aria-hidden />
-                    <div className="absolute -inset-px rounded-full border-2 border-teal-100/60" aria-hidden />
-                    <div className="absolute inset-0 rounded-full blur-sm opacity-40 bg-gradient-to-br from-teal-100 to-white" aria-hidden />
-                    <Info size={20} strokeWidth={1.8} className="text-teal-600 relative z-10" />
+                  <div className="relative w-14 h-14 flex items-center justify-center rounded-full bg-white border border-amber-400 shadow-inner overflow-hidden">
+                    <div className="absolute inset-0 rounded-full bg-amber-400/10" aria-hidden />
+                    <div className="absolute -inset-px rounded-full border-2 border-amber-400/60" aria-hidden />
+                    <div className="absolute inset-0 rounded-full blur-sm opacity-40 bg-gradient-to-br from-amber-200 to-white" aria-hidden />
+                    <Info size={20} strokeWidth={1.8} className="text-amber-500 relative z-10" />
                   </div>
                 }
               />
@@ -268,7 +274,7 @@ export default function ProfessionalDashboard() {
               <SeriousCard
                 title="Track"
                 subtitle="Access order tracking"
-                onClick={() => alert('Open order tracking')}
+                onClick={() => setShowTrackPopup(true)}
                 icon={
                   <div className="relative w-14 h-14 flex items-center justify-center rounded-full bg-white border border-teal-50 shadow-inner overflow-hidden">
                     {/* soft inner fill */}
@@ -284,7 +290,7 @@ export default function ProfessionalDashboard() {
               <SeriousCard
                 title="Support"
                 subtitle="Get help and guidance"
-                onClick={() => alert('Support action')}
+                onClick={() => setShowSupportPopup(true)}
                 icon={<div className="w-14 h-14 flex items-center justify-center rounded-full bg-white border border-teal-50 shadow-inner overflow-hidden relative"><div className="absolute inset-0 rounded-full bg-white/60" aria-hidden /><div className="absolute -inset-px rounded-full border border-teal-100/40" aria-hidden /><MessageSquare size={20} strokeWidth={1.8} className="text-teal-600 relative z-10" /></div>}
               />
             </div>
@@ -293,6 +299,9 @@ export default function ProfessionalDashboard() {
               <span className="text-gray-400 text-lg">Área reservada para vídeo</span>
             </div>
           </div>
+          <SupportPopup open={showSupportPopup} onClose={() => setShowSupportPopup(false)} />
+          <TrackPopup open={showTrackPopup} onClose={() => setShowTrackPopup(false)} />
+          <InstructionsBonusesPopup open={showInstructionsBonusesPopup} onClose={() => setShowInstructionsBonusesPopup(false)} />
         </section>
         {showInstructions && (
           <div className="fixed inset-0 z-50 flex items-center justify-center">
