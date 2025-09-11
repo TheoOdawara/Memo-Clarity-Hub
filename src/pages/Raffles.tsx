@@ -20,11 +20,8 @@ interface Raffle {
   winner_username?: string;
   status: 'active' | 'completed' | 'cancelled';
   created_at: string;
-}
-
-interface RaffleWithEntries extends Raffle {
-  entry_count: number;
-  user_entered: boolean;
+  entry_count?: number;
+  user_entered?: boolean;
 }
 
 const ADMIN_USER_IDS = [
@@ -34,7 +31,7 @@ const ADMIN_USER_IDS = [
 
 export default function Raffles() {
   const { user } = useAuth();
-  const [raffles, setRaffles] = useState<RaffleWithEntries[]>([]);
+  const [raffles, setRaffles] = useState<Raffle[]>([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
   const [editingRaffle, setEditingRaffle] = useState<Raffle | null>(null);
@@ -48,50 +45,51 @@ export default function Raffles() {
 
   const fetchRaffles = async () => {
     try {
-      // Fetch basic raffle data
-      const { data: raffleData, error: raffleError } = await supabase
+      const { data: rafflesData, error } = await supabase
         .from('raffles')
         .select('*')
         .order('created_at', { ascending: false });
 
-      if (raffleError) throw raffleError;
-      
-      if (!raffleData) {
-        setRaffles([]);
-        return;
-      }
+      if (error) throw error;
 
-      // For each raffle, get entry count and user entry status
-      const rafflesWithEntries = await Promise.all(
-        raffleData.map(async (raffle) => {
+      // Get entry counts and user entries for each raffle
+      const rafflesWithExtras = await Promise.all(
+        (rafflesData || []).map(async (raffle) => {
           // Get entry count
-          const { count } = await supabase
+          const { count, error: entriesError } = await supabase
             .from('raffle_entries')
             .select('*', { count: 'exact', head: true })
             .eq('raffle_id', raffle.id);
 
-          // Check if current user has entered this raffle
-          let userEntered = false;
+          let entry_count = 0;
+          if (!entriesError) {
+            entry_count = count || 0;
+          }
+
+          // Check if current user entered this raffle
+          let user_entered = false;
           if (user) {
-            const { data: entryData } = await supabase
+            const { data: userEntryData, error: userEntryError } = await supabase
               .from('raffle_entries')
               .select('id')
               .eq('raffle_id', raffle.id)
               .eq('user_id', user.id)
-              .single();
-            
-            userEntered = !!entryData;
+              .maybeSingle();
+
+            if (!userEntryError && userEntryData) {
+              user_entered = true;
+            }
           }
 
           return {
             ...raffle,
-            entry_count: count || 0,
-            user_entered: userEntered
+            entry_count,
+            user_entered
           };
         })
       );
 
-      setRaffles(rafflesWithEntries);
+      setRaffles(rafflesWithExtras);
     } catch (error) {
       console.error('Error fetching raffles:', error);
       toast.error('Failed to load raffles');
@@ -100,32 +98,39 @@ export default function Raffles() {
     }
   };
 
+  const handleRaffleSubmit = async () => {
+    await fetchRaffles();
+    setShowForm(false);
+    setEditingRaffle(null);
+  };
+
   const handleRaffleEntry = async (raffleId: string, isEntering: boolean) => {
     if (!user) {
-      toast.error('Please log in to enter raffles');
+      toast.error('Please sign in to enter raffles');
       return;
     }
 
     setEntryLoading(raffleId);
+    
     try {
       if (isEntering) {
-        // Enter the raffle
         const { error } = await supabase
           .from('raffle_entries')
-          .insert([{ raffle_id: raffleId, user_id: user.id }]);
+          .insert([{
+            raffle_id: raffleId,
+            user_id: user.id
+          }]);
 
         if (error) {
           if (error.code === '23505') { // Unique constraint violation
-            toast.error('You have already entered this raffle');
+            toast.error('You are already entered in this raffle');
           } else {
             throw error;
           }
         } else {
           toast.success('Successfully entered the raffle!');
-          await fetchRaffles(); // Refresh data
         }
       } else {
-        // Leave the raffle
         const { error } = await supabase
           .from('raffle_entries')
           .delete()
@@ -133,22 +138,16 @@ export default function Raffles() {
           .eq('user_id', user.id);
 
         if (error) throw error;
-        
         toast.success('Successfully left the raffle');
-        await fetchRaffles(); // Refresh data
       }
+      
+      fetchRaffles(); // Refresh to update entry count and status
     } catch (error) {
       console.error('Error with raffle entry:', error);
-      toast.error('Failed to update raffle entry');
+      toast.error(isEntering ? 'Failed to enter raffle' : 'Failed to leave raffle');
     } finally {
       setEntryLoading(null);
     }
-  };
-
-  const handleRaffleSubmit = async () => {
-    await fetchRaffles();
-    setShowForm(false);
-    setEditingRaffle(null);
   };
 
   const formatDate = (dateString: string) => {
@@ -256,7 +255,7 @@ export default function Raffles() {
                   
                   <div className="flex items-center gap-2 text-sm text-gray-600">
                     <Users className="w-4 h-4" />
-                    <span>{raffle.entry_count} {raffle.entry_count === 1 ? 'participant' : 'participants'}</span>
+                    <span>{raffle.entry_count || 0} entries</span>
                   </div>
                   
                   <div className="flex items-center gap-2 text-sm text-gray-600">
