@@ -71,15 +71,25 @@ export const checkinService = {
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) throw new Error('User not authenticated')
 
-    // Get checkins from the last 7 days
-    const weekAgo = new Date()
-    weekAgo.setDate(weekAgo.getDate() - 6) // Include today
+    // Get start of current week (Monday)
+    const now = new Date()
+    const dayOfWeek = now.getDay() // 0 = Sunday, 1 = Monday, etc.
+    const daysToMonday = dayOfWeek === 0 ? 6 : dayOfWeek - 1 // If Sunday, go back 6 days, otherwise go back (dayOfWeek - 1) days
+    const startOfWeek = new Date(now)
+    startOfWeek.setDate(now.getDate() - daysToMonday)
+    startOfWeek.setHours(0, 0, 0, 0)
+    
+    // Get end of current week (Sunday)
+    const endOfWeek = new Date(startOfWeek)
+    endOfWeek.setDate(startOfWeek.getDate() + 6)
+    endOfWeek.setHours(23, 59, 59, 999)
     
     const { data, error } = await supabase
       .from('checkins')
       .select('checked_at')
       .eq('user_id', user.id)
-      .gte('checked_at', weekAgo.toISOString())
+      .gte('checked_at', startOfWeek.toISOString())
+      .lte('checked_at', endOfWeek.toISOString())
       .order('checked_at', { ascending: true })
 
     return { data, error }

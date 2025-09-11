@@ -52,14 +52,14 @@ export default function ProfessionalDashboard() {
       const { data: weeklyCheckins } = await checkinService.getWeeklyCheckins();
       if (weeklyCheckins) {
         const weekArray = Array(7).fill(false);
-        const today = new Date();
         
         weeklyCheckins.forEach(checkin => {
           const checkinDate = new Date(checkin.checked_at);
-          const dayDiff = Math.floor((today.getTime() - checkinDate.getTime()) / (1000 * 60 * 60 * 24));
-          if (dayDiff >= 0 && dayDiff < 7) {
-            weekArray[6 - dayDiff] = true; // Reverse order so today is last
-          }
+          // Get day of week (0 = Sunday, 1 = Monday, ... 6 = Saturday)
+          const dayOfWeek = checkinDate.getDay();
+          // Map to our array where 0 = Monday, 1 = Tuesday, ... 6 = Sunday
+          const arrayIndex = dayOfWeek === 0 ? 6 : dayOfWeek - 1; // Sunday (0) -> index 6, Monday (1) -> index 0, etc.
+          weekArray[arrayIndex] = true;
         });
         
         setWeekChecks(weekArray);
