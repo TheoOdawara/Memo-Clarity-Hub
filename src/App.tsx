@@ -3,6 +3,7 @@ import { AuthProvider } from '@/contexts/AuthContext'
 import { ProtectedRoute } from '@/components/ProtectedRoute'
 import { ProfessionalLayout } from '@/components/layout/ProfessionalLayout'
 import LoginPage from '@/pages/LoginPage'
+import ResetPasswordPage from '@/pages/ResetPasswordPage'
 import ProfessionalDashboard from '@/pages/ProfessionalDashboard'
 import Games from '@/pages/Games'
 import TestFlow from './pages/games/MediumLevelTest';
@@ -15,6 +16,7 @@ function App() {
         <Routes>
           {/* Public routes */}
           <Route path="/login" element={<LoginPage />} />
+          <Route path="/auth/reset-password" element={<ResetPasswordPage />} />
           
           {/* Protected routes with professional layout */}
           <Route 
