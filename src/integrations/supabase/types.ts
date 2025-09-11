@@ -14,12 +14,47 @@ export type Database = {
   }
   public: {
     Tables: {
+      checkins: {
+        Row: {
+          checked_at: string
+          created_at: string
+          id: string
+          mood_score: number | null
+          notes: string | null
+          streak_day: number | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          checked_at?: string
+          created_at?: string
+          id?: string
+          mood_score?: number | null
+          notes?: string | null
+          streak_day?: number | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          checked_at?: string
+          created_at?: string
+          id?: string
+          mood_score?: number | null
+          notes?: string | null
+          streak_day?: number | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null
           created_at: string
           full_name: string | null
           id: string
+          last_checkin_date: string | null
+          streak_count: number | null
           updated_at: string
           user_id: string
           username: string | null
@@ -29,6 +64,8 @@ export type Database = {
           created_at?: string
           full_name?: string | null
           id?: string
+          last_checkin_date?: string | null
+          streak_count?: number | null
           updated_at?: string
           user_id: string
           username?: string | null
@@ -38,6 +75,8 @@ export type Database = {
           created_at?: string
           full_name?: string | null
           id?: string
+          last_checkin_date?: string | null
+          streak_count?: number | null
           updated_at?: string
           user_id?: string
           username?: string | null
