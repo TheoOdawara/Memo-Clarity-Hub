@@ -53,9 +53,9 @@ const MemoryGame: React.FC<MemoryGameProps> = ({ onEnd }) => {
   useEffect(() => {
     if (matched.length === cards.length) {
       // short delay so user sees final match
-      setTimeout(() => onEnd(score), 700);
+      setTimeout(() => onEnd(moves), 700);
     }
-  }, [matched, onEnd, score]);
+  }, [matched, onEnd, moves]);
 
   function handleStart() {
     setShuffled(shuffle(cards));
