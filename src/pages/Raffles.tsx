@@ -4,8 +4,9 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
-import { Gift, Calendar, Trophy, Plus, Edit, Users } from 'lucide-react';
+import { Gift, Calendar, Trophy, Plus, Edit, Users, Crown } from 'lucide-react';
 import { RaffleForm } from '@/components/features/RaffleForm';
+import { WinnerSelectionModal } from '@/components/features/WinnerSelectionModal';
 import toast from 'react-hot-toast';
 
 interface Raffle {
@@ -36,6 +37,8 @@ export default function Raffles() {
   const [showForm, setShowForm] = useState(false);
   const [editingRaffle, setEditingRaffle] = useState<Raffle | null>(null);
   const [entryLoading, setEntryLoading] = useState<string | null>(null);
+  const [showWinnerModal, setShowWinnerModal] = useState(false);
+  const [selectedRaffleForWinner, setSelectedRaffleForWinner] = useState<Raffle | null>(null);
   
   const isAdmin = user && ADMIN_USER_IDS.includes(user.id);
 
@@ -98,10 +101,15 @@ export default function Raffles() {
     }
   };
 
-  const handleRaffleSubmit = async () => {
+  const handleWinnerSelected = async () => {
     await fetchRaffles();
-    setShowForm(false);
-    setEditingRaffle(null);
+    setShowWinnerModal(false);
+    setSelectedRaffleForWinner(null);
+  };
+
+  const openWinnerSelection = (raffle: Raffle) => {
+    setSelectedRaffleForWinner(raffle);
+    setShowWinnerModal(true);
   };
 
   const handleRaffleEntry = async (raffleId: string, isEntering: boolean) => {
@@ -227,16 +235,30 @@ export default function Raffles() {
                       {raffle.status}
                     </Badge>
                     {isAdmin && (
-                      <Button
-                        size="sm"
-                        variant="ghost"
-                        onClick={() => {
-                          setEditingRaffle(raffle);
-                          setShowForm(true);
-                        }}
-                      >
-                        <Edit className="w-4 h-4" />
-                      </Button>
+                      <div className="flex gap-1">
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          onClick={() => {
+                            setEditingRaffle(raffle);
+                            setShowForm(true);
+                          }}
+                          title="Edit Raffle"
+                        >
+                          <Edit className="w-4 h-4" />
+                        </Button>
+                        {raffle.status === 'active' && raffle.entry_count && raffle.entry_count > 0 && (
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            onClick={() => openWinnerSelection(raffle)}
+                            title="Select Winner"
+                            className="text-yellow-600 hover:text-yellow-700"
+                          >
+                            <Crown className="w-4 h-4" />
+                          </Button>
+                        )}
+                      </div>
                     )}
                   </div>
                 </div>
@@ -303,7 +325,22 @@ export default function Raffles() {
             setShowForm(false);
             setEditingRaffle(null);
           }}
-          onSubmit={handleRaffleSubmit}
+          onSubmit={() => {
+            fetchRaffles();
+            setShowForm(false);
+            setEditingRaffle(null);
+          }}
+        />
+      )}
+
+      {showWinnerModal && selectedRaffleForWinner && (
+        <WinnerSelectionModal
+          raffle={selectedRaffleForWinner}
+          onClose={() => {
+            setShowWinnerModal(false);
+            setSelectedRaffleForWinner(null);
+          }}
+          onWinnerSelected={handleWinnerSelected}
         />
       )}
     </div>
