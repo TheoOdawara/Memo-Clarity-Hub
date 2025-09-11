@@ -4,6 +4,8 @@ import AssociationGame from '../../components/AssociationGame/AssociationGame';
 import ReactionGame from '../../components/ReactionGame/ReactionGame';
 import SequenceGame from '../../components/SequenceGame/SequenceGame';
 import MemoryGame from '../../components/MemoryGame/MemoryGame';
+import { testService } from '../../services/test';
+import toast from 'react-hot-toast';
 
 const games = [
   { name: 'Association', component: AssociationGame },
@@ -65,12 +67,26 @@ const MediumLevelTest: React.FC = () => {
     return 0;
   }
 
-  const handleGameEnd = (score: number) => {
+  const handleGameEnd = async (score: number) => {
     const normalized = normalizeScore(currentGame, score);
     const newResults = [...results, normalized];
     setResults(newResults);
-    // Se terminou o MemoryGame (último), mostra resultado
+    
+    // Se terminou o MemoryGame (último), salva no banco e mostra resultado
     if (currentGame === games.length - 1) {
+      const totalScore = newResults.reduce((a, b) => a + b, 0);
+      
+      try {
+        await testService.saveTestResult({
+          phase_scores: [newResults[0] || 0, newResults[1] || 0, newResults[2] || 0, newResults[3] || 0],
+          total_score: totalScore
+        });
+        toast.success('Test result saved successfully!');
+      } catch (error) {
+        console.error('Error saving test result:', error);
+        toast.error('Failed to save test result');
+      }
+      
       setCurrentGame(currentGame + 1); // Avança para mostrar resultado
     } else {
       setCurrentGame(currentGame + 1);

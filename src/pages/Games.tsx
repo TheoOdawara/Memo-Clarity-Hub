@@ -1,6 +1,7 @@
 import { FileText, Trophy, Rocket } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
+import { testService } from '../services/test';
 
 export default function Games() {
   const navigate = useNavigate();
@@ -12,50 +13,56 @@ export default function Games() {
   const [mounted, setMounted] = useState(false)
 
   useEffect(() => {
-  const taken = Number(localStorage.getItem('stats_tests_taken') || '0')
-  const best = Number(localStorage.getItem('stats_highest_score') || '0')
-  // Recupera histórico dos últimos 3 melhores scores
-  const scoresRaw = localStorage.getItem('stats_scores_history') || '[]';
-  let scores: number[] = [];
-  try {
-    scores = JSON.parse(scoresRaw);
-    if (!Array.isArray(scores)) scores = [];
-  } catch {
-    scores = [];
-  }
-  // Ordena e pega os 3 maiores
-  const top3 = scores.sort((a, b) => b - a).slice(0, 3);
-  setRecentScores(top3);
+    const loadStats = async () => {
+      try {
+        // Get tests count
+        const { data: tests } = await testService.getUserTests(100);
+        const taken = tests?.length || 0;
+        
+        // Get best score
+        const { data: bestScore } = await testService.getBestScore();
+        const best = bestScore || 0;
+        
+        // Get top 3 scores
+        const allScores = tests?.map(test => test.total_score) || [];
+        const top3 = allScores.sort((a, b) => b - a).slice(0, 3);
+        setRecentScores(top3);
 
-    // animate counters (simple interval-based ease)
-    const animate = (from: number, to: number, setter: (v: number) => void) => {
-      const duration = 700
-      const stepMs = 30
-      const steps = Math.max(1, Math.floor(duration / stepMs))
-      const increment = (to - from) / steps
-      let current = from
-      setter(Math.round(current))
-      const id = setInterval(() => {
-        current += increment
-        if ((increment > 0 && current >= to) || (increment < 0 && current <= to)) {
-          setter(to)
-          clearInterval(id)
-        } else {
+        // animate counters (simple interval-based ease)
+        const animate = (from: number, to: number, setter: (v: number) => void) => {
+          const duration = 700
+          const stepMs = 30
+          const steps = Math.max(1, Math.floor(duration / stepMs))
+          const increment = (to - from) / steps
+          let current = from
           setter(Math.round(current))
+          const id = setInterval(() => {
+            current += increment
+            if ((increment > 0 && current >= to) || (increment < 0 && current <= to)) {
+              setter(to)
+              clearInterval(id)
+            } else {
+              setter(Math.round(current))
+            }
+          }, stepMs)
+          return id
         }
-      }, stepMs)
-      return id
-    }
 
-    const id1 = animate(0, taken, setDisplayedTaken)
-    const id2 = animate(0, best, setDisplayedBest)
-    // mount animations
-    const t = setTimeout(() => setMounted(true), 80)
-    return () => {
-      clearInterval(id1)
-      clearInterval(id2)
-      clearTimeout(t)
-    }
+        const id1 = animate(0, taken, setDisplayedTaken)
+        const id2 = animate(0, best, setDisplayedBest)
+        // mount animations
+        const t = setTimeout(() => setMounted(true), 80)
+        return () => {
+          clearInterval(id1)
+          clearInterval(id2)
+          clearTimeout(t)
+        }
+      } catch (error) {
+        console.error('Error loading test stats:', error);
+      }
+    };
+
+    loadStats();
   }, [])
 
   return (
