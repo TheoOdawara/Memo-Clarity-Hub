@@ -1,6 +1,4 @@
--- Add winner_image_url column to raffles table
-ALTER TABLE public.raffles 
-ADD COLUMN IF NOT EXISTS winner_image_url TEXT;
+import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -21,6 +19,7 @@ interface Raffle {
   end_date: string;
   winner_user_id?: string;
   winner_username?: string;
+  winner_image_url?: string;
   status: 'active' | 'completed' | 'cancelled';
   created_at: string;
   entry_count?: number;
@@ -290,7 +289,16 @@ export default function Raffles() {
                   {raffle.status === 'completed' && raffle.winner_username && (
                     <div className="flex items-center gap-2 text-sm text-gray-600">
                       <Trophy className="w-4 h-4 text-yellow-500" />
-                      <span>Winner: {raffle.winner_username}</span>
+                      <div className="flex items-center gap-2">
+                        <span>Winner: {raffle.winner_username}</span>
+                        {raffle.winner_image_url && (
+                          <img
+                            src={raffle.winner_image_url}
+                            alt={raffle.winner_username}
+                            className="w-6 h-6 rounded-full object-cover border border-yellow-300"
+                          />
+                        )}
+                      </div>
                     </div>
                   )}
                 </div>
