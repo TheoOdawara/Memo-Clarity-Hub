@@ -25,6 +25,7 @@ export default function SequenceGame({ onEnd }: SequenceGameProps) {
   const [playerIdx, setPlayerIdx] = useState(0);
   const [error, setError] = useState(false);
   const [completed, setCompleted] = useState(false);
+  const [clickedButton, setClickedButton] = useState<number | null>(null);
   const sequenceRef = useRef<number[]>([]);
   const [started, setStarted] = useState(false);
 
@@ -69,6 +70,10 @@ export default function SequenceGame({ onEnd }: SequenceGameProps) {
   // Called when user clicks a quadrant
   async function handleClick(id: number) {
   if (!started || showing || completed) return;
+
+    // Show click feedback
+    setClickedButton(id);
+    setTimeout(() => setClickedButton(null), 150);
 
     // Defensive: ensure sequence is ready
     const seq = sequenceRef.current;
@@ -139,20 +144,38 @@ export default function SequenceGame({ onEnd }: SequenceGameProps) {
 
       <div className="w-80 h-80 mx-auto grid grid-cols-2 gap-4">
         {COLORS.map(c => {
-          const baseBg = active === c.id ? c.active : c.class;
-          const extra = active === c.id ? 'ring-8 ring-white/30 scale-105 shadow-2xl' : 'hover:scale-102';
+          const isSequenceActive = active === c.id;
+          const isClicked = clickedButton === c.id;
+          const baseBg = isSequenceActive ? c.active : c.class;
+          
+          let extra = '';
+          if (isSequenceActive) {
+            extra = 'ring-8 ring-white/30 scale-105 shadow-2xl';
+          } else if (isClicked) {
+            extra = 'scale-95 ring-4 ring-white/50 shadow-xl animate-pulse';
+          } else {
+            extra = 'hover:scale-102';
+          }
+          
           return (
             <button
               key={c.id}
               onClick={() => handleClick(c.id)}
-              className={`w-full h-full rounded-lg shadow-md focus:outline-none transform transition-all relative overflow-hidden ${baseBg} ${extra}`}
+              className={`w-full h-full rounded-lg shadow-md focus:outline-none transform transition-all duration-150 relative overflow-hidden ${baseBg} ${extra}`}
               aria-label={c.name}
               disabled={!started || showing || completed}
             >
               {/* subtle bright overlay when active for clearer visibility */}
               <span
-                className={`absolute inset-0 pointer-events-none transition-opacity duration-150 ${active === c.id ? 'bg-white/30 opacity-100' : 'opacity-0'}`}
+                className={`absolute inset-0 pointer-events-none transition-all duration-150 ${
+                  isSequenceActive || isClicked ? 'bg-white/40 opacity-100' : 'opacity-0'
+                }`}
               />
+              
+              {/* Click ripple effect */}
+              {isClicked && (
+                <span className="absolute inset-0 pointer-events-none bg-white/20 animate-ping rounded-lg" />
+              )}
             </button>
           );
         })}
