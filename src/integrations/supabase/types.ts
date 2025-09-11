@@ -83,6 +83,30 @@ export type Database = {
         }
         Relationships: []
       }
+      tests: {
+        Row: {
+          completed_at: string
+          id: string
+          phase_scores: number[]
+          total_score: number
+          user_id: string
+        }
+        Insert: {
+          completed_at?: string
+          id?: string
+          phase_scores: number[]
+          total_score?: number
+          user_id: string
+        }
+        Update: {
+          completed_at?: string
+          id?: string
+          phase_scores?: number[]
+          total_score?: number
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
