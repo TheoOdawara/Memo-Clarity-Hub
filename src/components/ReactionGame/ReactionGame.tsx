@@ -16,6 +16,7 @@ const TARGET_LIFETIME = 900; // ms
 const DISTRACTOR_CHANCE = 0.18;
 
 const ReactionGame: React.FC<ReactionGameProps> = ({ onEnd }) => {
+  const [started, setStarted] = useState(false);
   const [spawnedCount, setSpawnedCount] = useState(0);
   const [activeTarget, setActiveTarget] = useState<Target | null>(null);
   const [hits, setHits] = useState(0);
@@ -24,21 +25,20 @@ const ReactionGame: React.FC<ReactionGameProps> = ({ onEnd }) => {
   const timerRef = useRef<number | null>(null);
   const shownAtRef = useRef<number | null>(null);
 
+  // Don't auto-start - wait for user to click Start
   useEffect(() => {
-    startNext();
     return () => clearExistingTimer();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
     // end condition: all targets were shown and none active
-    if (spawnedCount >= TARGET_COUNT && activeTarget === null) {
+    if (started && spawnedCount >= TARGET_COUNT && activeTarget === null) {
       const avg = reactionTimes.length ? reactionTimes.reduce((a, b) => a + b, 0) / reactionTimes.length : 0;
       const score = Math.max(0, Math.round(hits * 1000 - avg - misses * 250));
       setTimeout(() => onEnd(score), 600);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [spawnedCount, activeTarget]);
+  }, [spawnedCount, activeTarget, started]);
 
   function clearExistingTimer() {
     if (timerRef.current) {
@@ -56,7 +56,7 @@ const ReactionGame: React.FC<ReactionGameProps> = ({ onEnd }) => {
   }
 
   function spawnTarget() {
-    if (spawnedCount >= TARGET_COUNT) return setActiveTarget(null);
+    if (!started || spawnedCount >= TARGET_COUNT) return setActiveTarget(null);
     const isDistractor = Math.random() < DISTRACTOR_CHANCE;
     const pos = randomPosition();
     const nextId = spawnedCount + 1; // numbered target id
@@ -83,6 +83,7 @@ const ReactionGame: React.FC<ReactionGameProps> = ({ onEnd }) => {
   }
 
   function startNext() {
+    if (!started) return;
     // small randomized delay before target appears (faster)
     clearExistingTimer();
     timerRef.current = window.setTimeout(() => {
@@ -90,7 +91,19 @@ const ReactionGame: React.FC<ReactionGameProps> = ({ onEnd }) => {
     }, Math.random() * 500 + 150);
   }
 
+  function handleStart() {
+    if (started) return;
+    setStarted(true);
+    setSpawnedCount(0);
+    setActiveTarget(null);
+    setHits(0);
+    setMisses(0);
+    setReactionTimes([]);
+    startNext();
+  }
+
   function handleTargetClick(t: Target) {
+    if (!started) return;
     const now = Date.now();
     if (!t) return;
     // if distractor clicked -> penalty
@@ -115,9 +128,22 @@ const ReactionGame: React.FC<ReactionGameProps> = ({ onEnd }) => {
 
   return (
     <div className="w-full max-w-4xl mx-auto">
-      <div className="mb-4 text-center">
-        <p className="text-lg font-poppins font-semibold text-[#0B4F6C]">Click the numbered targets as they appear — avoid the red ✖ targets.</p>
-        <p className="text-sm text-gray-600 mt-1">Targets left: {Math.max(0, TARGET_COUNT - spawnedCount)} • Hits: {hits} • Misses: {misses}</p>
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4 px-2">
+        <div className="text-left">
+          <p className="text-lg font-poppins font-semibold text-[#0B4F6C]">Click the numbered targets as they appear — avoid the red ✖ targets.</p>
+          {started && <p className="text-sm text-gray-600 mt-1">Targets left: {Math.max(0, TARGET_COUNT - spawnedCount)} • Hits: {hits} • Misses: {misses}</p>}
+        </div>
+
+        <div className="flex items-center gap-3">
+          <button
+            onClick={handleStart}
+            disabled={started}
+            className={`min-w-[120px] px-6 py-3 rounded-xl text-lg font-poppins font-semibold shadow-lg transition transform ${started ? 'bg-gray-200 text-gray-700' : 'bg-[#0B4F6C] text-white hover:scale-105'}`}
+            aria-pressed={started}
+          >
+            {started ? 'Running' : 'Start'}
+          </button>
+        </div>
       </div>
 
       <div className="relative bg-soft-white rounded-xl border-2 border-teal-100 h-80 overflow-hidden shadow-inner">
@@ -154,21 +180,23 @@ const ReactionGame: React.FC<ReactionGameProps> = ({ onEnd }) => {
           onClick={() => {
             // restart
             clearExistingTimer();
+            setStarted(false);
             setSpawnedCount(0);
             setActiveTarget(null);
             setHits(0);
             setMisses(0);
             setReactionTimes([]);
-            timerRef.current = window.setTimeout(() => startNext(), 400);
           }}
         >
           Restart
         </button>
 
-        <div className="flex items-center text-sm text-gray-600">
-          <span className="mr-2">Avg reaction:</span>
-          <span className="font-mono">{reactionTimes.length ? Math.round(reactionTimes.reduce((a,b)=>a+b,0)/reactionTimes.length) + ' ms' : '—'}</span>
-        </div>
+        {started && (
+          <div className="flex items-center text-sm text-gray-600">
+            <span className="mr-2">Avg reaction:</span>
+            <span className="font-mono">{reactionTimes.length ? Math.round(reactionTimes.reduce((a,b)=>a+b,0)/reactionTimes.length) + ' ms' : '—'}</span>
+          </div>
+        )}
       </div>
     </div>
   );
