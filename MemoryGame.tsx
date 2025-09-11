@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { ArrowLeft, Eye } from 'lucide-react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { GameResult } from '@/types/games';
@@ -26,7 +26,6 @@ const MemoryGame: React.FC<MemoryGameProps> = ({ level, onComplete, onExit }) =>
   const [cards, setCards] = useState<string[]>([]);
   const [flipped, setFlipped] = useState<number[]>([]);
   const [matched, setMatched] = useState<number[]>([]);
-  const [firstCard, setFirstCard] = useState<number|null>(null);
   const [moves, setMoves] = useState(0);
   const [startTime, setStartTime] = useState(0);
   const [score, setScore] = useState(0);
@@ -53,17 +52,10 @@ const MemoryGame: React.FC<MemoryGameProps> = ({ level, onComplete, onExit }) =>
       setPhase('result');
       setTimeout(() => {
         onComplete({
-          id: `memory_${Date.now()}`,
-          gameType: 'memory',
           score: finalScore,
-          level,
-          date: new Date().toISOString().split('T')[0],
-          timestamp: Date.now(),
-          stats: {
-            moves,
-            timeSpent,
-            pairs: pairCount
-          }
+          moves,
+          time: timeSpent,
+          completed: true
         });
       }, 2000);
     }
@@ -87,31 +79,33 @@ const MemoryGame: React.FC<MemoryGameProps> = ({ level, onComplete, onExit }) =>
   if (phase === 'instructions') {
     return (
       <div className="min-h-screen bg-background p-4 flex items-center justify-center">
-        <Card className="w-full max-w-md">
-          <CardHeader>
-            <div className="flex items-center gap-3">
-              <Button variant="ghost" size="sm" onClick={onExit}>
-                <ArrowLeft className="w-4 h-4" />
-              </Button>
-              <div>
-                <CardTitle>Jogo da Memória</CardTitle>
-                <CardDescription>Nível {level}</CardDescription>
+        <div className="w-full max-w-md">
+          <Card>
+            <CardContent>
+              <div className="flex items-center gap-3 mb-4">
+                <Button onClick={onExit}>
+                  <ArrowLeft className="w-4 h-4" />
+                </Button>
+                <div>
+                  <CardTitle>Jogo da Memória</CardTitle>
+                  <CardDescription>Nível {level}</CardDescription>
+                </div>
               </div>
-            </div>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="space-y-2">
-              <h3 className="font-semibold">Como jogar:</h3>
-              <ul className="text-sm space-y-1 text-muted-foreground">
-                <li>• Encontre todos os pares de cartas</li>
-                <li>• Clique para virar duas cartas por vez</li>
-                <li>• Memorize a posição das cartas</li>
-                <li>• Menos movimentos e tempo = maior pontuação</li>
-              </ul>
-            </div>
-            <Button onClick={() => setPhase('countdown')}>Começar Jogo</Button>
-          </CardContent>
-        </Card>
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <h3 className="font-semibold">Como jogar:</h3>
+                  <ul className="text-sm space-y-1 text-muted-foreground">
+                    <li>• Encontre todos os pares de cartas</li>
+                    <li>• Clique para virar duas cartas por vez</li>
+                    <li>• Memorize a posição das cartas</li>
+                    <li>• Menos movimentos e tempo = maior pontuação</li>
+                  </ul>
+                </div>
+                <Button onClick={() => setPhase('countdown')}>Começar Jogo</Button>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
       </div>
     );
   }
@@ -132,25 +126,27 @@ const MemoryGame: React.FC<MemoryGameProps> = ({ level, onComplete, onExit }) =>
   if (phase === 'result') {
     return (
       <div className="min-h-screen bg-background p-4 flex items-center justify-center">
-        <Card className="w-full max-w-md text-center">
-          <CardHeader>
-            <CardTitle>Jogo Concluído!</CardTitle>
-            <CardDescription>Parabéns! Sua memória está em ação.</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="text-4xl font-bold text-primary">{score}%</div>
-            <div className="grid grid-cols-2 gap-4 text-sm">
-              <div>
-                <p className="text-muted-foreground">Movimentos</p>
-                <p className="font-bold">{moves}</p>
+        <div className="w-full max-w-md">
+          <Card>
+            <CardContent>
+              <div className="text-center space-y-4">
+                <CardTitle>Jogo Concluído!</CardTitle>
+                <CardDescription>Parabéns! Sua memória está em ação.</CardDescription>
+                <div className="text-4xl font-bold text-primary">{score}%</div>
+                <div className="grid grid-cols-2 gap-4 text-sm">
+                  <div>
+                    <p className="text-muted-foreground">Movimentos</p>
+                    <p className="font-bold">{moves}</p>
+                  </div>
+                  <div>
+                    <p className="text-muted-foreground">Nível</p>
+                    <p className="font-bold">{level}</p>
+                  </div>
+                </div>
               </div>
-              <div>
-                <p className="text-muted-foreground">Nível</p>
-                <p className="font-bold">{level}</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+            </CardContent>
+          </Card>
+        </div>
       </div>
     );
   }
@@ -159,11 +155,11 @@ const MemoryGame: React.FC<MemoryGameProps> = ({ level, onComplete, onExit }) =>
     <div className="min-h-screen bg-background p-4">
       <div className="max-w-md mx-auto">
         <div className="flex items-center justify-between mb-6">
-          <Button variant="ghost" size="sm" onClick={onExit}>
+          <Button onClick={onExit}>
             <ArrowLeft className="w-4 h-4 mr-2" />
             Sair
           </Button>
-          <Badge variant="secondary">Nível {level}</Badge>
+          <Badge>Nível {level}</Badge>
         </div>
         <div className="text-center mb-6">
           <h2 className="text-xl font-bold mb-2">Encontre os pares</h2>
