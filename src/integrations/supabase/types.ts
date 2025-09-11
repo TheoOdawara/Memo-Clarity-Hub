@@ -83,6 +83,54 @@ export type Database = {
         }
         Relationships: []
       }
+      raffles: {
+        Row: {
+          created_at: string
+          created_by: string
+          description: string | null
+          end_date: string
+          id: string
+          image_url: string | null
+          prize: string
+          start_date: string
+          status: string
+          title: string
+          updated_at: string
+          winner_user_id: string | null
+          winner_username: string | null
+        }
+        Insert: {
+          created_at?: string
+          created_by: string
+          description?: string | null
+          end_date: string
+          id?: string
+          image_url?: string | null
+          prize: string
+          start_date?: string
+          status?: string
+          title: string
+          updated_at?: string
+          winner_user_id?: string | null
+          winner_username?: string | null
+        }
+        Update: {
+          created_at?: string
+          created_by?: string
+          description?: string | null
+          end_date?: string
+          id?: string
+          image_url?: string | null
+          prize?: string
+          start_date?: string
+          status?: string
+          title?: string
+          updated_at?: string
+          winner_user_id?: string | null
+          winner_username?: string | null
+        }
+        Relationships: []
+      }
       tests: {
         Row: {
           completed_at: string

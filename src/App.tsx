@@ -7,6 +7,7 @@ import LoginPage from '@/pages/LoginPage'
 import ResetPasswordPage from '@/pages/ResetPasswordPage'
 import ProfessionalDashboard from '@/pages/ProfessionalDashboard'
 import Games from '@/pages/Games'
+import Raffles from '@/pages/Raffles'
 import TestFlow from './pages/games/MediumLevelTest';
 import './App.css'
 
@@ -47,6 +48,7 @@ function App() {
                     } />
                     <Route path="/games" element={<Games />} />
                     <Route path="/games/test" element={<TestFlow />} />
+                    <Route path="/raffles" element={<Raffles />} />
                     <Route path="/progress" element={
                       <div className="bg-white rounded-xl border border-gray-200 p-8 text-center">
                         <div className="text-6xl mb-4">📊</div>
