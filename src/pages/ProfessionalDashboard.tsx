@@ -1,6 +1,8 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Brain, ArrowUpRight, Gift, Truck, MessageSquare, Info, Activity } from 'lucide-react';
+import { checkinService } from '@/services/checkin';
+import { toast } from 'react-hot-toast';
 
 function SeriousCard({ title, subtitle, icon, onClick }: { title: string; subtitle?: string; icon: JSX.Element; onClick?: () => void }) {
   return (
@@ -24,9 +26,71 @@ function SeriousCard({ title, subtitle, icon, onClick }: { title: string; subtit
 export default function ProfessionalDashboard() {
   const [checkedIn, setCheckedIn] = useState(false);
   const [showInstructions, setShowInstructions] = useState(false);
+  const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
-  const [checkins, setCheckins] = useState(3); // Example: 3 check-ins done
-  const [weekChecks, setWeekChecks] = useState([true, false, true, false, false, false, false]); // Example: week days
+  const [streakCount, setStreakCount] = useState(0);
+  const [weekChecks, setWeekChecks] = useState([false, false, false, false, false, false, false]);
+
+  // Load checkin data when component mounts
+  useEffect(() => {
+    loadCheckinData();
+  }, []);
+
+  const loadCheckinData = async () => {
+    try {
+      setLoading(true);
+      
+      // Check if user already checked in today
+      const { data: todayCheckin } = await checkinService.getTodayCheckin();
+      setCheckedIn(!!todayCheckin);
+      
+      // Get streak count
+      const { data: streak } = await checkinService.getStreakCount();
+      setStreakCount(streak);
+      
+      // Get weekly checkins
+      const { data: weeklyCheckins } = await checkinService.getWeeklyCheckins();
+      if (weeklyCheckins) {
+        const weekArray = Array(7).fill(false);
+        const today = new Date();
+        
+        weeklyCheckins.forEach(checkin => {
+          const checkinDate = new Date(checkin.checked_at);
+          const dayDiff = Math.floor((today.getTime() - checkinDate.getTime()) / (1000 * 60 * 60 * 24));
+          if (dayDiff >= 0 && dayDiff < 7) {
+            weekArray[6 - dayDiff] = true; // Reverse order so today is last
+          }
+        });
+        
+        setWeekChecks(weekArray);
+      }
+    } catch (error) {
+      console.error('Error loading checkin data:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleCheckin = async () => {
+    try {
+      const { error } = await checkinService.createCheckin();
+      
+      if (error) {
+        toast.error('Erro ao fazer check-in. Tente novamente.');
+        console.error('Checkin error:', error);
+        return;
+      }
+      
+      toast.success('Check-in realizado com sucesso!');
+      setCheckedIn(true);
+      
+      // Reload data to get updated streak
+      await loadCheckinData();
+    } catch (error) {
+      toast.error('Erro ao fazer check-in. Tente novamente.');
+      console.error('Checkin error:', error);
+    }
+  };
 
   return (
     <div className="min-h-screen w-full bg-gradient-to-br from-teal-50 via-white to-aqua-100 flex flex-col items-center pt-0">
@@ -41,9 +105,11 @@ export default function ProfessionalDashboard() {
                 Daily Check-in
               </h2>
               <p className="text-base lg:text-lg max-w-md mx-auto lg:mx-0 mb-4 px-2 py-2 rounded-xl bg-white/60 shadow text-teal-700 font-medium backdrop-blur-md animate-fade-in">
-                {checkedIn
-                  ? 'Check-in completed! See you tomorrow.'
-                  : 'Mark your daily check-in to keep your streak.'}
+                {loading 
+                  ? 'Carregando...'
+                  : checkedIn
+                    ? `Check-in completo! Sua sequência é de ${streakCount} dias.`
+                    : 'Faça seu check-in diário para manter sua sequência.'}
               </p>
             </div>
             {/* Beautiful weekly calendar */}
@@ -51,36 +117,33 @@ export default function ProfessionalDashboard() {
               <span className="text-xs text-gray-500 mb-2">Week</span>
               <div className="flex gap-3">
                 {["S", "T", "Q", "Q", "S", "S", "D"].map((day, idx) => (
-                  <button
+                  <div
                     key={day + idx}
-                    className={`w-9 h-9 rounded-full flex items-center justify-center font-bold text-base transition-all border-2 duration-150 focus:outline-none focus:ring-2 focus:ring-teal-400 shadow-md
-                      ${weekChecks[idx] ? "bg-gradient-to-br from-teal-400 via-teal-300 to-yellow-200 text-white border-teal-400 scale-105" : "bg-white text-teal-400 border-teal-200 hover:bg-teal-50"}`}
-                    onClick={() => {
-                      const updated = [...weekChecks];
-                      updated[idx] = !updated[idx];
-                      setWeekChecks(updated);
-                      if (!weekChecks[idx]) setCheckins(checkins + 1);
-                      else setCheckins(checkins - 1);
-                    }}
+                    className={`w-9 h-9 rounded-full flex items-center justify-center font-bold text-base transition-all border-2 duration-150 shadow-md
+                      ${weekChecks[idx] ? "bg-gradient-to-br from-teal-400 via-teal-300 to-yellow-200 text-white border-teal-400 scale-105" : "bg-white text-teal-400 border-teal-200"}`}
                   >
                     {day}
-                  </button>
+                  </div>
                 ))}
               </div>
             </div>
             {/* Stylish check-ins counter */}
             <div className="flex flex-col items-center justify-center bg-gradient-to-br from-teal-100 via-white to-yellow-100 rounded-xl shadow p-4 mx-2 min-w-[90px]">
-              <span className="text-xs text-gray-500 mb-1">Check-ins</span>
-              <span className="text-4xl font-extrabold text-teal-700 drop-shadow-lg tracking-tight">{checkins}</span>
+              <span className="text-xs text-gray-500 mb-1">Sequência</span>
+              <span className="text-4xl font-extrabold text-teal-700 drop-shadow-lg tracking-tight">{streakCount}</span>
             </div>
             {/* Botão de check-in estilizado */}
             <div className="flex items-center justify-center ml-2">
               <button
-                className="bg-teal-600 text-white font-bold px-6 py-3 rounded-full shadow-lg hover:bg-teal-700 hover:scale-105 hover:shadow-xl transition-all duration-150 text-lg drop-shadow focus:outline-none focus:ring-2 focus:ring-teal-400"
-                onClick={() => setCheckedIn(true)}
-                disabled={checkedIn}
+                className={`font-bold px-6 py-3 rounded-full shadow-lg transition-all duration-150 text-lg drop-shadow focus:outline-none focus:ring-2 focus:ring-teal-400 ${
+                  checkedIn 
+                    ? "bg-gray-400 text-white cursor-not-allowed" 
+                    : "bg-teal-600 text-white hover:bg-teal-700 hover:scale-105 hover:shadow-xl"
+                }`}
+                onClick={handleCheckin}
+                disabled={checkedIn || loading}
               >
-                {checkedIn ? "Checked in" : "Check-in"}
+                {loading ? "Carregando..." : checkedIn ? "✓ Concluído" : "Check-in"}
               </button>
             </div>
           </div>

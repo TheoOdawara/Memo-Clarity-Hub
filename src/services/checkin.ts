@@ -1,4 +1,4 @@
-import { supabase } from '@local/supabase/client'
+import { supabase } from '@/integrations/supabase/client'
 
 export type CheckinData = {
   mood_score?: number
@@ -49,7 +49,7 @@ export const checkinService = {
       .eq('user_id', user.id)
       .gte('checked_at', `${today}T00:00:00.000Z`)
       .lt('checked_at', `${today}T23:59:59.999Z`)
-      .single()
+      .maybeSingle()
 
     return { data, error }
   },
@@ -60,10 +60,28 @@ export const checkinService = {
 
     const { data, error } = await supabase
       .from('profiles')
-      .select('streak_count')
+      .select('streak_count, last_checkin_date')
       .eq('user_id', user.id)
-      .single()
+      .maybeSingle()
 
     return { data: data?.streak_count || 0, error }
+  },
+
+  async getWeeklyCheckins() {
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) throw new Error('User not authenticated')
+
+    // Get checkins from the last 7 days
+    const weekAgo = new Date()
+    weekAgo.setDate(weekAgo.getDate() - 6) // Include today
+    
+    const { data, error } = await supabase
+      .from('checkins')
+      .select('checked_at')
+      .eq('user_id', user.id)
+      .gte('checked_at', weekAgo.toISOString())
+      .order('checked_at', { ascending: true })
+
+    return { data, error }
   }
 }
