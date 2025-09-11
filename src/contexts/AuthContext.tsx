@@ -18,16 +18,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     // Listener para mudanças de autenticação
     const { data: { subscription } } = authService.onAuthStateChange(
       async (_event, session) => {
-        // Verificar se há login demo ativo antes de processar mudanças do Supabase
-        const demoUser = localStorage.getItem('demo-user')
-        if (demoUser) {
-          // Se há login demo, manter o usuário demo e ignorar mudanças do Supabase
-          setUser(JSON.parse(demoUser) as AuthUser)
-          setLoading(false)
-          return
-        }
-
-        // Processar mudanças normais do Supabase apenas se não estiver em modo demo
         if (session?.user) {
           setUser(session.user as AuthUser)
         } else {
@@ -44,16 +34,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const checkInitialSession = async () => {
     try {
-      // Verificar se há login demo
-      const demoUser = localStorage.getItem('demo-user')
-      
-      if (demoUser) {
-        const user = JSON.parse(demoUser) as AuthUser
-        setUser(user)
-        setLoading(false)
-        return
-      }
-
       // Verificar sessão normal do Supabase
       const { session } = await authService.getCurrentSession()
       if (session?.user) {
@@ -132,9 +112,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const signOut = async () => {
     setLoading(true)
     
-    // Limpar login demo se existir
-    localStorage.removeItem('demo-user')
-    
     const { error } = await authService.signOut()
     
     if (error) {
@@ -164,20 +141,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     return { error }
   }
 
-  const loginDemo = () => {
-    const demoUser = {
-      id: 'demo-user-123',
-      email: 'demo@memoclarity.com',
-      email_confirmed_at: new Date().toISOString(),
-      created_at: new Date().toISOString(),
-    } as AuthUser
-
-    localStorage.setItem('demo-user', JSON.stringify(demoUser))
-    setUser(demoUser)
-    setError(null)
-    setLoading(false)
-  }
-
   const value: AuthContextType = {
     user,
     loading,
@@ -186,9 +149,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     signUp,
     signInWithGoogle,
     signOut,
-  resetPassword,
-  resendConfirmation,
-    loginDemo, // Adicionar loginDemo ao contexto
+    resetPassword,
+    resendConfirmation,
   }
 
   return (
