@@ -1,19 +1,9 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { supabase } from '@/integrations/supabase/client';
-import { X, Trophy, User } from 'lucide-react';
+import { X, Trophy, Upload } from 'lucide-react';
 import toast from 'react-hot-toast';
-
-interface RaffleEntry {
-  id: string;
-  user_id: string;
-  created_at: string;
-  profiles: {
-    username: string;
-    full_name: string;
-  } | null;
-}
 
 interface Raffle {
   id: string;
@@ -29,109 +19,91 @@ interface WinnerSelectionModalProps {
 
 export function WinnerSelectionModal({ raffle, onClose, onWinnerSelected }: WinnerSelectionModalProps) {
   const [loading, setLoading] = useState(false);
-  const [entries, setEntries] = useState<RaffleEntry[]>([]);
-  const [loadingEntries, setLoadingEntries] = useState(true);
-  const [selectedWinner, setSelectedWinner] = useState<RaffleEntry | null>(null);
+  const [uploadingImage, setUploadingImage] = useState(false);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [previewUrl, setPreviewUrl] = useState<string>('');
+  const [formData, setFormData] = useState({
+    winner_name: '',
+    winner_image_url: ''
+  });
 
-  useEffect(() => {
-    fetchEntries();
-  }, [raffle.id]);
-
-  const fetchEntries = async () => {
-    try {
-      // First, get all raffle entries
-      const { data: entriesData, error: entriesError } = await supabase
-        .from('raffle_entries')
-        .select('id, user_id, created_at')
-        .eq('raffle_id', raffle.id)
-        .order('created_at', { ascending: true });
-
-      if (entriesError) throw entriesError;
-
-      if (!entriesData || entriesData.length === 0) {
-        setEntries([]);
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      if (file.size > 5 * 1024 * 1024) { // 5MB limit
+        toast.error('File size must be less than 5MB');
         return;
       }
-
-      // Get user profiles for the user_ids
-      const userIds = entriesData.map(entry => entry.user_id);
-      const { data: profilesData, error: profilesError } = await supabase
-        .from('profiles')
-        .select('user_id, username, full_name')
-        .in('user_id', userIds);
-
-      if (profilesError) {
-        console.warn('Error fetching profiles:', profilesError);
-        // Continue without profiles data
+      
+      if (!file.type.startsWith('image/')) {
+        toast.error('Please select an image file');
+        return;
       }
-
-      // Combine entries with profile data
-      const entriesWithProfiles = entriesData.map(entry => {
-        const profile = profilesData?.find(p => p.user_id === entry.user_id);
-        return {
-          ...entry,
-          profiles: profile || null
-        };
-      });
-
-      setEntries(entriesWithProfiles);
-    } catch (error) {
-      console.error('Error fetching entries:', error);
-      toast.error('Failed to load raffle entries');
-    } finally {
-      setLoadingEntries(false);
+      
+      setSelectedFile(file);
+      const url = URL.createObjectURL(file);
+      setPreviewUrl(url);
+      // Clear URL input when file is selected
+      setFormData(prev => ({ ...prev, winner_image_url: '' }));
     }
   };
 
+  const uploadWinnerImage = async (file: File): Promise<string> => {
+    const fileExt = file.name.split('.').pop();
+    const fileName = `winner-${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
+    
+    const { error } = await supabase.storage
+      .from('raffle-images')
+      .upload(fileName, file);
+
+    if (error) {
+      throw error;
+    }
+
+    const { data: { publicUrl } } = supabase.storage
+      .from('raffle-images')
+      .getPublicUrl(fileName);
+
+    return publicUrl;
+  };
+
   const selectWinner = async () => {
-    if (!selectedWinner) {
-      toast.error('Please select a winner first');
+    if (!formData.winner_name.trim()) {
+      toast.error('Please enter winner name');
       return;
     }
 
     setLoading(true);
     try {
-      // Use username as priority, fallback to full_name if username not available
-      const winnerUsername = selectedWinner.profiles?.username || 
-                           selectedWinner.profiles?.full_name || 
-                           `User ${selectedWinner.user_id.substring(0, 8)}`;
+      let winnerImageUrl = formData.winner_image_url;
+      
+      // Upload file if selected
+      if (selectedFile) {
+        setUploadingImage(true);
+        winnerImageUrl = await uploadWinnerImage(selectedFile);
+        setUploadingImage(false);
+      }
 
       const { error } = await supabase
         .from('raffles')
         .update({
           status: 'completed',
-          winner_user_id: selectedWinner.user_id,
-          winner_username: winnerUsername
+          winner_username: formData.winner_name.trim(),
+          winner_image_url: winnerImageUrl || null
         })
         .eq('id', raffle.id);
 
       if (error) throw error;
 
-      toast.success(`Winner selected: ${winnerUsername}`);
+      toast.success(`Winner selected: ${formData.winner_name}`);
       onWinnerSelected();
     } catch (error) {
       console.error('Error selecting winner:', error);
       toast.error('Failed to select winner');
     } finally {
       setLoading(false);
+      setUploadingImage(false);
     }
-  };
-
-  const selectRandomWinner = () => {
-    if (entries.length === 0) {
-      toast.error('No entries available for random selection');
-      return;
-    }
-
-    const randomIndex = Math.floor(Math.random() * entries.length);
-    const randomWinner = entries[randomIndex];
-    setSelectedWinner(randomWinner);
-    
-    // Use username as priority for display
-    const winnerName = randomWinner.profiles?.username || 
-                      randomWinner.profiles?.full_name || 
-                      `User ${randomWinner.user_id.substring(0, 8)}`;
-    toast.success(`Randomly selected: ${winnerName}`);
   };
 
   return (
@@ -148,100 +120,100 @@ export function WinnerSelectionModal({ raffle, onClose, onWinnerSelected }: Winn
         </CardHeader>
 
         <CardContent className="space-y-6">
-          {loadingEntries ? (
-            <div className="flex items-center justify-center py-8">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-            </div>
-          ) : entries.length === 0 ? (
-            <div className="text-center py-8">
-              <User className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">No Entries</h3>
-              <p className="text-gray-600">No one has entered this raffle yet.</p>
-            </div>
-          ) : (
-            <>
-              <div className="flex items-center justify-between">
-                <h3 className="text-lg font-semibold">
-                  Participants ({entries.length})
-                </h3>
-                <Button
-                  variant="outline"
-                  onClick={selectRandomWinner}
-                  className="flex items-center gap-2"
-                >
-                  <Trophy className="w-4 h-4" />
-                  Random Pick
-                </Button>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Winner Name *
+            </label>
+            <input
+              type="text"
+              required
+              value={formData.winner_name}
+              onChange={(e) => setFormData(prev => ({ ...prev, winner_name: e.target.value }))}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
+              placeholder="Enter winner's name"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Winner Image (Optional)
+            </label>
+            <div className="space-y-4">
+              {/* File Upload */}
+              <div className="border-2 border-dashed border-gray-300 rounded-md p-4 hover:border-gray-400 transition-colors">
+                <div className="text-center">
+                  <Upload className="mx-auto h-8 w-8 text-gray-400" />
+                  <div className="mt-2">
+                    <label htmlFor="winner-image-upload" className="cursor-pointer">
+                      <span className="text-sm font-medium text-blue-600 hover:text-blue-500">
+                        Upload winner image
+                      </span>
+                      <input
+                        id="winner-image-upload"
+                        type="file"
+                        className="sr-only"
+                        accept="image/*"
+                        onChange={handleFileSelect}
+                      />
+                    </label>
+                  </div>
+                  <p className="text-xs text-gray-500 mt-1">PNG, JPG, WEBP up to 5MB</p>
+                </div>
               </div>
 
-              <div className="grid gap-2 max-h-64 overflow-y-auto">
-                {entries.map((entry) => {
-                  const displayName = entry.profiles?.username || 
-                                    entry.profiles?.full_name || 
-                                    `User ${entry.user_id.substring(0, 8)}`;
-                  
-                  return (
-                    <div
-                      key={entry.id}
-                      className={`p-3 border rounded-lg cursor-pointer transition-colors ${
-                        selectedWinner?.id === entry.id
-                          ? 'border-yellow-500 bg-yellow-50'
-                          : 'border-gray-200 hover:border-gray-300'
-                      }`}
-                      onClick={() => setSelectedWinner(entry)}
-                    >
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-3">
-                          <div className={`w-4 h-4 rounded-full border-2 ${
-                            selectedWinner?.id === entry.id
-                              ? 'border-yellow-500 bg-yellow-500'
-                              : 'border-gray-300'
-                          }`}>
-                            {selectedWinner?.id === entry.id && (
-                              <div className="w-full h-full rounded-full bg-white scale-50"></div>
-                            )}
-                          </div>
-                          <div>
-                            <p className="font-medium text-gray-900">{displayName}</p>
-                            <p className="text-sm text-gray-500">
-                              Entered: {new Date(entry.created_at).toLocaleDateString()}
-                            </p>
-                          </div>
-                        </div>
-                        {selectedWinner?.id === entry.id && (
-                          <Trophy className="w-5 h-5 text-yellow-500" />
-                        )}
-                      </div>
-                    </div>
-                  );
-                })}
+              {/* OR divider */}
+              <div className="relative">
+                <div className="absolute inset-0 flex items-center">
+                  <div className="w-full border-t border-gray-300" />
+                </div>
+                <div className="relative flex justify-center text-sm">
+                  <span className="px-2 bg-white text-gray-500">OR</span>
+                </div>
               </div>
 
-              {selectedWinner && (
-                <div className="p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
-                  <h4 className="font-semibold text-yellow-800 mb-2">Selected Winner:</h4>
-                  <p className="text-yellow-700">
-                    {selectedWinner.profiles?.username || 
-                     selectedWinner.profiles?.full_name || 
-                     `User ${selectedWinner.user_id.substring(0, 8)}`}
-                  </p>
+              {/* URL Input */}
+              <input
+                type="url"
+                value={formData.winner_image_url}
+                onChange={(e) => {
+                  setFormData(prev => ({ ...prev, winner_image_url: e.target.value }));
+                  setPreviewUrl(e.target.value);
+                  setSelectedFile(null);
+                }}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
+                placeholder="Or enter image URL"
+              />
+
+              {/* Image Preview */}
+              {previewUrl && (
+                <div className="mt-2">
+                  <p className="text-sm font-medium text-gray-700 mb-2">Preview:</p>
+                  <img
+                    src={previewUrl}
+                    alt="Winner preview"
+                    className="max-w-full h-32 object-cover rounded-md border"
+                    onError={() => {
+                      setPreviewUrl('');
+                      toast.error('Failed to load image');
+                    }}
+                  />
                 </div>
               )}
+            </div>
+          </div>
 
-              <div className="flex gap-3 pt-4 border-t">
-                <Button
-                  onClick={selectWinner}
-                  disabled={loading || !selectedWinner}
-                  className="flex-1"
-                >
-                  {loading ? 'Selecting Winner...' : 'Confirm Winner'}
-                </Button>
-                <Button variant="outline" onClick={onClose}>
-                  Cancel
-                </Button>
-              </div>
-            </>
-          )}
+          <div className="flex gap-3 pt-4 border-t">
+            <Button
+              onClick={selectWinner}
+              disabled={loading || uploadingImage || !formData.winner_name.trim()}
+              className="flex-1"
+            >
+              {loading ? 'Selecting Winner...' : uploadingImage ? 'Uploading Image...' : 'Confirm Winner'}
+            </Button>
+            <Button variant="outline" onClick={onClose}>
+              Cancel
+            </Button>
+          </div>
         </CardContent>
       </Card>
     </div>

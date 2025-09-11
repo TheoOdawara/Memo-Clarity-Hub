@@ -1,4 +1,6 @@
-import { useState, useEffect } from 'react';
+-- Add winner_image_url column to raffles table
+ALTER TABLE public.raffles 
+ADD COLUMN IF NOT EXISTS winner_image_url TEXT;
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
