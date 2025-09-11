@@ -22,7 +22,7 @@ const SequenceGame: React.FC<SequenceGameProps> = ({ onEnd }) => {
 
   return (
     <form onSubmit={handleSubmit} className="text-center">
-      <div className="mb-2">Digite a sequência correta: <span className="font-mono">A B C D</span></div>
+      <div className="mb-2">Enter the correct sequence: <span className="font-mono">A B C D</span></div>
       <input
         type="text"
         value={input}
@@ -32,10 +32,10 @@ const SequenceGame: React.FC<SequenceGameProps> = ({ onEnd }) => {
         maxLength={4}
       />
       <button type="submit" className="px-3 py-1 bg-green-500 text-white rounded" disabled={finished}>
-        Enviar
+        Submit
       </button>
       {finished && (
-        <div className="mt-2">{input === sequence.join('') ? 'Correto!' : 'Incorreto.'}</div>
+        <div className="mt-2">{input === sequence.join('') ? 'Correct!' : 'Incorrect.'}</div>
       )}
     </form>
   );

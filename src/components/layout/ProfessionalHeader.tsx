@@ -1,4 +1,5 @@
 import { useAuth } from '@/hooks/useAuth'
+import { useNavigate } from 'react-router-dom'
 import LogoParaQualquerFundo from '@/assets/LogoParaQualquerFundo.png'
 
 interface ProfessionalHeaderProps {
@@ -7,19 +8,23 @@ interface ProfessionalHeaderProps {
 
 export function ProfessionalHeader({ title = "MemoClarity" }: ProfessionalHeaderProps) {
   const { user, signOut } = useAuth()
+  const navigate = useNavigate()
   const isDemoUser = user?.id === 'demo-user-123'
 
   return (
     <header className="bg-white/80 backdrop-blur border-b border-gray-200 shadow-sm h-20 flex items-center w-full overflow-x-auto">
       <div className="flex flex-nowrap items-center justify-between w-full px-2 sm:px-8 max-w-full min-w-0 gap-2">
         {/* Logo e título */}
-  <div className="flex items-center space-x-2 max-w-full overflow-hidden">
+        <button 
+          onClick={() => navigate('/dashboard')}
+          className="flex items-center space-x-2 max-w-full overflow-hidden hover:opacity-80 transition-opacity cursor-pointer"
+        >
           <img src={LogoParaQualquerFundo} alt="MemoClarity Logo" className="w-10 h-10 object-contain drop-shadow-xl flex-shrink-0" />
           <h1 className="text-lg sm:text-2xl font-bold text-teal-900 font-sans tracking-tight truncate max-w-[120px] sm:max-w-none">{title}</h1>
           {isDemoUser && (
             <span className="px-1 py-0.5 text-xs text-green-700 font-medium truncate">DEMO</span>
           )}
-        </div>
+        </button>
 
         {/* User section + botões de ação */}
         {user && (

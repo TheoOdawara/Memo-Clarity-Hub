@@ -15,6 +15,9 @@ export default function Games() {
   useEffect(() => {
     const loadStats = async () => {
       try {
+        // Clean up duplicates first
+        await testService.cleanupDuplicateTests();
+        
         // Get tests count
         const { data: tests } = await testService.getUserTests(100);
         const taken = tests?.length || 0;

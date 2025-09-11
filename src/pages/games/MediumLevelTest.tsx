@@ -17,6 +17,8 @@ const games = [
 const MediumLevelTest: React.FC = () => {
   const [currentGame, setCurrentGame] = useState(0);
   const [results, setResults] = useState<number[]>([]);
+  const [testSaved, setTestSaved] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
 
   // Normalização customizada para cada jogo
   // AssociationGame: score = tempo em segundos (quanto menor, melhor)
@@ -68,12 +70,18 @@ const MediumLevelTest: React.FC = () => {
   }
 
   const handleGameEnd = async (score: number) => {
+    // Prevent multiple calls for the same game
+    if (isSaving) return;
+    
     const normalized = normalizeScore(currentGame, score);
     const newResults = [...results, normalized];
     setResults(newResults);
     
     // Se terminou o MemoryGame (último), salva no banco e mostra resultado
-    if (currentGame === games.length - 1) {
+    if (currentGame === games.length - 1 && !testSaved && !isSaving) {
+      setIsSaving(true);
+      setTestSaved(true);
+      
       const totalScore = newResults.reduce((a, b) => a + b, 0);
       
       try {
@@ -82,13 +90,14 @@ const MediumLevelTest: React.FC = () => {
           total_score: totalScore
         });
         toast.success('Test result saved successfully!');
+        setCurrentGame(currentGame + 1); // Avança para mostrar resultado
       } catch (error) {
         console.error('Error saving test result:', error);
         toast.error('Failed to save test result');
+        setTestSaved(false); // Allow retry on error
+        setIsSaving(false);
       }
-      
-      setCurrentGame(currentGame + 1); // Avança para mostrar resultado
-    } else {
+    } else if (currentGame < games.length - 1) {
       setCurrentGame(currentGame + 1);
     }
   };

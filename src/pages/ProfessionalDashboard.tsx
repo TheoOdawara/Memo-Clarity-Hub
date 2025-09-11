@@ -58,14 +58,14 @@ export default function ProfessionalDashboard() {
       const { data: weeklyCheckins } = await checkinService.getWeeklyCheckins();
       if (weeklyCheckins) {
         const weekArray = Array(7).fill(false);
-        const today = new Date();
         
         weeklyCheckins.forEach(checkin => {
           const checkinDate = new Date(checkin.checked_at);
-          const dayDiff = Math.floor((today.getTime() - checkinDate.getTime()) / (1000 * 60 * 60 * 24));
-          if (dayDiff >= 0 && dayDiff < 7) {
-            weekArray[6 - dayDiff] = true; // Reverse order so today is last
-          }
+          // Get day of week (0 = Sunday, 1 = Monday, ... 6 = Saturday)
+          const dayOfWeek = checkinDate.getDay();
+          // Map to our array where 0 = Monday, 1 = Tuesday, ... 6 = Sunday
+          const arrayIndex = dayOfWeek === 0 ? 6 : dayOfWeek - 1; // Sunday (0) -> index 6, Monday (1) -> index 0, etc.
+          weekArray[arrayIndex] = true;
         });
         
         setWeekChecks(weekArray);
@@ -82,18 +82,18 @@ export default function ProfessionalDashboard() {
       const { error } = await checkinService.createCheckin();
       
       if (error) {
-        toast.error('Erro ao fazer check-in. Tente novamente.');
+        toast.error('Error during check-in. Please try again.');
         console.error('Checkin error:', error);
         return;
       }
       
-      toast.success('Check-in realizado com sucesso!');
+      toast.success('Check-in completed successfully!');
       setCheckedIn(true);
       
       // Reload data to get updated streak
       await loadCheckinData();
     } catch (error) {
-      toast.error('Erro ao fazer check-in. Tente novamente.');
+      toast.error('Error during check-in. Please try again.');
       console.error('Checkin error:', error);
     }
   };
@@ -111,18 +111,18 @@ export default function ProfessionalDashboard() {
                 Daily Check-in
               </h2>
               <p className="text-base lg:text-lg max-w-md mx-auto lg:mx-0 mb-4 px-2 py-2 rounded-xl bg-white/60 shadow text-teal-700 font-medium backdrop-blur-md animate-fade-in">
-                {loading 
-                  ? 'Carregando...'
+                 {loading 
+                  ? 'Loading...'
                   : checkedIn
-                    ? `Check-in completo! Sua sequência é de ${streakCount} dias.`
-                    : 'Faça seu check-in diário para manter sua sequência.'}
+                    ? `Check-in complete! Your streak is ${streakCount} days.`
+                    : 'Complete your daily check-in to maintain your streak.'}
               </p>
             </div>
             {/* Beautiful weekly calendar */}
             <div className="flex flex-col items-center gap-2 bg-white/70 rounded-xl shadow p-4 mx-2">
               <span className="text-xs text-gray-500 mb-2">Week</span>
               <div className="flex gap-3">
-                {["S", "T", "Q", "Q", "S", "S", "D"].map((day, idx) => (
+                {["M", "T", "W", "T", "F", "S", "S"].map((day, idx) => (
                   <div
                     key={day + idx}
                     className={`w-9 h-9 rounded-full flex items-center justify-center font-bold text-base transition-all border-2 duration-150 shadow-md
@@ -135,7 +135,7 @@ export default function ProfessionalDashboard() {
             </div>
             {/* Stylish check-ins counter */}
             <div className="flex flex-col items-center justify-center bg-gradient-to-br from-teal-100 via-white to-yellow-100 rounded-xl shadow p-4 mx-2 min-w-[90px]">
-              <span className="text-xs text-gray-500 mb-1">Sequência</span>
+              <span className="text-xs text-gray-500 mb-1">Streak</span>
               <span className="text-4xl font-extrabold text-teal-700 drop-shadow-lg tracking-tight">{streakCount}</span>
             </div>
             {/* Botão de check-in estilizado */}
@@ -149,7 +149,7 @@ export default function ProfessionalDashboard() {
                 onClick={handleCheckin}
                 disabled={checkedIn || loading}
               >
-                {loading ? "Carregando..." : checkedIn ? "✓ Concluído" : "Check-in"}
+                {loading ? "Loading..." : checkedIn ? "✓ Completed" : "Check-in"}
               </button>
             </div>
           </div>
@@ -296,7 +296,7 @@ export default function ProfessionalDashboard() {
             </div>
             {/* Área reservada para vídeo, alinhada verticalmente ao grid dos cards */}
             <div className="flex items-center justify-center w-full lg:w-[340px] min-h-[460px] bg-white/40 rounded-2xl border-2 border-dashed border-teal-200 shadow-xl">
-              <span className="text-gray-400 text-lg">Área reservada para vídeo</span>
+              <span className="text-gray-400 text-lg">Reserved area for video</span>
             </div>
           </div>
           <SupportPopup open={showSupportPopup} onClose={() => setShowSupportPopup(false)} />
