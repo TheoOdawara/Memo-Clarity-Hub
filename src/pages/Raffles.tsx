@@ -205,151 +205,185 @@ export default function Raffles() {
   }
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900">Raffles</h1>
-          <p className="text-gray-600 mt-2">Enter exciting raffles and win amazing prizes!</p>
-        </div>
-        {isAdmin && (
-          <Button
-            onClick={() => setShowForm(true)}
-            className="flex items-center gap-2"
-          >
-            <Plus className="w-4 h-4" />
-            Create Raffle
-          </Button>
-        )}
+    <div className="relative min-h-screen overflow-x-hidden">
+      {/* Animated gradient background */}
+      <div className="absolute inset-0 -z-10 animate-gradient bg-gradient-to-br from-teal-800 via-amber-400 to-coral-500 opacity-80" />
+      {/* Particles or animated shapes */}
+      <div className="absolute inset-0 pointer-events-none -z-10">
+        <svg className="absolute top-10 left-10 animate-float" width="120" height="120"><circle cx="60" cy="60" r="50" fill="#A7D9D3" opacity="0.25" /></svg>
+        <svg className="absolute bottom-20 right-20 animate-float2" width="80" height="80"><rect width="80" height="80" rx="24" fill="#FCA311" opacity="0.18" /></svg>
       </div>
+      <div className="space-y-8 px-4 pt-10 pb-20 max-w-7xl mx-auto">
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-4xl font-extrabold text-teal-800 drop-shadow-lg font-[Poppins] tracking-tight animate-fadein">Raffles</h1>
+            <p className="text-lg text-amber-500 mt-2 font-semibold animate-fadein2">Enter exciting raffles and win amazing prizes!</p>
+          </div>
+          {isAdmin && (
+            <Button
+              onClick={() => setShowForm(true)}
+              className="flex items-center gap-2 bg-amber-400 text-teal-900 font-bold px-6 py-3 rounded-xl shadow-lg hover:bg-amber-500 transition-all text-lg animate-bounce"
+            >
+              <Plus className="w-6 h-6" />
+              Create Raffle
+            </Button>
+          )}
+        </div>
 
-      {raffles.length === 0 ? (
-        <Card>
-          <CardContent className="flex flex-col items-center justify-center py-12">
-            <Gift className="w-16 h-16 text-gray-400 mb-4" />
-            <h3 className="text-xl font-semibold text-gray-900 mb-2">No Raffles Available</h3>
-            <p className="text-gray-600 text-center">
-              There are no active raffles at the moment. Check back soon for exciting prizes!
-            </p>
-          </CardContent>
-        </Card>
-      ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {raffles.map((raffle) => (
-            <Card key={raffle.id} className="overflow-hidden hover:shadow-lg transition-shadow">
-              {raffle.image_url && (
-                <div className="aspect-video bg-gray-100">
-                  <img
-                    src={raffle.image_url}
-                    alt={raffle.title}
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-              )}
-              
-              <CardHeader>
-                <div className="flex items-start justify-between">
-                  <CardTitle className="text-lg font-semibold line-clamp-2">
-                    {raffle.title}
-                  </CardTitle>
-                  <div className="flex items-center gap-2">
-                    <Badge className={getStatusColor(raffle.status)}>
-                      {raffle.status}
-                    </Badge>
-                    {isAdmin && (
-                      <div className="flex gap-1">
-                        <Button
-                          size="sm"
-                          variant="ghost"
-                          onClick={() => {
-                            setEditingRaffle(raffle);
-                            setShowForm(true);
-                          }}
-                          title="Edit Raffle"
-                        >
-                          <Edit className="w-4 h-4" />
-                        </Button>
-                        {raffle.status === 'active' && raffle.entry_count && raffle.entry_count > 0 && (
+        {raffles.length === 0 ? (
+          <Card className="bg-white/80 rounded-2xl shadow-xl border-2 border-teal-800 animate-fadein3">
+            <CardContent className="flex flex-col items-center justify-center py-16">
+              <Gift className="w-20 h-20 text-amber-400 mb-6 animate-bounce" />
+              <h3 className="text-2xl font-bold text-teal-800 mb-2">No Raffles Available</h3>
+              <p className="text-lg text-gray-600 text-center">
+                There are no active raffles at the moment. Check back soon for exciting prizes!
+              </p>
+            </CardContent>
+          </Card>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {raffles.map((raffle, idx) => (
+              <Card key={raffle.id} className={`overflow-hidden rounded-3xl shadow-2xl border-4 border-amber-400 bg-white/90 transition-transform duration-300 hover:scale-105 hover:shadow-amber-400 animate-cardin`} style={{ animationDelay: `${idx * 80}ms` }}>
+                {raffle.image_url && (
+                  <div className="aspect-video bg-gradient-to-br from-amber-100 via-teal-50 to-white animate-fadein2">
+                    <img
+                      src={raffle.image_url}
+                      alt={raffle.title}
+                      className="w-full h-full object-cover rounded-t-2xl border-b-2 border-amber-400"
+                    />
+                  </div>
+                )}
+                <CardHeader>
+                  <div className="flex items-start justify-between">
+                    <CardTitle className="text-xl font-bold text-teal-800 line-clamp-2 font-[Poppins]">
+                      {raffle.title}
+                    </CardTitle>
+                    <div className="flex items-center gap-2">
+                      <Badge className={getStatusColor(raffle.status) + ' text-base font-bold px-3 py-1 rounded-full shadow'}>
+                        {raffle.status}
+                      </Badge>
+                      {isAdmin && (
+                        <div className="flex gap-1">
                           <Button
                             size="sm"
                             variant="ghost"
-                            onClick={() => openWinnerSelection(raffle)}
-                            title="Select Winner"
-                            className="text-yellow-600 hover:text-yellow-700"
+                            onClick={() => {
+                              setEditingRaffle(raffle);
+                              setShowForm(true);
+                            }}
+                            title="Edit Raffle"
+                            className="hover:bg-aqua-200"
                           >
-                            <Crown className="w-4 h-4" />
+                            <Edit className="w-5 h-5 text-teal-800" />
                           </Button>
-                        )}
-                      </div>
-                    )}
-                  </div>
-                </div>
-              </CardHeader>
-
-              <CardContent className="space-y-4">
-                {raffle.description && (
-                  <p className="text-gray-600 line-clamp-3">{raffle.description}</p>
-                )}
-                
-                <div className="space-y-2">
-                  <div className="flex items-center gap-2 text-sm text-gray-600">
-                    <Gift className="w-4 h-4" />
-                    <span className="font-medium">Prize: {raffle.prize}</span>
-                  </div>
-                  
-                  <div className="flex items-center gap-2 text-sm text-gray-600">
-                    <Users className="w-4 h-4" />
-                    <span>{raffle.entry_count || 0} entries</span>
-                  </div>
-                  
-                  <div className="flex items-center gap-2 text-sm text-gray-600">
-                    <Calendar className="w-4 h-4" />
-                    <span>Ends: {formatDate(raffle.end_date)}</span>
-                  </div>
-                  
-                  {raffle.status === 'completed' && raffle.winner_username && (
-                    <div className="flex items-center gap-2 text-sm text-gray-600">
-                      <Trophy className="w-4 h-4 text-yellow-500" />
-                      <div className="flex items-center gap-2">
-                        <span>Winner: {raffle.winner_username}</span>
-                        {raffle.winner_image_url && (
-                          <img
-                            src={raffle.winner_image_url}
-                            alt={raffle.winner_username}
-                            className="w-6 h-6 rounded-full object-cover border border-yellow-300"
-                          />
-                        )}
-                      </div>
-                      {raffle.winner_description && (
-                        <p className="text-xs text-gray-500 mt-1 italic">"{raffle.winner_description}"</p>
+                          {raffle.status === 'active' && raffle.entry_count && raffle.entry_count > 0 && (
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              onClick={() => openWinnerSelection(raffle)}
+                              title="Select Winner"
+                              className="text-yellow-600 hover:text-yellow-700"
+                            >
+                              <Crown className="w-5 h-5" />
+                            </Button>
+                          )}
+                        </div>
                       )}
                     </div>
+                  </div>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  {raffle.description && (
+                    <p className="text-base text-gray-700 line-clamp-3 font-[Nunito Sans]">{raffle.description}</p>
                   )}
-                </div>
-
-                {raffle.status === 'active' && (
-                  <Button 
-                    className="w-full" 
-                    variant={raffle.user_entered ? 'outline' : 'default'}
-                    disabled={entryLoading === raffle.id}
-                    onClick={() => handleRaffleEntry(raffle.id, !raffle.user_entered)}
-                  >
-                    {entryLoading === raffle.id ? (
-                      <div className="flex items-center gap-2">
-                        <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
-                        <span>Loading...</span>
+                  <div className="space-y-2">
+                    <div className="flex items-center gap-2 text-base text-coral-500 font-semibold">
+                      <Gift className="w-5 h-5" />
+                      <span>Prize: <span className="text-amber-500 font-bold">{raffle.prize}</span></span>
+                    </div>
+                    <div className="flex items-center gap-2 text-base text-teal-800">
+                      <Users className="w-5 h-5" />
+                      <span>{raffle.entry_count || 0} entries</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-base text-teal-800">
+                      <Calendar className="w-5 h-5" />
+                      <span>Ends: <span className="font-bold text-coral-500">{formatDate(raffle.end_date)}</span></span>
+                    </div>
+                    {raffle.status === 'completed' && raffle.winner_username && (
+                      <div className="flex items-center gap-2 text-base text-teal-800">
+                        <Trophy className="w-5 h-5 text-amber-400 animate-bounce" />
+                        <div className="flex items-center gap-2">
+                          <span>Winner: <span className="font-bold text-amber-500">{raffle.winner_username}</span></span>
+                          {raffle.winner_image_url && (
+                            <img
+                              src={raffle.winner_image_url}
+                              alt={raffle.winner_username}
+                              className="w-7 h-7 rounded-full object-cover border-2 border-amber-400"
+                            />
+                          )}
+                        </div>
+                        {raffle.winner_description && (
+                          <p className="text-xs text-gray-500 mt-1 italic">"{raffle.winner_description}"</p>
+                        )}
                       </div>
-                    ) : raffle.user_entered ? (
-                      'Leave Raffle'
-                    ) : (
-                      'Enter Raffle'
                     )}
-                  </Button>
-                )}
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-      )}
+                  </div>
+                  {raffle.status === 'active' && (
+                    <Button 
+                      className={`w-full font-bold text-lg py-3 rounded-xl shadow-lg transition-all duration-200 ${raffle.user_entered ? 'bg-aqua-200 text-teal-800 border-2 border-teal-800' : 'bg-amber-400 text-teal-900 hover:bg-amber-500'} animate-fadein2`}
+                      variant={raffle.user_entered ? 'outline' : 'default'}
+                      disabled={entryLoading === raffle.id}
+                      onClick={() => handleRaffleEntry(raffle.id, !raffle.user_entered)}
+                    >
+                      {entryLoading === raffle.id ? (
+                        <div className="flex items-center gap-2">
+                          <div className="w-5 h-5 border-2 border-current border-t-transparent rounded-full animate-spin" />
+                          <span>Loading...</span>
+                        </div>
+                      ) : raffle.user_entered ? (
+                        'Leave Raffle'
+                      ) : (
+                        'Enter Raffle'
+                      )}
+                    </Button>
+                  )}
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        )}
+        {/* Animations CSS */}
+        <style>{`
+          @keyframes gradient {
+            0% {background-position:0% 50%}
+            50% {background-position:100% 50%}
+            100% {background-position:0% 50%}
+          }
+          .animate-gradient {
+            background-size: 200% 200%;
+            animation: gradient 8s ease-in-out infinite;
+          }
+          @keyframes float {
+            0% {transform:translateY(0)}
+            50% {transform:translateY(-16px)}
+            100% {transform:translateY(0)}
+          }
+          .animate-float { animation: float 5s ease-in-out infinite; }
+          .animate-float2 { animation: float 7s ease-in-out infinite; }
+          @keyframes fadein {
+            from { opacity: 0; transform: translateY(24px); }
+            to { opacity: 1; transform: translateY(0); }
+          }
+          .animate-fadein { animation: fadein 0.7s cubic-bezier(.4,0,.2,1) both; }
+          .animate-fadein2 { animation: fadein 1.2s cubic-bezier(.4,0,.2,1) both; }
+          .animate-fadein3 { animation: fadein 1.7s cubic-bezier(.4,0,.2,1) both; }
+          @keyframes cardin {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
+          }
+          .animate-cardin { animation: cardin 0.7s cubic-bezier(.4,0,.2,1) both; }
+        `}</style>
+      </div>
 
       {showForm && (
         <RaffleForm
@@ -368,7 +402,7 @@ export default function Raffles() {
 
       {showWinnerModal && selectedRaffleForWinner && (
         <WinnerSelectionModal
-          raffle={selectedRaffleForWinner}
+          raffle={selectedRaffleForWinner!}
           onClose={() => {
             setShowWinnerModal(false);
             setSelectedRaffleForWinner(null);

@@ -3,10 +3,11 @@ import React from 'react';
 interface CardProps {
   children: React.ReactNode;
   className?: string;
+  style?: React.CSSProperties;
 }
 
-export const Card: React.FC<CardProps> = ({ children, className = "" }) => (
-  <div className={`bg-white rounded-lg shadow p-4 ${className}`}>{children}</div>
+export const Card: React.FC<CardProps> = ({ children, className = "", style }) => (
+  <div className={`bg-white rounded-lg shadow p-4 ${className}`} style={style}>{children}</div>
 );
 
 export const CardHeader: React.FC<CardProps> = ({ children, className = "" }) => (
