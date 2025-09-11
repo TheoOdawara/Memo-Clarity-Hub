@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
-import { Gift, Calendar, Trophy, Plus, Edit } from 'lucide-react';
+import { Gift, Calendar, Trophy, Plus, Edit, Users } from 'lucide-react';
 import { RaffleForm } from '@/components/features/RaffleForm';
 import toast from 'react-hot-toast';
 
@@ -22,6 +22,11 @@ interface Raffle {
   created_at: string;
 }
 
+interface RaffleWithEntries extends Raffle {
+  entry_count: number;
+  user_entered: boolean;
+}
+
 const ADMIN_USER_IDS = [
   'e125efb8-857b-41b5-943b-745f11fd5808',
   'fed35ccf-2bd5-4d64-a50c-e8bb951c632c'
@@ -29,10 +34,11 @@ const ADMIN_USER_IDS = [
 
 export default function Raffles() {
   const { user } = useAuth();
-  const [raffles, setRaffles] = useState<Raffle[]>([]);
+  const [raffles, setRaffles] = useState<RaffleWithEntries[]>([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
   const [editingRaffle, setEditingRaffle] = useState<Raffle | null>(null);
+  const [entryLoading, setEntryLoading] = useState<string | null>(null);
   
   const isAdmin = user && ADMIN_USER_IDS.includes(user.id);
 
@@ -42,18 +48,100 @@ export default function Raffles() {
 
   const fetchRaffles = async () => {
     try {
-      const { data, error } = await supabase
+      // Fetch basic raffle data
+      const { data: raffleData, error: raffleError } = await supabase
         .from('raffles')
         .select('*')
         .order('created_at', { ascending: false });
 
-      if (error) throw error;
-      setRaffles(data || []);
+      if (raffleError) throw raffleError;
+      
+      if (!raffleData) {
+        setRaffles([]);
+        return;
+      }
+
+      // For each raffle, get entry count and user entry status
+      const rafflesWithEntries = await Promise.all(
+        raffleData.map(async (raffle) => {
+          // Get entry count
+          const { count } = await supabase
+            .from('raffle_entries')
+            .select('*', { count: 'exact', head: true })
+            .eq('raffle_id', raffle.id);
+
+          // Check if current user has entered this raffle
+          let userEntered = false;
+          if (user) {
+            const { data: entryData } = await supabase
+              .from('raffle_entries')
+              .select('id')
+              .eq('raffle_id', raffle.id)
+              .eq('user_id', user.id)
+              .single();
+            
+            userEntered = !!entryData;
+          }
+
+          return {
+            ...raffle,
+            entry_count: count || 0,
+            user_entered: userEntered
+          };
+        })
+      );
+
+      setRaffles(rafflesWithEntries);
     } catch (error) {
       console.error('Error fetching raffles:', error);
       toast.error('Failed to load raffles');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleRaffleEntry = async (raffleId: string, isEntering: boolean) => {
+    if (!user) {
+      toast.error('Please log in to enter raffles');
+      return;
+    }
+
+    setEntryLoading(raffleId);
+    try {
+      if (isEntering) {
+        // Enter the raffle
+        const { error } = await supabase
+          .from('raffle_entries')
+          .insert([{ raffle_id: raffleId, user_id: user.id }]);
+
+        if (error) {
+          if (error.code === '23505') { // Unique constraint violation
+            toast.error('You have already entered this raffle');
+          } else {
+            throw error;
+          }
+        } else {
+          toast.success('Successfully entered the raffle!');
+          await fetchRaffles(); // Refresh data
+        }
+      } else {
+        // Leave the raffle
+        const { error } = await supabase
+          .from('raffle_entries')
+          .delete()
+          .eq('raffle_id', raffleId)
+          .eq('user_id', user.id);
+
+        if (error) throw error;
+        
+        toast.success('Successfully left the raffle');
+        await fetchRaffles(); // Refresh data
+      }
+    } catch (error) {
+      console.error('Error with raffle entry:', error);
+      toast.error('Failed to update raffle entry');
+    } finally {
+      setEntryLoading(null);
     }
   };
 
@@ -167,6 +255,11 @@ export default function Raffles() {
                   </div>
                   
                   <div className="flex items-center gap-2 text-sm text-gray-600">
+                    <Users className="w-4 h-4" />
+                    <span>{raffle.entry_count} {raffle.entry_count === 1 ? 'participant' : 'participants'}</span>
+                  </div>
+                  
+                  <div className="flex items-center gap-2 text-sm text-gray-600">
                     <Calendar className="w-4 h-4" />
                     <span>Ends: {formatDate(raffle.end_date)}</span>
                   </div>
@@ -180,8 +273,22 @@ export default function Raffles() {
                 </div>
 
                 {raffle.status === 'active' && (
-                  <Button className="w-full" disabled>
-                    Enter Raffle (Coming Soon)
+                  <Button 
+                    className="w-full" 
+                    variant={raffle.user_entered ? 'outline' : 'default'}
+                    disabled={entryLoading === raffle.id}
+                    onClick={() => handleRaffleEntry(raffle.id, !raffle.user_entered)}
+                  >
+                    {entryLoading === raffle.id ? (
+                      <div className="flex items-center gap-2">
+                        <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
+                        <span>Loading...</span>
+                      </div>
+                    ) : raffle.user_entered ? (
+                      'Leave Raffle'
+                    ) : (
+                      'Enter Raffle'
+                    )}
                   </Button>
                 )}
               </CardContent>

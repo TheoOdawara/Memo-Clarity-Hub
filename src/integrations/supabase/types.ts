@@ -83,6 +83,35 @@ export type Database = {
         }
         Relationships: []
       }
+      raffle_entries: {
+        Row: {
+          created_at: string
+          id: string
+          raffle_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          raffle_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          raffle_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "raffle_entries_raffle_id_fkey"
+            columns: ["raffle_id"]
+            isOneToOne: false
+            referencedRelation: "raffles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       raffles: {
         Row: {
           created_at: string
@@ -160,7 +189,14 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      get_raffle_entry_count: {
+        Args: { raffle_id_param: string }
+        Returns: number
+      }
+      user_entered_raffle: {
+        Args: { raffle_id_param: string; user_id_param: string }
+        Returns: boolean
+      }
     }
     Enums: {
       [_ in never]: never
