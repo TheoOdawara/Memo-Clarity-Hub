@@ -53,9 +53,15 @@ export const authService = {
     return { data, error }
   },
 
-  // Login com Google (implementar depois com chaves do cliente)
+  // Login com Google
   async signInWithGoogle() {
-    return { data: null, error: { message: 'Google OAuth será implementado em breve' } }
+    const { data, error } = await supabase.auth.signInWithOAuth({
+      provider: 'google',
+      options: {
+        redirectTo: `${window.location.origin}/`
+      }
+    })
+    return { data, error }
   },
 
   // Logout
