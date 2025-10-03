@@ -55,10 +55,3 @@ docs/
 supabase/
 ├── migrations/
 └── functions/
-```
-
-## Contact
-If you want to know more about my work or discuss collaboration opportunities, feel free to reach out via [LinkedIn](https://www.linkedin.com/) or email.
-
----
-This project is a proud example of my commitment to quality, user-centric design, and technical excellence.
